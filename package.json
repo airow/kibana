@@ -54,7 +54,7 @@
     "release": "grunt release",
     "start": "bin\\kibana --dev --no-ssl --no-base-path",
     "start:linux": "sh ./bin/kibana --dev",
-    "precommit": "grunt precommit",
+    "!precommit": "grunt precommit",
     "karma": "karma start",
     "elasticsearch": "grunt esvm:dev:keepalive",
     "elasticsearchWithPlugins": "grunt esvm:withPlugins:keepalive",
