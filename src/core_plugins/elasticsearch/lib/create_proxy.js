@@ -4,7 +4,7 @@ import { resolve } from 'url';
 import { assign } from 'lodash';
 
 function createProxy(server, method, route, config) {
-
+  //服务端转发es请求的代理-暂时理解为
   const options = {
     method: method,
     path: createProxy.createPath(route),
