@@ -43,6 +43,8 @@ uiRoutes
   reloadOnSearch: false,
   resolve: {
     ip: function (Promise, courier, config, $location, Private) {
+      console.log("resolve.ip");
+      debugger;
       const State = Private(StateProvider);
       return courier.indexPatterns.getIds()
       .then(function (list) {
@@ -71,6 +73,8 @@ uiRoutes
       });
     },
     savedSearch: function (courier, savedSearches, $route) {
+      console.log("resolve.savedSearch");
+      debugger;
       return savedSearches.get($route.current.params.id)
       .catch(courier.redirectWhenMissing({
         'search': '/discover',
@@ -97,7 +101,7 @@ function discoverController($scope, config, courier, $route, $window, Notifier,
   const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
   const filterManager = Private(FilterManagerProvider);
-
+debugger;
   const notify = new Notifier({
     location: 'Discover'
   });
@@ -592,5 +596,23 @@ function discoverController($scope, config, courier, $route, $window, Notifier,
     return loaded;
   }
 
+  $scope.test=function () {
+    debugger;
+
+    /*在方法中 this===$scope 成立*/
+    /*
+    * 可以通过修改$scope中对应的熟悉后，
+    * 调用$state.save();出发查询。该方法会将查询的条件序列化到URL中，序列化的方式使用的是 rison.encode(state) ，https://github.com/Nanonid/rison
+    * $state 为状态控制对象，src/ui/public/state_management/state.js  =》 StateProvider
+    *   src/core_plugins/kibana/public/discover/controllers/discover.js@158
+    *   const $state = $scope.state = new AppState(getStateDefaults());
+    *   AppState集成state _.class(AppState).inherits(State);
+    * */
+
+    alert(this.timefilter.time.from);
+    this.timefilter.time.from = 'now-30d';
+    alert(this === $scope);
+    $state.save();
+  }
   init();
 };

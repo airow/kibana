@@ -30,7 +30,7 @@ module.directive('kbnTimepicker', function (quickRanges, timeUnits, refreshInter
       $scope.format = 'MMMM Do YYYY, HH:mm:ss.SSS';
       $scope.modes = ['quick', 'relative', 'absolute'];
       $scope.activeTab = $scope.activeTab || 'filter';
-
+debugger;
       if (_.isUndefined($scope.mode)) $scope.mode = 'quick';
 
       $scope.quickLists = _(quickRanges).groupBy('section').values().value();

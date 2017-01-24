@@ -1,5 +1,5 @@
 <div class="sidebar-list">
-  <div ng-show="indexPatternList.length > 1">
+  <div style="display:none;" ng-show="indexPatternList.length > 1">
     <div class="index-pattern" ng-click="showIndexPatternSelection = !showIndexPatternSelection"
     ng-class="{active: showIndexPatternSelection === true}">
       <div css-truncate title="{{indexPattern.id}}">{{indexPattern.id}}</div>
