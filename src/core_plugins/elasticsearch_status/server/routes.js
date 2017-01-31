@@ -22,7 +22,7 @@ export default function (server) {
       // passing authentication data from kibana to elasticsearch or return
       // authorization requests, etc.
       // Second parameter to the function is the name of the javascript method
-      // you would like to call, as you can find it here in the documentation:
+      // you would like to call, as  youcan find it here in the documentation:
       // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/
       // The third parameter will be passed as a parameter to the javascript method
       // (it should contain the data you would have also passed to the client directly).

@@ -11,6 +11,7 @@ export default function mapUri(server, prefix) {
   }
 
   return function (request, done) {
+    console.log('doing some aditional stuff before redirecting');
     const {
       protocol: esUrlProtocol,
       slashes: esUrlHasSlashes,
@@ -43,6 +44,8 @@ export default function mapUri(server, prefix) {
     const filteredHeaders = filterHeaders(request.headers, config.get('elasticsearch.requestHeadersWhitelist'));
     const mappedHeaders = setHeaders(filteredHeaders, config.get('elasticsearch.customHeaders'));
     const mappedUrl = formatUrl(mappedUrlComponents);
+    //console.log(mappedUrl);
+    //console.log(mappedHeaders);
     done(null, mappedUrl, mappedHeaders);
   };
 };
