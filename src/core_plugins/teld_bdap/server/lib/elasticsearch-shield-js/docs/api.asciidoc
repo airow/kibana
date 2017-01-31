@@ -1,0 +1,6 @@
+[[api-reference-shield]]
+== Elasticsearch.js Shield API
+
+[[js-api-method-index-shield]]
+
+

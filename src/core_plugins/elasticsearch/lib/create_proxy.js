@@ -4,7 +4,7 @@ import { resolve } from 'url';
 import { assign } from 'lodash';
 
 function createProxy(server, method, route, config) {
-  //·þÎñ¶Ë×ª·¢esÇëÇóµÄ´úÀí-ÔÝÊ±Àí½âÎª
+  //æœåŠ¡ç«¯è½¬å‘esè¯·æ±‚çš„ä»£ç†-æš‚æ—¶ç†è§£ä¸º
   const options = {
     method: method,
     path: createProxy.createPath(route),
@@ -20,11 +20,12 @@ function createProxy(server, method, route, config) {
         xforward: true,
         timeout: server.config().get('elasticsearch.requestTimeout'),
         onResponse: function (err, responseFromUpstream, request, reply) {
+          console.log('receiving the response from the upstream.');
           if (err) {
             reply(err);
             return;
           }
-
+          //console.log(responseFromUpstream);
           if (responseFromUpstream.headers.location) {
             // TODO: Workaround for #8705 until hapi has been updated to >= 15.0.0
             responseFromUpstream.headers.location = encodeURI(responseFromUpstream.headers.location);
