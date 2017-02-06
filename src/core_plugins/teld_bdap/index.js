@@ -13,6 +13,8 @@ import initAutoLoginView from './server/routes/views/autologin';
 //import initAutoLoginView from './server/routes/views/login';
 import createScheme from './server/lib/login_scheme';
 
+import initPathMappingView from './server/routes/path/mapping';
+
 export default function (kibana) {
   return new kibana.Plugin({
     require: ['kibana', 'elasticsearch'],
@@ -186,6 +188,9 @@ export default function (kibana) {
 
       //initLoginView(server, thisPlugin);
       initAutoLoginView(server, thisPlugin);
+
+      //注册服务端用于地址转换的路由
+      initPathMappingView(server,thisPlugin);
     }
 
   });
