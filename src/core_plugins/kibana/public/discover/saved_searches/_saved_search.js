@@ -23,7 +23,8 @@ module.factory('SavedSearch', function (courier) {
         columns: [],
         hits: 0,
         sort: [],
-        version: 1
+        version: 1,
+        tagetIndex:''
       }
     });
   }
@@ -36,7 +37,8 @@ module.factory('SavedSearch', function (courier) {
     hits: 'integer',
     columns: 'string',
     sort: 'string',
-    version: 'integer'
+    version: 'integer',
+    tagetIndex: 'string'
   };
 
   SavedSearch.searchSource = true;
