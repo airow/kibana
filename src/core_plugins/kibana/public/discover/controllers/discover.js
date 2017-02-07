@@ -75,6 +75,14 @@ uiRoutes
     savedSearch: function (courier, savedSearches, $route) {
       console.log("resolve.savedSearch");
       debugger;
+      /*
+      * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
+      * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
+      *    _saved_search.js为src/ui/public/courier/saved_object/saved_object.js的子类
+      *   _.class(SavedSearch).inherits(courier.SavedObject);
+      *   【注意】在这里无法获取当前index的id，需要在“function discoverController”控制器中进行赋值
+      *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
+      * */
       return savedSearches.get($route.current.params.id)
       .catch(courier.redirectWhenMissing({
         'search': '/discover',
@@ -148,6 +156,13 @@ debugger;
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
+
+
+  /*
+  * #设置索引id@2017-02-06 22:11:23
+  * savedSearch 对象为src/core_plugins/kibana/public/discover/saved_searches/saved_searches.js，在路由规则的resolve中初始化
+  * */
+  savedSearch.tagetIndex=savedSearch.searchSource.get("index").id
 
   if (savedSearch.id) {
     docTitle.change(savedSearch.title);
@@ -601,8 +616,8 @@ debugger;
 
     /*在方法中 this===$scope 成立*/
     /*
-    * 可以通过修改$scope中对应的熟悉后，
-    * 调用$state.save();出发查询。该方法会将查询的条件序列化到URL中，序列化的方式使用的是 rison.encode(state) ，https://github.com/Nanonid/rison
+    * 可以通过修改$scope中对应的属性后，
+    * scope.fetch()调用$state.save();触发查询。该方法会将查询的条件序列化到URL中，序列化的方式使用的是 rison.encode(state) ，https://github.com/Nanonid/rison
     * $state 为状态控制对象，src/ui/public/state_management/state.js  =》 StateProvider
     *   src/core_plugins/kibana/public/discover/controllers/discover.js@158
     *   const $state = $scope.state = new AppState(getStateDefaults());
@@ -613,6 +628,7 @@ debugger;
     this.timefilter.time.from = 'now-30d';
     alert(this === $scope);
     $state.save();
+    //或$scope.fetch() 详细分析见http://www.cnblogs.com/xing901022/p/5158425.html
   }
   init();
 };

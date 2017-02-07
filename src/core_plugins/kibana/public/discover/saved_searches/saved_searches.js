@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import rison from 'rison-node';/*用于解析地址栏_a参数获取当前索引的Id*/
 import Scanner from 'ui/utils/scanner';
 import 'plugins/kibana/discover/saved_searches/_saved_search';
 import 'ui/notify';
@@ -16,7 +17,7 @@ require('plugins/kibana/management/saved_object_registry').register({
   title: 'searches'
 });
 
-module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl) {
+module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl,$location) {
   const scanner = new Scanner(es, {
     index: kbnIndex,
     type: 'search'
@@ -66,7 +67,7 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
     return source;
   };
 
-  this.find = function (searchString, size = 100) {
+  this.findOld = function (searchString, size = 100) {
     let body;
     if (searchString) {
       body = {
@@ -80,6 +81,49 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
       };
     } else {
       body = { query: {match_all: {}}};
+    }
+
+    return es.search({
+      index: kbnIndex,
+      type: 'search',
+      body: body,
+      size: size
+    })
+    .then((resp) => {
+      return {
+        total: resp.hits.total,
+        hits: resp.hits.hits.map((hit) => this.mapHits(hit))
+      };
+    });
+  };
+
+  this.find = function (searchString, size = 100) {
+    debugger;
+    let search=$location.search();//获取地址栏查询参数angular $location 组件
+    let searchAJson=rison.decode(search["_a"]); //使用rison解码地址栏参数
+    let tagetIndex=searchAJson.index;
+
+    let body;
+    if (searchString) {
+      body = {
+        query: {
+          bool: {
+            must: [{
+              term: {
+                tagetIndex
+              }
+			}, {
+			  simple_query_string: {
+                query: searchString + '*',
+                fields: ['title^3', 'description'],
+                default_operator: 'AND'
+              }
+            }]
+          }
+        }
+      };
+    } else {
+      body = {query: {match: {tagetIndex}}};
     }
 
     return es.search({

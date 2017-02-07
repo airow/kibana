@@ -120,6 +120,8 @@
     "gridster": "0.5.6",
     "h2o2": "5.1.1",
     "hapi": "14.2.0",
+    "hapi-auth-basic": "4.2.0",
+    "hapi-auth-cookie": "6.1.1",
     "httpolyglot": "0.1.1",
     "imports-loader": "0.6.4",
     "inert": "4.0.2",
