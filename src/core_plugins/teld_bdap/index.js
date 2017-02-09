@@ -135,6 +135,8 @@ export default function (kibana) {
         });
 */
       // load multiple plugins
+
+      /*
       server.register([hapiAuthBasic,hapiAuthCookie], (err) => {
         if (err) {
           console.error('Failed to load a plugin:', err);
@@ -185,6 +187,7 @@ export default function (kibana) {
 
       initAuthenticateApi(server);
       //getUserProvider(server);
+      */
 
       //initLoginView(server, thisPlugin);
       initAutoLoginView(server, thisPlugin);
