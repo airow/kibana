@@ -27,6 +27,7 @@ import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/kibana/discover/index.html';
 import StateProvider from 'ui/state_management/state';
+import rison from 'rison-node';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -127,7 +128,10 @@ debugger;
   $scope.topNavMenu = [{
     key: 'new',
     description: 'New Search',
-    run: function () { kbnUrl.change('/discover'); },
+    run: function () {
+      /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
+      kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
+    },
     testId: 'discoverNewButton',
   }, {
     key: 'save',
