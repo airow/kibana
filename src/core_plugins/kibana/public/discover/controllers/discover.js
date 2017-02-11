@@ -125,15 +125,17 @@ debugger;
   $scope.toggleInterval = function () {
     $scope.showInterval = !$scope.showInterval;
   };
-  $scope.topNavMenu = [{
-    key: 'new',
-    description: 'New Search',
-    run: function () {
-      /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-      kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
-    },
-    testId: 'discoverNewButton',
-  }, {
+  $scope.topNavMenu = [
+  //   {
+  //   key: 'new',
+  //   description: 'New Search',
+  //   run: function () {
+  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
+  //     kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
+  //   },
+  //   testId: 'discoverNewButton',
+  // },
+    {
     key: 'save',
     description: 'Save Search',
     template: require('plugins/kibana/discover/partials/save_search.html'),
@@ -143,12 +145,22 @@ debugger;
     description: 'Open Saved Search',
     template: require('plugins/kibana/discover/partials/load_search.html'),
     testId: 'discoverOpenButton',
-  }, {
-    key: 'share',
-    description: 'Share Search',
-    template: require('plugins/kibana/discover/partials/share_search.html'),
-    testId: 'discoverShareButton',
-  }];
+  }
+  // , {
+  //   key: 'export',
+  //   description: 'Export Search',
+  //   run: function () {
+  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
+  //     kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
+  //   },
+  //   testId: 'discoverExportButton',
+  // }, {
+  //   key: 'share',
+  //   description: 'Share Search',
+  //   template: require('plugins/kibana/discover/partials/share_search.html'),
+  //   testId: 'discoverShareButton',
+  // }
+  ];
   $scope.timefilter = timefilter;
 
 
