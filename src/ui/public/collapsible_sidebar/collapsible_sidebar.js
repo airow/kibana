@@ -28,7 +28,7 @@ uiModules
           $siblings.toggleClass(siblingsClass + ' col-md-12');
         }
       })
-
+      .click()/*默认收起字段选择区域*/
       .appendTo($elem);
     }
   };
