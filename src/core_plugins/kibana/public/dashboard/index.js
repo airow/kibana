@@ -104,6 +104,19 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
 
       $scope.$watch('state.options.darkTheme', setDarkTheme);
 
+      $scope.topNavMenu = [
+        {
+          key: 'help',
+          description: 'help',
+          run: function () {
+            window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
+            //window.showModalDialog("http://www.baidu.com");
+          }
+        }
+      ];
+
+      /*  屏蔽掉功能菜单
+
       $scope.topNavMenu = [{
         key: 'new',
         description: 'New Dashboard',
@@ -135,6 +148,7 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         template: require('plugins/kibana/dashboard/partials/options.html'),
         testId: 'dashboardOptionsButton',
       }];
+      */
 
       $scope.refresh = _.bindKey(courier, 'fetch');
 
