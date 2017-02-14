@@ -101,7 +101,7 @@ app.directive('discoverApp', function () {
   };
 });
 
-function discoverController($scope, config, courier, $route, $window, Notifier,
+function discoverController($http, $scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags) {
 
   const Vis = Private(VisProvider);
@@ -126,6 +126,30 @@ debugger;
     $scope.showInterval = !$scope.showInterval;
   };
   $scope.topNavMenu = [
+    {
+      key: 'help',
+      description: 'help',
+      run: function () {
+        window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
+        //window.showModalDialog("http://www.baidu.com");
+      },
+      // run: function () {
+      //   //top.kibana_help();
+      //   ddd();
+      //   // alert(dialog);
+      //   // ngDialog.open({
+      //   //   template: '<p>my template</p>',
+      //   //   plain: true
+      //   // });
+      //   //window.open("http://www.qq.com");
+      //   // ngDialog.open({
+      //   //   template: '<p>my template</p>',
+      //   //   plain: true
+      //   // });
+      // },
+      //template: require('plugins/kibana/discover/partials/help_search.html'),
+      testId: 'discoverHelpButton',
+    },
   //   {
   //   key: 'new',
   //   description: 'New Search',
@@ -151,15 +175,19 @@ debugger;
   //   description: 'Export Search',
   //   run: function () {
   //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-  //     kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
+  //     alert(1);
+  //     $scope.export();
   //   },
   //   testId: 'discoverExportButton',
-  // }, {
-  //   key: 'share',
-  //   description: 'Share Search',
-  //   template: require('plugins/kibana/discover/partials/share_search.html'),
-  //   testId: 'discoverShareButton',
-  // }
+  // },
+  //   ,{
+  //     key: 'share',
+  //     description: 'Share Search',
+  //     run: function () {
+  //
+  //     },
+  //     testId: 'discoverShareButton',
+  //   }
   ];
   $scope.timefilter = timefilter;
 
@@ -625,6 +653,50 @@ debugger;
       notify.warning(err + ' Using the default index pattern: "' + loaded.id + '"');
     }
     return loaded;
+  }
+
+  $scope.export=function () {
+    let url = "/elasticsearch/export/_search";
+    let data = {"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082};
+    data = {"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]};
+    data={
+      "index": "异常日志",
+      "filter": [],
+      "highlight": {
+        "pre_tags": [
+          "@kibana-highlighted-field@"
+        ],
+        "post_tags": [
+          "@/kibana-highlighted-field@"
+        ],
+        "fields": {
+          "*": {}
+        },
+        "require_field_match": false,
+        "fragment_size": 2147483647
+      },
+      "query": {
+        "query_string": {
+          "query": "*",
+          "analyze_wildcard": true
+        }
+      }
+    };
+    data={
+      "query": {
+        "match_all": {}
+      }
+    }
+    $http.post(url, data)
+      .then(function successCallback(response) {
+        console.log(response);
+        // this callback will be called asynchronously
+        // when the response is available
+      }, function errorCallback(response) {
+        debugger;
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });
   }
 
   $scope.test=function () {
