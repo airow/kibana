@@ -20,18 +20,24 @@ function createProxy(server, method, route, config) {
         xforward: true,
         timeout: server.config().get('elasticsearch.requestTimeout'),
         onResponse: function (err, responseFromUpstream, request, reply) {
-          console.log('receiving the response from the upstream.');
+          //console.log('receiving the response from the upstream.');
           if (err) {
             reply(err);
             return;
           }
-          //console.log(responseFromUpstream);
           if (responseFromUpstream.headers.location) {
             // TODO: Workaround for #8705 until hapi has been updated to >= 15.0.0
             responseFromUpstream.headers.location = encodeURI(responseFromUpstream.headers.location);
           }
 
           reply(null, responseFromUpstream);
+
+          // const Wreck = require('wreck');
+          // Wreck.read(responseFromUpstream, {json:true}, (err, body) => {
+          //   /* do stuff */
+          //
+          //   console.log(JSON.stringify(body));
+          // });
         }
       }
     },
