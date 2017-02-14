@@ -5,8 +5,10 @@ module.exports = function (grunt) {
     grunt.task.run(flatten([
       'clean:build',
       'clean:target',
-      '_build:downloadNodeBuilds',
-      '_build:extractNodeBuilds',
+      grunt.option('skip-downloadNodeBuilds') ? [] : [
+          '_build:downloadNodeBuilds',
+          '_build:extractNodeBuilds',
+      ],
       'copy:devSource',
       'babel:build',
       '_build:babelOptions',
@@ -19,9 +21,9 @@ module.exports = function (grunt) {
       '_build:removePkgJsonDeps',
       'clean:testsFromModules',
       'run:optimizeBuild',
-      'stop:optimizeBuild',
-      '_build:versionedLinks',
-      '_build:osShellScripts',
+      //'stop:optimizeBuild',
+      // '_build:versionedLinks',
+      // '_build:osShellScripts',
       grunt.option('skip-archives') ? [] : ['_build:archives'],
       grunt.option('skip-os-packages') ? [] : [
         '_build:pleaseRun',
