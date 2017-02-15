@@ -29,6 +29,9 @@ import indexTemplate from 'plugins/kibana/discover/index.html';
 import StateProvider from 'ui/state_management/state';
 import rison from 'rison-node';
 
+import RequestQueueProvider from 'ui/courier/_request_queue';
+import CallClientProvider from 'ui/courier/fetch/call_client';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
@@ -45,7 +48,6 @@ uiRoutes
   resolve: {
     ip: function (Promise, courier, config, $location, Private) {
       console.log("resolve.ip");
-      debugger;
       const State = Private(StateProvider);
       return courier.indexPatterns.getIds()
       .then(function (list) {
@@ -75,7 +77,6 @@ uiRoutes
     },
     savedSearch: function (courier, savedSearches, $route) {
       console.log("resolve.savedSearch");
-      debugger;
       /*
       * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
       * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
@@ -110,7 +111,9 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
   const filterManager = Private(FilterManagerProvider);
-debugger;
+
+  
+
   const notify = new Notifier({
     location: 'Discover'
   });
@@ -170,16 +173,14 @@ debugger;
     template: require('plugins/kibana/discover/partials/load_search.html'),
     testId: 'discoverOpenButton',
   }
-  // , {
-  //   key: 'export',
-  //   description: 'Export Search',
-  //   run: function () {
-  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-  //     alert(1);
-  //     $scope.export();
-  //   },
-  //   testId: 'discoverExportButton',
-  // },
+  , {
+    key: 'export',
+    description: 'Export Search',
+    run: function () {
+      $scope.export();
+    },
+    testId: 'discoverExportButton',
+  },
   //   ,{
   //     key: 'share',
   //     description: 'Share Search',
@@ -653,51 +654,7 @@ debugger;
       notify.warning(err + ' Using the default index pattern: "' + loaded.id + '"');
     }
     return loaded;
-  }
-
-  $scope.export=function () {
-    let url = "/elasticsearch/export/_search";
-    let data = {"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082};
-    data = {"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]};
-    data={
-      "index": "异常日志",
-      "filter": [],
-      "highlight": {
-        "pre_tags": [
-          "@kibana-highlighted-field@"
-        ],
-        "post_tags": [
-          "@/kibana-highlighted-field@"
-        ],
-        "fields": {
-          "*": {}
-        },
-        "require_field_match": false,
-        "fragment_size": 2147483647
-      },
-      "query": {
-        "query_string": {
-          "query": "*",
-          "analyze_wildcard": true
-        }
-      }
-    };
-    data={
-      "query": {
-        "match_all": {}
-      }
-    }
-    $http.post(url, data)
-      .then(function successCallback(response) {
-        console.log(response);
-        // this callback will be called asynchronously
-        // when the response is available
-      }, function errorCallback(response) {
-        debugger;
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-      });
-  }
+  } 
 
   $scope.test=function () {
     debugger;
@@ -718,5 +675,87 @@ debugger;
     $state.save();
     //或$scope.fetch() 详细分析见http://www.cnblogs.com/xing901022/p/5158425.html
   }
+
+  const requestQueue = Private(RequestQueueProvider);
+  // const isRequest = Private(IsRequestProvider);
+  // const mergeDuplicateRequests = Private(MergeDuplicatesRequestProvider);
+  const callClient = Private(CallClientProvider);
+  const forEachStrategy = Private(require("ui/courier/fetch/for_each_strategy"));
+  const ABORTED = { CourierFetchRequestStatus: 'aborted' };
+
+  $scope.export=function () {
+
+    debugger;
+    // $scope.searchSource 拼接查询条件的数据
+    alert($scope.searchSource._fetchStrategy);
+    alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
+
+    const requests = requestQueue.getStartable($scope.searchSource._fetchStrategy);
+    
+    function startRequests(requests) {
+      return Promise.map(requests, function (req) {
+        //return req;
+        return new Promise(function (resolve) {
+          const action = req.started ? req.continue : req.start;
+          resolve(action.call(req));
+        })
+          .catch(err => {
+            console.log(err);
+          });
+      });
+    }
+
+    function fetchWithStrategy(strategy, requests) {
+      function replaceAbortedRequests() {
+        requests = requests.map(r => r.aborted ? ABORTED : r);
+      }
+
+      replaceAbortedRequests();
+      return startRequests(requests)
+      .then(function () {
+        replaceAbortedRequests();
+        return callClient(strategy, requests);
+      })
+    }
+
+let ooo= forEachStrategy(requests, function (strategy, reqsForStrategy) {
+      return fetchWithStrategy(strategy, reqsForStrategy.map(function (req) {
+        if (!req.started) return req;
+        return req.retry();
+      }));
+    })
+    .catch(notify.fatal);
+
+    debugger;
+    let reqsFetchParams = [
+      {
+        index: ['logstash-123'],
+        type: 'blah',
+        search_type: 'blah2',
+        body: { foo: 'bar', $foo: 'bar' }
+      }
+    ];
+    debugger;
+    let value;
+    $scope.searchSource._fetchStrategy.reqsFetchParamsToBody(reqsFetchParams)
+      .then(val => {
+        value = val;
+        console.log(value);
+      });
+
+    let url = "/elasticsearch/export/_msearch";
+    let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
+    $http.post(url, data)
+      .then(function successCallback(response) {
+        console.log(response);
+        // this callback will be called asynchronously
+        // when the response is available
+      }, function errorCallback(response) {
+        debugger;
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });
+  }
+
   init();
 };
