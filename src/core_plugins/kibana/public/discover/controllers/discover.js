@@ -32,6 +32,8 @@ import rison from 'rison-node';
 import RequestQueueProvider from 'ui/courier/_request_queue';
 import CallClientProvider from 'ui/courier/fetch/call_client';
 
+import { saveAs } from '@spalger/filesaver';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
@@ -683,7 +685,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   const forEachStrategy = Private(require("ui/courier/fetch/for_each_strategy"));
   const ABORTED = { CourierFetchRequestStatus: 'aborted' };
 
-  $scope.export=function () {
+  $scope.export222=function () {
 
     debugger;
     // $scope.searchSource 拼接查询条件的数据
@@ -755,6 +757,159 @@ let ooo= forEachStrategy(requests, function (strategy, reqsForStrategy) {
         // called asynchronously if an error occurs
         // or server returns response with an error status.
       });
+  }
+
+  $scope.export2=function () {
+    const discoveExport = Private(require("plugins/kibana/discover/export/discover_export"));
+    let searchStrategy = Private(require("ui/courier/fetch/strategy/search"));
+    //let searchStrategy = Private(require("ui/courier/fetch/strategy/search"));
+
+    discoveExport.fetchQueued(searchStrategy).then(function(body){
+      console.log("discoveExport"+body);
+    });
+  }
+
+  $scope.export3=function () {
+    let indexPattern = $scope.indexPattern;
+    let columns = $scope.state.columns;
+
+    function createSummaryRow(row) {
+
+      // We just create a string here because its faster.
+      let exportRow = {};
+
+      if (indexPattern.timeFieldName) {
+        //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
+        exportRow[indexPattern.timeFieldName] = _displayField(row, indexPattern.timeFieldName);
+      }
+
+      columns.forEach(function (column) {
+        //exportRow.push({ text: _displayField(row, column, true) });
+        exportRow[column] = _displayField(row, column, true);
+      });
+
+      return exportRow;
+    }
+
+    function _displayField(row, fieldName, truncate) {
+      let indexPattern = $scope.indexPattern;
+      let text = indexPattern.formatField(row, fieldName);
+      return text;
+    }
+
+    let exportRows = [];
+
+    $scope.rows.forEach(function (row, i) {
+      exportRows.push(createSummaryRow(row));
+    });
+
+    console.log(exportRows);
+  }
+
+  $scope.exportCvs = function () {
+    let indexPattern = $scope.indexPattern;
+    let columns = $scope.state.columns;
+
+    function createSummaryRow(row) {
+
+      // We just create a string here because its faster.
+      let exportRow = {};
+
+      if (indexPattern.timeFieldName) {
+        //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
+        exportRow[indexPattern.timeFieldName] = fff(row, indexPattern.timeFieldName);
+      }
+
+      columns.forEach(function (column) {
+        //exportRow.push({ text: _displayField(row, column, true) });
+        exportRow[column] = fff(row, column, true);
+      });
+
+      return exportRow;
+    }
+
+    function fff(hit, fieldName) {
+      let text;
+      if (indexPattern.timeFieldName === fieldName) {
+        text = indexPattern.formatField(hit, fieldName);
+      } else {
+        text = getFieldValue(hit, fieldName)
+      }
+      return text;
+    }
+
+    function getFieldValue(hit, fieldName) {
+      let value = hit[fieldName];
+      if (!value) {
+        value = hit._source[fieldName];
+      }
+      return value;
+    };
+
+    let exportRows = [];
+
+    $scope.rows.forEach(function (row, i) {
+      exportRows.push(createSummaryRow(row));
+    });
+
+    console.log(exportRows);
+
+
+    ///////////////////////////////////////////
+
+    function toCsv(data) {
+      let rows = data;      
+      let nonAlphaNumRE = /[^a-zA-Z0-9]/;
+      let allDoubleQuoteRE = /"/g;
+      let formatted = false;
+      function escape(val) {
+        if (!formatted && _.isObject(val)) val = val.valueOf();
+        val = String(val);
+        let quoteValues = config.get('csv:quoteValues');
+        if (quoteValues && nonAlphaNumRE.test(val)) {
+          val = '"' + val.replace(allDoubleQuoteRE, '""') + '"';
+        }
+        return val;
+      }
+
+      // escape each cell in each row
+      let csvRows = rows.map(function (row) {
+
+
+
+        let rowArray=[];
+
+        for (let prop in row) {
+          rowArray.push(row[prop]);
+        }
+
+        return rowArray.map(escape);
+      });
+
+      
+      let columns = [];
+
+      for (let prop in rows[0]) {
+        columns.push(prop);
+      }
+
+      // add the columns to the rows
+      csvRows.unshift(columns.map(function (col) {
+        return escape(col);
+      }));
+
+      return csvRows.map(function (row) {
+        let separator = config.get('csv:separator');
+        return row.join(separator) + '\r\n';
+      }).join('');
+    };
+
+    let csv = new Blob([toCsv(exportRows)], { type: 'text/plain;charset=utf-8' });
+    saveAs(csv, "1.csv");    
+  }
+
+  $scope.export = function () {
+    $scope.exportCvs();
   }
 
   init();
