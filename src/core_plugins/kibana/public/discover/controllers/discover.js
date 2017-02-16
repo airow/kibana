@@ -33,6 +33,7 @@ import RequestQueueProvider from 'ui/courier/_request_queue';
 import CallClientProvider from 'ui/courier/fetch/call_client';
 
 import { saveAs } from '@spalger/filesaver';
+import DiscoverExportExcelProvider from '../export/discover_export_excel';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -114,7 +115,8 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   const queryFilter = Private(FilterBarQueryFilterProvider);
   const filterManager = Private(FilterManagerProvider);
 
-  
+
+  const discoverExportExcel = Private(DiscoverExportExcelProvider);  
 
   const notify = new Notifier({
     location: 'Discover'
@@ -241,6 +243,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   $scope.opts = {
     // number of records to fetch, then paginate through
     sampleSize: config.get('discover:sampleSize'),
+    //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,
     timefield: $scope.indexPattern.timeFieldName,
@@ -720,13 +723,13 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
       })
     }
 
-let ooo= forEachStrategy(requests, function (strategy, reqsForStrategy) {
+    let ooo = forEachStrategy(requests, function (strategy, reqsForStrategy) {
       return fetchWithStrategy(strategy, reqsForStrategy.map(function (req) {
         if (!req.started) return req;
         return req.retry();
       }));
     })
-    .catch(notify.fatal);
+      .catch(notify.fatal);
 
     debugger;
     let reqsFetchParams = [
@@ -908,9 +911,139 @@ let ooo= forEachStrategy(requests, function (strategy, reqsForStrategy) {
     saveAs(csv, "1.csv");    
   }
 
-  $scope.export = function () {
-    $scope.exportCvs();
+  function jjj () {
+    let indexPattern = $scope.indexPattern;
+    let columns = $scope.state.columns;
+
+    function createSummaryRow(row) {
+
+      // We just create a string here because its faster.
+      let exportRow = {};
+
+      if (indexPattern.timeFieldName) {
+        //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
+        exportRow[indexPattern.timeFieldName] = fff(row, indexPattern.timeFieldName);
+      }
+
+      columns.forEach(function (column) {
+        //exportRow.push({ text: _displayField(row, column, true) });
+        exportRow[column] = fff(row, column, true);
+      });
+
+      return exportRow;
+    }
+
+    function fff(hit, fieldName) {
+      let text;
+      if (indexPattern.timeFieldName === fieldName) {
+        text = indexPattern.formatField(hit, fieldName);
+      } else {
+        text = getFieldValue(hit, fieldName)
+      }
+      return text;
+    }
+
+    function getFieldValue(hit, fieldName) {
+      let value = hit[fieldName];
+      if (!value) {
+        value = hit._source[fieldName];
+      }
+      return value;
+    };
+
+    let exportRows = [];
+
+    $scope.rows.forEach(function (row, i) {
+      exportRows.push(createSummaryRow(row));
+    });
+
+    return exportRows;
   }
+
+  $scope.export = function(){
+    let indexPattern = $scope.indexPattern;
+    let columns = $scope.state.columns;
+    //let ddd = discoverExportExcel(indexPattern,$scope.state,savedSearch,$scope.rows);
+    discoverExportExcel(indexPattern,$scope.state,savedSearch,$scope.rows);
+  }
+
+  $scope.exportExecl2 = function () {
+    //$scope.exportCvs();
+    //$scope.exportXML();
+    let dataSource = [
+      {
+        name: "sheet", 
+        columns: ["col1", {title:"col2",ss:{type:'String',styleID:"Red"}}, {title:"field:col3",field:"col3"}, {title:"日期",field:"col4"}], 
+        data: [
+          { "col1": '1-1', "col2": '1-2', "col3": '1-3', "col4": '2017-02-16 11:51:28' },
+          { "col1": '2-1', "col2": '2-2', "col3": '2-3', "col4": '2017-02-16 11:51:28' },
+          { "col1": '3-1', "col2": {value:'3-2'}, "col3": '3-3', "col4": '2017-02-16 11:51:28' },
+          { "col1": '4-1', "col2": '4-2', "col3": '4-3', "col4": '2017-02-16 11:51:28' },
+          { "col1": '5-1', "col2": '5-2', "col3": '5-3', "col4": '2017-02-16 11:51:28' }
+        ]
+      }
+      ,
+      {
+        name: "sheet2", 
+        //columns: ["col1", "col2", "col3"], 
+        data: [
+          { "col1": '1-1', "col2": '1-2', "col3": '1-3' },
+          { "col1": '2-1', "col2": '2-2', "col3": '2-3' },
+          { "col1": '3-1', "col2": '3-2', "col3": '3-3' },
+          { "col1": '4-1', "col2": '4-2', "col3": '4-3' },
+          { "col1": '5-1', "col2": '5-2', "col3": '5-3' }
+        ]
+      }
+    ];
+
+    let sheet = {
+      name: savedSearch.title,
+      columns: [],
+      data: []
+    };
+
+    let rows = jjj();
+    _.forEach(rows[0], function (n, key) {
+      sheet.columns.push(key);
+    });
+    sheet.data = rows;
+    dataSource = [sheet];
+    exportExecl(dataSource, sheet.name);
+  }
+
+  function exportExecl(dataSource, fileName) {    
+
+    let execlTemplate = _.template(require('./temp.nocols.html'));
+
+    let out = execlTemplate({ sheets: dataSource });
+
+    // let xls = new Blob([out], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    // saveAs(xls, (fileName||'Export_Execl') + ".xls");
+
+    let xls = new Blob([out], { type: 'text/xml;charset=utf-8' });
+    saveAs(xls, (fileName||'Export_Execl') + ".xml");
+  }
+
+
+  $scope.exportXML = function() {
+    let t = _.template(require('./temp.html'));
+    let html = t();
+
+    console.log(html);
+
+    // let csv = new Blob([html], { type: 'text/xml;charset=utf-8' });
+    // saveAs(csv, "1.xml");    
+
+    let csv = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    saveAs(csv, "1.xls");    
+
+    //let t = _.template('<Table ss:DefaultColumnWidth="54" ss:DefaultRowHeight="13.5"><% _.forEach(users, function(user) { %><li><%- user %></li><% }); %></table>');
+  }
+
+  // $scope.exportXLSX = function () {
+  //   const data = [[1, 2, 3], [true, false, null, 'sheetjs'], ['foo', 'bar', new Date('2014-02-19T14:30Z'), '0.3'], ['baz', null, 'qux']];
+  //   var buffer = xlsx.build([{ name: "mySheetName", data: data }]); // Returns a buffer 
+  // }
 
   init();
 };

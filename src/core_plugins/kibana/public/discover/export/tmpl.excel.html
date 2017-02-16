@@ -1,0 +1,137 @@
+<%
+    function ssType(col){
+        return (col.ss && col.ss.type) || 'String';
+    }
+
+    function ssStyleID(col){
+        let styleID = (col.ss && col.ss.styleID) || '';
+
+        if(styleID !=="")
+        {
+            styleID = ' ss:StyleID="'+styleID+'" ';
+        }
+
+        return styleID;
+    }
+
+    function getColTitle(col){
+        let returnValue = col;
+        if( typeof(col) !== "string" ){
+            returnValue = (col.title || col.field || "");
+        } 
+        return returnValue;
+    }
+
+    function getColField(col){
+        let returnValue = col;
+        if( typeof(col) !== "string" ){
+            returnValue = (col.field || col.title || "");
+        } 
+        return returnValue;
+    }
+
+    function getValue(item , col){
+        console.log(getColField(col));
+        let val = item[getColField(col)];
+        console.log(val);
+        let returnValue = val;  
+        if(typeof(val) !== "string")
+        {
+            returnValue = val.value;
+        } 
+        return returnValue;
+    }
+%>
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Windows 用户</Author>
+  <LastAuthor>Windows 用户</LastAuthor>
+  <Created>2017-02-16T01:41:44Z</Created>
+  <Version>15.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>8145</WindowHeight>
+  <WindowWidth>21570</WindowWidth>
+  <WindowTopX>0</WindowTopX>
+  <WindowTopY>0</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="宋体" x:CharSet="134" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+
+  <Style ss:ID="DateTime">
+   <NumberFormat ss:Format="General Date"/>
+  </Style>
+
+  <Style ss:ID="Red">
+   <Font ss:FontName="宋体" x:CharSet="134" ss:Size="11" ss:Color="#FF0000"/>
+  </Style>
+
+ </Styles>
+ <% _.forEach(sheets, function(sheet) { %>
+ <Worksheet ss:Name="<%= sheet.name %>">
+  <Table>
+   <% if(sheet.columns){ %>
+    <Row>
+     <% _.forEach(sheet.columns, function(col) { %>
+        <% if( typeof(col) === "string" ){ %>
+            <Cell><Data ss:Type="String">${ col }</Data></Cell>
+        <% }else{ %>
+            <Cell><Data ss:Type="String">${ getColTitle(col) }</Data></Cell>
+        <% } %>     
+     <% }); %>
+    </Row>
+    <% _.forEach(sheet.data, function(row) { %>
+    <Row>
+        <% _.forEach(sheet.columns, function(col) { %>
+        <Cell ${ ssStyleID(col) } ><Data ss:Type="${ ssType(col) }">${ getValue(row,col) }</Data></Cell>
+        <% }); %>
+    </Row>
+    <% }); %>
+   <% } else {%>
+    <% _.forEach(sheet.data, function(row) { %>
+    <Row>
+        <% _.forEach(row, function(n,key) { %>
+        <Cell><Data ss:Type="String">${ n }</Data></Cell>
+        <% }); %>
+    </Row>
+    <% }); %>
+   <% } %>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>1</ActiveRow>
+     <ActiveCol>1</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <% }); %>
+</Workbook>
