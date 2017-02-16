@@ -13,10 +13,12 @@ import 'plugins/kibana/dashboard/services/saved_dashboards';
 import 'plugins/kibana/dashboard/styles/main.less';
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 import DocTitleProvider from 'ui/doc_title';
-import stateMonitorFactory  from 'ui/state_management/state_monitor_factory';
+import stateMonitorFactory from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/kibana/dashboard/index.html';
+
+import DiscoverExportExcelProvider from '../discover/export/discover_export_excel';
 
 require('ui/saved_objects/saved_object_registry').register(require('plugins/kibana/dashboard/services/saved_dashboard_register'));
 
@@ -30,28 +32,28 @@ const app = uiModules.get('app/dashboard', [
 ]);
 
 uiRoutes
-.defaults(/dashboard/, {
-  requireDefaultIndex: true
-})
-.when('/dashboard', {
-  template: indexTemplate,
-  resolve: {
-    dash: function (savedDashboards, config) {
-      return savedDashboards.get();
+  .defaults(/dashboard/, {
+    requireDefaultIndex: true
+  })
+  .when('/dashboard', {
+    template: indexTemplate,
+    resolve: {
+      dash: function (savedDashboards, config) {
+        return savedDashboards.get();
+      }
     }
-  }
-})
-.when('/dashboard/:id', {
-  template: indexTemplate,
-  resolve: {
-    dash: function (savedDashboards, Notifier, $route, $location, courier) {
-      return savedDashboards.get($route.current.params.id)
-      .catch(courier.redirectWhenMissing({
-        'dashboard' : '/dashboard'
-      }));
+  })
+  .when('/dashboard/:id', {
+    template: indexTemplate,
+    resolve: {
+      dash: function (savedDashboards, Notifier, $route, $location, courier) {
+        return savedDashboards.get($route.current.params.id)
+          .catch(courier.redirectWhenMissing({
+            'dashboard': '/dashboard'
+          }));
+      }
     }
-  }
-});
+  });
 
 app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
   return {
@@ -60,6 +62,8 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
     controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState) {
 
       const queryFilter = Private(FilterBarQueryFilterProvider);
+
+      const discoverExportExcel = Private(DiscoverExportExcelProvider);
 
       const notify = new Notifier({
         location: 'Dashboard'
@@ -89,7 +93,7 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         panels: dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [],
         options: dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {},
         uiState: dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {},
-        query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || {query_string: {query: '*'}},
+        query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } },
         filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter),
       };
 
@@ -112,6 +116,15 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
             window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
             //window.showModalDialog("http://www.baidu.com");
           }
+        }
+        ,
+        {
+          key: 'export',
+          description: 'Export Search',
+          run: function () {
+            $scope.export();
+          },
+          testId: 'discoverExportButton',
         }
       ];
 
@@ -254,17 +267,17 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         dash.optionsJSON = angular.toJson($state.options);
 
         dash.save()
-        .then(function (id) {
-          stateMonitor.setInitialState($state.toJSON());
-          $scope.kbnTopNav.close('save');
-          if (id) {
-            notify.info('Saved Dashboard as "' + dash.title + '"');
-            if (dash.id !== $routeParams.id) {
-              kbnUrl.change('/dashboard/{{id}}', {id: dash.id});
+          .then(function (id) {
+            stateMonitor.setInitialState($state.toJSON());
+            $scope.kbnTopNav.close('save');
+            if (id) {
+              notify.info('Saved Dashboard as "' + dash.title + '"');
+              if (dash.id !== $routeParams.id) {
+                kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
+              }
             }
-          }
-        })
-        .catch(notify.fatal);
+          })
+          .catch(notify.fatal);
       };
 
       let pendingVis = _.size($state.panels);
@@ -302,6 +315,32 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         addSearch: $scope.addSearch,
         timefilter: $scope.timefilter
       };
+
+      //2017-02-17 00:35:03
+      $scope.$on('doc_table.hits.onResults', function (event, data) {
+        $scope.onResults = data;
+        console.log(data);
+      });
+      
+
+      $scope.export = function () {
+        console.log($scope.onResults);
+
+        // let onResults = {
+        //   indexPattern: $scope.indexPattern,
+        //   columns: $scope.state.columns,
+        //   savedSearch: savedSearch,
+        //   rows: $scope.rows
+        // };
+
+        let onResults = $scope.onResults;
+
+        let indexPattern = onResults.indexPattern;
+        let columns = onResults.columns;
+        let rows = onResults.rows;
+        //let ddd = discoverExportExcel(indexPattern,$scope.state,savedSearch,$scope.rows);
+        discoverExportExcel(indexPattern, columns, { title: "32423" }, rows);
+      }
 
       init();
     }

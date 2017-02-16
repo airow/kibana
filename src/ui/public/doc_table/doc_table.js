@@ -103,6 +103,16 @@ uiModules.get('kibana')
 
           $scope.hits = resp.hits.hits;
 
+          let results = {
+            indexPattern: $scope.indexPattern,
+            columns: $scope.columns,
+            //savedSearch: savedSearch,
+            rows: resp.hits.hits
+          };
+
+          //2017-02-17 00:32:09 父子通信
+          $scope.$emit('doc_table.hits.onResults', results);  
+
           return $scope.searchSource.onResults().then(onResults);
         }).catch(notify.fatal);
 

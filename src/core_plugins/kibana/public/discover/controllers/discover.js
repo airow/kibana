@@ -684,7 +684,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   $scope.export = function(){
     let indexPattern = $scope.indexPattern;
     let columns = $scope.state.columns;
-    discoverExportExcel(indexPattern,$scope.state,savedSearch,$scope.rows);
+    discoverExportExcel(indexPattern,columns,savedSearch,$scope.rows);
   }
 
   const requestQueue = Private(RequestQueueProvider);

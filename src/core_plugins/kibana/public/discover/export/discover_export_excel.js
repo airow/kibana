@@ -12,8 +12,7 @@ import { saveAs } from '@spalger/filesaver';
 
 export default function discoverExportExcelService(Private, Promise) {
 
-  function exportExcel(indexPattern, state,savedSearch,rows) {
-    let columns = state.columns;
+  function exportExcel(indexPattern, columns, savedSearch, rows) {
 
     function createSummaryRow(row) {
 
