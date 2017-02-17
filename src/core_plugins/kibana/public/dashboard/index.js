@@ -319,9 +319,26 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
       //2017-02-17 00:35:03
       $scope.$on('doc_table.hits.onResults', function (event, data) {
         $scope.onResults = data;
-        console.log(data);
+        
+        //计算显示区域的高度
         $timeout(function(){
-              $(".docTable").closest("li").height($(".docTable .paginate").height()+55);
+            //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
+            
+            let contentHeight = $(window).height() - $(".localNav").height();
+            let li = $(".docTable").closest("ul").find("li.gs-w");
+            let liCount = li.size();
+
+            let liSumHeight = 0;
+            for (let index = 0; index < liCount - 1; index++) {
+              liSumHeight += $(li[index]).height();
+            }
+
+            let lastLi = $(li[liCount - 1]);
+            let fillHeight = contentHeight - liSumHeight - 20;
+            if (fillHeight > lastLi.height()) {
+              lastLi.height(fillHeight);
+            }
+
           },1000);        
       });
       
