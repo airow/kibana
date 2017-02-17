@@ -326,7 +326,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
       });
 
       $(window).resize(function () {
-        fillHeight();
+        $timeout(fillHeight, 1000);        
       });
 
       function fillHeight() {
@@ -349,7 +349,6 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           lastLi.height($(".docTable .paginate").height() + 100);
         }
         $(".gridster").height(contentHeight)
-
       }
       
 
