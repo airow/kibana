@@ -321,31 +321,39 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
         $scope.onResults = data;
         
         //计算显示区域的高度
-        $timeout(function(){
-            //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
-            
-            let contentHeight = $(window).height() - $(".localNav").height();
-            let li = $(".docTable").closest("ul").find("li.gs-w");
-            let liCount = li.size();
-
-            let liSumHeight = 0;
-            for (let index = 0; index < liCount - 1; index++) {
-              liSumHeight += $(li[index]).height();
-            }
-
-            let lastLi = $(li[liCount - 1]);
-            let fillHeight = contentHeight - liSumHeight - 20;
-            if (fillHeight > lastLi.height()) {
-              lastLi.height(fillHeight);
-            }
-
-          },1000);        
+        $timeout(fillHeight, 1000);        
+        //fillHeight();
       });
+
+      $(window).resize(function () {
+        fillHeight();
+      });
+
+      function fillHeight() {
+        //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
+
+        let contentHeight = $(window).height() - $(".localNav").height() - 20;
+        let li = $(".docTable").closest("ul").find("li.gs-w");
+        let liCount = li.size();
+
+        let liSumHeight = 0;
+        for (let index = 0; index < liCount - 1; index++) {
+          liSumHeight += $(li[index]).height();
+        }
+
+        let lastLi = $(li[liCount - 1]);
+        let fillHeight = contentHeight - liSumHeight;
+        if (fillHeight > lastLi.height()) {
+          lastLi.height(fillHeight)         
+        } else {
+          lastLi.height($(".docTable .paginate").height() + 100);
+        }
+        $(".gridster").height(contentHeight)
+
+      }
       
 
       $scope.export = function () {
-        console.log($scope.onResults);
-
         // let onResults = {
         //   indexPattern: $scope.indexPattern,
         //   columns: $scope.state.columns,
@@ -358,8 +366,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
         let indexPattern = onResults.indexPattern;
         let columns = onResults.columns;
         let rows = onResults.rows;
-        //let ddd = discoverExportExcel(indexPattern,$scope.state,savedSearch,$scope.rows);
-        discoverExportExcel(indexPattern, columns, { title: "32423" }, rows);
+        discoverExportExcel(indexPattern, columns, { title: dash.title }, rows);
       }
 
       init();

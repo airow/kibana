@@ -16,7 +16,7 @@
 
     function getColTitle(col){
         let returnValue = col;
-        if( typeof(col) !== "string" ){
+        if( typeof(col) === "object" ){
             returnValue = (col.title || col.field || "");
         } 
         return returnValue;
@@ -24,22 +24,20 @@
 
     function getColField(col){
         let returnValue = col;
-        if( typeof(col) !== "string" ){
+        if( typeof(col) === "object" ){
             returnValue = (col.field || col.title || "");
         } 
         return returnValue;
     }
 
     function getValue(item , col){
-        console.log(getColField(col));
         let val = item[getColField(col)];
-        console.log(val);
         let returnValue = val;  
-        if(typeof(val) !== "string")
+        if(val && typeof(val) === "object")
         {
             returnValue = val.value;
-        } 
-        return returnValue;
+        }        
+        return returnValue ? returnValue : "";
     }
 %>
 <?xml version="1.0"?>

@@ -21,18 +21,18 @@ export default function discoverExportExcelService(Private, Promise) {
 
     if (indexPattern.timeFieldName) {
       //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
-      exportRow[indexPattern.timeFieldName] = fff(row, indexPattern.timeFieldName);
+      exportRow["time"] = getFiled(row, indexPattern.timeFieldName);
     }
 
     columns.forEach(function (column) {
       //exportRow.push({ text: _displayField(row, column, true) });
-      exportRow[column] = fff(row, column, true);
+      exportRow[column] = getFiled(row, column, true);
     });
 
     return exportRow;
   }
 
-  function fff(hit, fieldName) {
+  function getFiled(hit, fieldName) {
     let text;
     if (indexPattern.timeFieldName === fieldName) {
       text = indexPattern.formatField(hit, fieldName);
