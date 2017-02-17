@@ -101,27 +101,29 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   // sources.
   const searchSource = savedVis.searchSource;
 
-  $scope.topNavMenu = [{
-    key: 'new',
-    description: 'New Visualization',
-    run: function () { kbnUrl.change('/visualize', {}); },
-    testId: 'visualizeNewButton',
-  }, {
-    key: 'save',
-    description: 'Save Visualization',
-    template: require('plugins/kibana/visualize/editor/panels/save.html'),
-    testId: 'visualizeSaveButton',
-  }, {
-    key: 'open',
-    description: 'Open Saved Visualization',
-    template: require('plugins/kibana/visualize/editor/panels/load.html'),
-    testId: 'visualizeOpenButton',
-  }, {
-    key: 'share',
-    description: 'Share Visualization',
-    template: require('plugins/kibana/visualize/editor/panels/share.html'),
-    testId: 'visualizeShareButton',
-  }, {
+  $scope.topNavMenu = [
+  // {
+  //   key: 'new',
+  //   description: 'New Visualization',
+  //   run: function () { kbnUrl.change('/visualize', {}); },
+  //   testId: 'visualizeNewButton',
+  // }, {
+  //   key: 'save',
+  //   description: 'Save Visualization',
+  //   template: require('plugins/kibana/visualize/editor/panels/save.html'),
+  //   testId: 'visualizeSaveButton',
+  // }, {
+  //   key: 'open',
+  //   description: 'Open Saved Visualization',
+  //   template: require('plugins/kibana/visualize/editor/panels/load.html'),
+  //   testId: 'visualizeOpenButton',
+  // }, {
+  //   key: 'share',
+  //   description: 'Share Visualization',
+  //   template: require('plugins/kibana/visualize/editor/panels/share.html'),
+  //   testId: 'visualizeShareButton',
+  // }, 
+  {
     key: 'refresh',
     description: 'Refresh',
     run: function () { $scope.fetch(); },
