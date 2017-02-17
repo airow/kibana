@@ -343,7 +343,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
 
         let lastLi = $(li[liCount - 1]);
         let fillHeight = contentHeight - liSumHeight;
-        if (fillHeight > lastLi.height()) {
+        if (fillHeight > 400) {
           lastLi.height(fillHeight)         
         } else {
           lastLi.height($(".docTable .paginate").height() + 100);
