@@ -55,7 +55,7 @@ uiRoutes
     }
   });
 
-app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
+app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, timefilter, kbnUrl) {
   return {
     restrict: 'E',
     controllerAs: 'dashboardApp',
@@ -320,6 +320,9 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
       $scope.$on('doc_table.hits.onResults', function (event, data) {
         $scope.onResults = data;
         console.log(data);
+        $timeout(function(){
+              $(".docTable").closest("li").height($(".docTable .paginate").height()+55);
+          },1000);        
       });
       
 

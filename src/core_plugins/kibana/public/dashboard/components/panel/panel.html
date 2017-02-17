@@ -3,7 +3,10 @@
     <span class="panel-title" title="{{::savedObj.title}}">
       {{::savedObj.title}}
     </span>
-    <div class="btn-group">
+    <div class="btn-group">      
+      <!--<a aria-label="Edit" ng-switch-when="search" ng-show="chrome.getVisible() && editUrl" ng-href="{{::editUrl}}">
+        <i aria-hidden="true" class="fa fa-pencil"></i>导出
+      </a>-->
       <a aria-label="Edit" ng-show="chrome.getVisible() && editUrl" ng-href="{{::editUrl}}">
         <i aria-hidden="true" class="fa fa-pencil"></i>
       </a>
@@ -32,7 +35,7 @@
     class="panel-content">
   </visualize>
 
-  <doc-table
+  <doc-table class="docTable"
     ng-switch-when="search"
     search-source="savedObj.searchSource"
     sorting="panel.sort"
