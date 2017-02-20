@@ -321,16 +321,18 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
         $scope.onResults = data;       
       });
 
-      $(window).resize(function () {
-        window.refreshfillHeight = true;
-      });
+      // $(window).resize(function () {
+      //   window.refreshfillHeight = true;
+      // });
 
-      setInterval(function () {
-        if (window.refreshfillHeight || window.refreshfillHeight === undefined) {
-          fillHeight();
-          window.refreshfillHeight = false;
-        }
-      }, 1000);
+      // setInterval(function () {
+      //   if (window.refreshfillHeight || window.refreshfillHeight === undefined) {
+      //     fillHeight();
+      //     window.refreshfillHeight = false;
+      //   }
+      // }, 1000);
+
+      setInterval(fillHeight, 1000);
 
       function fillHeight() {
         //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
