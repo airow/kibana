@@ -318,16 +318,19 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
 
       //2017-02-17 00:35:03
       $scope.$on('doc_table.hits.onResults', function (event, data) {
-        $scope.onResults = data;
-        
-        //计算显示区域的高度
-        $timeout(fillHeight, 1000);        
-        //fillHeight();
+        $scope.onResults = data;       
       });
 
       $(window).resize(function () {
-        $timeout(fillHeight, 1000);        
+        window.refreshfillHeight = true;
       });
+
+      setInterval(function () {
+        if (window.refreshfillHeight || window.refreshfillHeight === undefined) {
+          fillHeight();
+          window.refreshfillHeight = false;
+        }
+      }, 1000);
 
       function fillHeight() {
         //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
@@ -347,8 +350,8 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           lastLi.height(fillHeight)         
         } else {
           lastLi.height($(".docTable .paginate").height() + 100);
-        }
-        $(".gridster").height(contentHeight)
+        }        
+        $(".gridster").height("100%");
       }
       
 
