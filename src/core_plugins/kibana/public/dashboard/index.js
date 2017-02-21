@@ -345,14 +345,13 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
         for (let index = 0; index < liCount - 1; index++) {
           liSumHeight += $(li[index]).height();
         }
-
         let lastLi = $(li[liCount - 1]);
         let fillHeight = contentHeight - liSumHeight;
-        if (fillHeight > 400) {
-          lastLi.height(fillHeight)         
+        if (true || fillHeight > 400) {
+          lastLi.height(fillHeight);          
         } else {
           lastLi.height($(".docTable .paginate").height() + 100);
-        }        
+        }
         $(".gridster").height("100%");
       }
       
