@@ -134,8 +134,10 @@ app.directive('discoverApp', function () {
   };
 });
 
-function discoverController($http, $scope, config, courier, $route, $window, Notifier,
+function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es) {
+
+    $rootScope.showNotify = true;
 
     // const teldConf = $route.current.locals.teldConf;
     // console.log(teldConf);
@@ -265,7 +267,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   
   $scope.opts = {
     // number of records to fetch, then paginate through
-    sampleSize: savedSearch.pageSize || config.get('discover:sampleSize'),
+    sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
     //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,

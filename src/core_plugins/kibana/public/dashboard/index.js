@@ -62,6 +62,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
     controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState) {
 
       const queryFilter = Private(FilterBarQueryFilterProvider);
+      $rootScope.showNotify = false;
 
       const discoverExportExcel = Private(DiscoverExportExcelProvider);
 
