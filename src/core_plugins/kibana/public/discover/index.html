@@ -26,6 +26,9 @@
       >
         <div class="typeahead" kbn-typeahead="discover">
           <div class="localSearch">
+            <label style="flex: 0 0 auto; margin: auto 10px auto auto;">TOP：</label>
+            <input class="localSearchInput" style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" step="50" value="{{opts.sampleSize}}" type="number" placeholder="PageSize">            
+            <label style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤条件：</label>
             <input
               parse-query
               input-focus
@@ -37,8 +40,6 @@
               class="localSearchInput"
               ng-class="{'localSearchInput-isInvalid': discoverSearch.$invalid}"
             >
-            <input class="localDropdownInput" ng-model="opts.sampleSize" type="text"
-              class="localSearchInput" placeholder="PageSize">
             <button
               type="submit"
               aria-label="Search"
