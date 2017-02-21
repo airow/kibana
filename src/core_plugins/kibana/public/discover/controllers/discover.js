@@ -167,10 +167,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
     $scope.showInterval = !$scope.showInterval;
   };
 
-  
-
   $scope.timefilter = timefilter;
-
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
@@ -212,7 +209,9 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
 
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
-      menuKeys = ["help", "save", "open", "export"];
+      for (let key in confTopNavMenu) {
+        menuKeys.push(key);
+      }
     }
     menuKeys.forEach(function (value) {
       let confMenu = confTopNavMenu[value];
@@ -263,7 +262,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   $scope.$watchCollection('state.columns', function () {
     $state.save();
   });
-  alert(savedSearch.pageSize);
+  
   $scope.opts = {
     // number of records to fetch, then paginate through
     sampleSize: savedSearch.pageSize || config.get('discover:sampleSize'),
