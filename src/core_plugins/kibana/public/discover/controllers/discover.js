@@ -94,6 +94,35 @@ uiRoutes
         'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
       }));
     }
+    // ,teldConf: function (Promise, courier, savedSearches, $route, es) {
+    //   console.log(es);
+    //   console.log("es"+$route.current.params.id);
+
+    //   // let conf = Promise.props({});
+    //   // if ($route.current.params.id) {
+    //   //   conf = es.get({
+    //   //     index: ".teld.conf",
+    //   //     type: 'search',
+    //   //     id: $route.current.params.id
+    //   //   })
+    //   //     .then(function (resp) {
+    //   //       console.log("es get");
+    //   //       console.log(resp);
+    //   //     });
+    //   // }
+
+    //   // return conf;
+
+    //   return es.get({
+    //       index: ".teld.conf",
+    //       type: 'search',
+    //       id: $route.current.params.id
+    //     })
+    //       .then(function (resp) {
+    //         console.log("es get");
+    //         console.log(resp);
+    //       });
+    // }
   }
 });
 
@@ -106,8 +135,13 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es) {
 
+    // const teldConf = $route.current.locals.teldConf;
+    // console.log(teldConf);
+
+    console.log($route.current.locals.savedSearch);
+    
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
@@ -132,74 +166,63 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   $scope.toggleInterval = function () {
     $scope.showInterval = !$scope.showInterval;
   };
-  $scope.topNavMenu = [
-    {
-      key: 'help',
-      description: 'help',
-      run: function () {
-        window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
-        //window.showModalDialog("http://www.baidu.com");
-      },
-      // run: function () {
-      //   //top.kibana_help();
-      //   ddd();
-      //   // alert(dialog);
-      //   // ngDialog.open({
-      //   //   template: '<p>my template</p>',
-      //   //   plain: true
-      //   // });
-      //   //window.open("http://www.qq.com");
-      //   // ngDialog.open({
-      //   //   template: '<p>my template</p>',
-      //   //   plain: true
-      //   // });
-      // },
-      //template: require('plugins/kibana/discover/partials/help_search.html'),
-      testId: 'discoverHelpButton',
-    },
-  //   {
-  //   key: 'new',
-  //   description: 'New Search',
-  //   run: function () {
-  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-  //     kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
-  //   },
-  //   testId: 'discoverNewButton',
-  // },
-    {
-    key: 'save',
-    description: 'Save Search',
-    template: require('plugins/kibana/discover/partials/save_search.html'),
-    testId: 'discoverSaveButton',
-  }, {
-    key: 'open',
-    description: 'Open Saved Search',
-    template: require('plugins/kibana/discover/partials/load_search.html'),
-    testId: 'discoverOpenButton',
-  }
-  , {
-    key: 'export',
-    description: 'Export Search',
-    run: function () {
-      $scope.export();
-    },
-    testId: 'discoverExportButton',
-  },
-  //   ,{
-  //     key: 'share',
-  //     description: 'Share Search',
-  //     run: function () {
-  //
-  //     },
-  //     testId: 'discoverShareButton',
-  //   }
-  ];
+
+  
+
   $scope.timefilter = timefilter;
 
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
-  $scope.$on('$destroy', savedSearch.destroy);
+  $scope.$on('$destroy', savedSearch.destroy);  
+  $scope.topNavMenu = getTopNavMenu(savedSearch.menus);
+
+  function getTopNavMenu(menuKeys) {
+    let confTopNavMenu = {
+      "help": {
+        key: 'help',
+        description: 'help',
+        run: function () {
+          window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
+          //window.showModalDialog("http://www.baidu.com");
+        },
+        testId: 'discoverHelpButton',
+      },
+      'save': {
+        key: 'save',
+        description: 'Save Search',
+        template: require('plugins/kibana/discover/partials/save_search.html'),
+        testId: 'discoverSaveButton',
+      },
+      'open': {
+        key: 'open',
+        description: 'Open Saved Search',
+        template: require('plugins/kibana/discover/partials/load_search.html'),
+        testId: 'discoverOpenButton',
+      },
+      'export': {
+        key: 'export',
+        description: 'Export Search',
+        run: function () {
+          $scope.export();
+        },
+        testId: 'discoverExportButton',
+      }
+    };    
+
+    let menus = [];
+    if (menuKeys && menuKeys.length == 0) {
+      menuKeys = ["help", "save", "open", "export"];
+    }
+    menuKeys.forEach(function (value) {
+      let confMenu = confTopNavMenu[value];
+      if (confMenu) {
+        menus.push(confMenu);
+      }
+    });
+
+    return menus;
+  }
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
@@ -227,6 +250,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
       query: $scope.searchSource.get('query') || '',
       sort: getSort.array(savedSearch.sort, $scope.indexPattern),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns'),
+      pageSize: savedSearch.pageSize ? savedSearch.pageSize : config.get('discover:sampleSize'),
       index: $scope.indexPattern.id,
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
@@ -239,10 +263,10 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
   $scope.$watchCollection('state.columns', function () {
     $state.save();
   });
-
+  alert(savedSearch.pageSize);
   $scope.opts = {
     // number of records to fetch, then paginate through
-    sampleSize: config.get('discover:sampleSize'),
+    sampleSize: savedSearch.pageSize || config.get('discover:sampleSize'),
     //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,
@@ -390,6 +414,7 @@ function discoverController($http, $scope, config, courier, $route, $window, Not
       savedSearch.id = savedSearch.title;
       savedSearch.columns = $scope.state.columns;
       savedSearch.sort = $scope.state.sort;
+      savedSearch.pageSize = $scope.opts.sampleSize;
 
       return savedSearch.save()
       .then(function (id) {
