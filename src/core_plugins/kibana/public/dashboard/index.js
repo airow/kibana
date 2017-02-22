@@ -125,8 +125,8 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           key: 'help',
           description: 'help',
           run: function () {
-            //window.open("/doc/help/kibana_discover_help.htm");
-            $scope.helpDialog();
+            window.open("/doc/help/kibana_discover_help.htm");
+            //$scope.helpDialog();
           }
         }
         ,

@@ -183,8 +183,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         key: 'help',
         description: 'help',
         run: function () {
-          //window.open("/doc/help/kibana_discover_help.htm");
-          $scope.helpDialog();
+          window.open("/doc/help/kibana_discover_help.htm");
+          //$scope.helpDialog();
         },
         testId: 'discoverHelpButton',
       },
