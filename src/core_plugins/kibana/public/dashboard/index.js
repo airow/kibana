@@ -114,8 +114,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           key: 'help',
           description: 'help',
           run: function () {
-            window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
-            //window.showModalDialog("http://www.baidu.com");
+            window.open("/doc/help/kibana_discover_help.htm");
           }
         }
         ,

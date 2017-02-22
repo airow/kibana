@@ -182,7 +182,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         key: 'help',
         description: 'help',
         run: function () {
-          window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
+          //window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
+          window.open("/doc/help/kibana_discover_help.htm");
           //window.showModalDialog("http://www.baidu.com");
         },
         testId: 'discoverHelpButton',
