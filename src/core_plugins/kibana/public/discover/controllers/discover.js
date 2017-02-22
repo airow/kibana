@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import angular from 'angular';
+import angular from 'angular'; //貌似非必需
+require("ngDialog"); // 等效于 import ngDialog from 'ngDialog';
 import moment from 'moment';
 import getSort from 'ui/doc_table/lib/get_sort';
 import dateMath from '@elastic/datemath';
@@ -135,7 +136,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es,ngDialog) {
 
     $rootScope.showNotify = true;
 
@@ -182,9 +183,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         key: 'help',
         description: 'help',
         run: function () {
-          //window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
-          window.open("/doc/help/kibana_discover_help.htm");
-          //window.showModalDialog("http://www.baidu.com");
+          //window.open("/doc/help/kibana_discover_help.htm");
+          $scope.helpDialog();
         },
         testId: 'discoverHelpButton',
       },
@@ -230,6 +230,16 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
+
+  $scope.helpDialog = function () {
+    ngDialog.open({
+      width: '90%',
+      height: '98%',
+      template: '<div style="padding-top: 20px; height: 100%"><iframe style="border: 1px solid;border-radius: 8px;width: 100%;height: inherit;" src="/doc/help/kibana_discover_help.htm"></iframe></div>',
+      className: 'ngdialog-theme-default',
+      plain: true
+    });
+  }
 
 
   /*

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import angular from 'angular';
+import ngDialog from 'ngDialog'
 import chrome from 'ui/chrome';
 import 'ui/courier';
 import 'ui/config';
@@ -59,7 +60,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
   return {
     restrict: 'E',
     controllerAs: 'dashboardApp',
-    controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState) {
+    controller: function ($scope, $rootScope, $route, $routeParams, $location, ngDialog, Private, getAppState) {
 
       const queryFilter = Private(FilterBarQueryFilterProvider);
       $rootScope.showNotify = false;
@@ -109,12 +110,23 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
 
       $scope.$watch('state.options.darkTheme', setDarkTheme);
 
+      $scope.helpDialog = function () {
+        ngDialog.open({
+          width: '90%',
+          height: '98%',
+          template: '<div style="padding-top: 20px; height: 100%"><iframe style="border: 1px solid;border-radius: 8px;width: 100%;height: inherit;" src="/doc/help/kibana_discover_help.htm"></iframe></div>',
+          className: 'ngdialog-theme-default',
+          plain: true
+        });
+      }
+
       $scope.topNavMenu = [
         {
           key: 'help',
           description: 'help',
           run: function () {
-            window.open("/doc/help/kibana_discover_help.htm");
+            //window.open("/doc/help/kibana_discover_help.htm");
+            $scope.helpDialog();
           }
         }
         ,
