@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)http://localhost:2368/kibana-search/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#263238">
+        <title>日志检索分析使用帮助</title>
+        <meta name="description" content="">
+        <link type="text/css" rel="stylesheet" href="./kibana_discover_help_files/materialize.min.css" media="screen,projection">
+        <link type="text/css" rel="stylesheet" href="./kibana_discover_help_files/style.min.css" media="screen,projection">  
+        <link rel="canonical" href="http://localhost:2368/kibana-search/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="Teld">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="日志检索分析使用帮助">
+    <meta property="og:description" content="一、简介 用户可以通过列表和仪表盘2类页面对系统日志进行实时的分析统计。主要提供如下功能。 基于时间序对日志的内容进行查询，通过列表和仪表盘展现查询结果 基于内容的模糊查询和精确查询 基于字段的模糊查询和精确查询 根据查询条件和指定的刷新频率进行自动刷新 灵活的定义列表显示的字段，以及字段显示以及按照字段内容进行排序 基于字段内容的自动统计，以及对应内容的灵活筛选 用户将自定义的列表和图形布局保存为自己的查询格式，用于后续查询 二、功能操作 　a)列表页面 　１主界面    　①　时间范围选择 快速选择   !快速选择 指定相对时间    自动刷新频率    　②　共享该查询 　③　打开已保存的查询格式 　④　保存该查询格式（保存时如果名字不一样，系统视为一个新的查询） 　⑤　点击此箭头可查看已选择字段和所有字段    　⑥　点击此箭头可查看该行详细内容    　⑦　排序及调整字段顺 鼠标移到字段名称上，点击向上的箭头，可用此字段进行排序    鼠标移到字段名称上，点击向左或向右的箭头，可调整此字段的顺序    　⑧　查询条件 *为查询所有，即无查询条件。 简单的文本搜索，直接输入文本字符串。 Eg：输入 &quot;充电异常&quot; 来搜索所有字段中出现该字符串的 ，注意不加双引号为模糊匹配。双引号为英文状态下的双引号。">
+    <meta property="og:url" content="http://localhost:2368/kibana-search/">
+    <meta property="og:image" content="http://localhost:2368/content/images/2017/02/image002-1.jpg">
+    <meta property="article:published_time" content="2017-02-13T14:54:00.000Z">
+    <meta property="article:modified_time" content="2017-02-14T03:43:54.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="日志检索分析使用帮助">
+    <meta name="twitter:description" content="一、简介 用户可以通过列表和仪表盘2类页面对系统日志进行实时的分析统计。主要提供如下功能。 基于时间序对日志的内容进行查询，通过列表和仪表盘展现查询结果 基于内容的模糊查询和精确查询 基于字段的模糊查询和精确查询 根据查询条件和指定的刷新频率进行自动刷新 灵活的定义列表显示的字段，以及字段显示以及按照字段内容进行排序 基于字段内容的自动统计，以及对应内容的灵活筛选 用户将自定义的列表和图形布局保存为自己的查询格式，用于后续查询 二、功能操作 　a)列表页面 　１主界面    　①　时间范围选择 快速选择   !快速选择 指定相对时间    自动刷新频率    　②　共享该查询 　③　打开已保存的查询格式 　④　保存该查询格式（保存时如果名字不一样，系统视为一个新的查询） 　⑤　点击此箭头可查看已选择字段和所有字段    　⑥　点击此箭头可查看该行详细内容    　⑦　排序及调整字段顺 鼠标移到字段名称上，点击向上的箭头，可用此字段进行排序    鼠标移到字段名称上，点击向左或向右的箭头，可调整此字段的顺序    　⑧　查询条件 *为查询所有，即无查询条件。 简单的文本搜索，直接输入文本字符串。 Eg：输入 &quot;充电异常&quot; 来搜索所有字段中出现该字符串的 ，注意不加双引号为模糊匹配。双引号为英文状态下的双引号。">
+    <meta name="twitter:url" content="http://localhost:2368/kibana-search/">
+    <meta name="twitter:image" content="http://localhost:2368/content/images/2017/02/image002-1.jpg">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="ghost">
+    <meta name="twitter:site" content="@fff">
+    <meta property="og:image:width" content="583">
+    <meta property="og:image:height" content="251">
+	<style type="">
+		.post-p img {margin-left:0px;}
+		.card-title {height:80px; padding:50px; text-align:center; font-size:20px;}
+	</style>
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Teld",
+        "logo": "http://localhost:2368/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "ghost",
+        "url": "http://localhost:2368/author/ghost-user/",
+        "sameAs": []
+    },
+    "headline": "日志检索分析使用帮助",
+    "url": "http://localhost:2368/kibana-search/",
+    "datePublished": "2017-02-13T14:54:00.000Z",
+    "dateModified": "2017-02-14T03:43:54.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://localhost:2368/content/images/2017/02/image002-1.jpg",
+        "width": 583,
+        "height": 251
+    },
+    "description": "一、简介 用户可以通过列表和仪表盘2类页面对系统日志进行实时的分析统计。主要提供如下功能。 基于时间序对日志的内容进行查询，通过列表和仪表盘展现查询结果 基于内容的模糊查询和精确查询 基于字段的模糊查询和精确查询 根据查询条件和指定的刷新频率进行自动刷新 灵活的定义列表显示的字段，以及字段显示以及按照字段内容进行排序 基于字段内容的自动统计，以及对应内容的灵活筛选 用户将自定义的列表和图形布局保存为自己的查询格式，用于后续查询 二、功能操作 　a)列表页面 　１主界面    　①　时间范围选择 快速选择   !快速选择 指定相对时间    自动刷新频率    　②　共享该查询 　③　打开已保存的查询格式 　④　保存该查询格式（保存时如果名字不一样，系统视为一个新的查询） 　⑤　点击此箭头可查看已选择字段和所有字段    　⑥　点击此箭头可查看该行详细内容    　⑦　排序及调整字段顺 鼠标移到字段名称上，点击向上的箭头，可用此字段进行排序    鼠标移到字段名称上，点击向左或向右的箭头，可调整此字段的顺序    　⑧　查询条件 *为查询所有，即无查询条件。 简单的文本搜索，直接输入文本字符串。 Eg：输入 &quot;充电异常&quot; 来搜索所有字段中出现该字符串的 ，注意不加双引号为模糊匹配。双引号为英文状态下的双引号。",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://localhost:2368"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Teld" href="http://localhost:2368/rss/">
+    </head>
+    <body class="post-template">
+                <main> 
+            <div class="row">
+                <div class="post col s12 m12 l10 offset-l1">
+					<h1>
+						日志检索分析使用帮助
+					</h1>
+                    <article class="card">
+                        
+						
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="card-meta blue-grey-text text-lighten-2">                                   
+                                    2017-02-13
+                                </div>
+                            </div>
+                            <div class="post-p"> 
+                               <h2 id="">一、简介</h2>
+
+<p>用户可以通过列表和仪表盘2类页面对系统日志进行实时的分析统计。主要提供如下功能。</p>
+
+<ul>
+<li>基于时间序对日志的内容进行查询，通过列表和仪表盘展现查询结果</li>
+<li>基于内容的模糊查询和精确查询</li>
+<li>基于字段的模糊查询和精确查询</li>
+<li>根据查询条件和指定的刷新频率进行自动刷新</li>
+<li>灵活的定义列表显示的字段，以及字段显示以及按照字段内容进行排序</li>
+<li>基于字段内容的自动统计，以及对应内容的灵活筛选</li>
+<li>用户将自定义的列表和图形布局保存为自己的查询格式，用于后续查询</li>
+</ul>
+
+<h2 id="">二、功能操作</h2>
+
+<h3 id="a">　a)列表页面</h3>
+
+<h5 id="">　１主界面</h5>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/image001-1.png" alt="列表页面" title=""></p>
+</blockquote>
+
+<hr>
+
+<h6 id="">　①　时间范围选择</h6>
+
+<ul>
+<li>快速选择</li>
+</ul>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.1.png" alt="快速选择" title=""></p>
+</blockquote>
+
+<ul>
+<li>指定相对时间</li>
+</ul>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.2.png" alt="指定相对时间" title=""></p>
+</blockquote>
+
+<ul>
+<li>指定绝对时间</li>
+</ul>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.3.png" alt="指定绝对时间" title=""></p>
+</blockquote>
+
+<ul>
+<li>自动刷新频率</li>
+</ul>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.4.png" alt="自动刷新频率" title=""></p>
+</blockquote>
+
+<h6 id="">　②　共享该查询</h6>
+
+<h6 id="">　③　打开已保存的查询格式</h6>
+
+<h6 id="">　④　保存该查询格式（保存时如果名字不一样，系统视为一个新的查询）</h6>
+
+<h6 id="">　⑤　点击此箭头可查看已选择字段和所有字段</h6>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/image012-1.jpg" alt="选择字段" title=""></p>
+</blockquote>
+
+<h6 id="">　⑥　点击此箭头可查看该行详细内容</h6>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.5.png" alt="详细内容" title=""></p>
+</blockquote>
+
+<h6 id="">　⑦　排序及调整字段顺</h6>
+
+<ul>
+<li><p>鼠标移到字段名称上，点击向上的箭头，可用此字段进行排序</p>
+</li>
+</ul>
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.6.png" alt="排序" title=""></p>
+</blockquote>
+<ul>
+<li><p>鼠标移到字段名称上，点击向左或向右的箭头，可调整此字段的顺序</p>
+</li>
+</ul>
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.7.png" alt="顺序" title=""></p>
+</blockquote>
+
+
+<h6 id="">　⑧　查询条件</h6>
+
+<ul>
+<li>*为查询所有，即无查询条件。</li>
+<li>简单的文本搜索，直接输入文本字符串。
+Eg：输入 "充电异常" 来搜索所有字段中出现该字符串的 ，注意不加双引号为模糊匹配。双引号为英文状态下的双引号。  </li>
+<li><p>要搜索特定字段中的值，则在值前加上字段名。Eg：输入 InnerExpInfo:"充电异常" ，限制搜索结果都是在 InnerExpInfo字段里。</p>
+
+<p>　快速选择:</p>
+
+<p>　点击选择的字段，点击该字段值后面的加号代表搜索为该值的结果，减号代表不为该值的结果。</p>
+
+</li></ul>
+<blockquote>
+  <p><img src="./kibana_discover_help_files/1.8.png" alt="" title=""></p>
+</blockquote>
+<ul>
+<li><p>范围查询
+<br/>　Ø  要搜索一个值的范围，可以用范围查询语法， [START<em>VALUE TO END</em>VALUE] ，”[]”为包括其实值，”{}”为不包括起始值。Eg：要查找 4xx 的状态码，可以输入 <code>status:[400 TO 499]</code>。
+<br/>　Ø  指定更复杂的搜索标准，你可以用布尔操作符 AND , OR , 和 NOT 。Eg： <code>(AppCode:"BOSS" OR AppCode:"Boss") AND ModuleCode:"PCM"　(AppCode:"BOSS" OR AppCode:"Boss") AND NOT "ModuleCode:"</code></p></li>
+</ul>
+
+<h5 id="2">　2字段内容的自动统计和筛选</h5>
+
+<ul>
+<li><p>自动展示某一段时间内，某列内容统计情况，并通过加减号，进行灵活的筛选</p>
+
+</li>
+</ul>
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3333.png" alt="筛选" title=""></p>
+</blockquote>
+<ul>
+<li><p>点击界面中的Visualize,图形展示（全部内容）</p>
+</li>
+</ul>
+<blockquote>
+  <p><img src="./kibana_discover_help_files/image026.jpg" alt="Visualize" title=""></p>
+</blockquote>
+
+<h2 id="">三、仪表盘界面操作</h2>
+
+<p>目前提供了对异常日志的仪表盘界面，默认展示一个月内每天异常数的变化曲线以及一个月内按照应用和模块进行统计的异常数量的饼图展示.</p>
+
+<h5 id="31">3.1主界面</h5>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.1.png" alt="" title=""></p>
+</blockquote>
+
+<h6 id="">　①　时间范围选择（同查询界面操作）</h6>
+
+<h6 id="">　②　查询条件（同查询界面操作）</h6>
+
+<h6 id="">　③　选择特定值</h6>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.2.png" alt="选择特定值" title=""></p>
+</blockquote>
+
+<p>点击要查询的值，加号为包括此值，减号为不包括此值。Eg: 下图为点击Sys后，仅查询sys的变化曲线</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.3.png" alt="选择特定值" title=""></p>
+</blockquote>
+
+<p>若想删除查询条件，将鼠标移动到上图红框，出现下图删除按钮，删除即可。</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.4.png" alt="" title=""></p>
+</blockquote>
+
+<h6 id="">　④　显示图表数值</h6>
+
+<p>鼠标移动到图表指定点，即可显示此点对应的值。</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.5.png" alt="" title=""></p>
+</blockquote>
+
+<h5 id="32">3.2主界面</h5>
+
+<p>将图形对应的数据导出</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.6.png" alt="" title=""></p>
+</blockquote>
+
+<p>显示列表界面</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.7.png" alt="" title=""></p>
+</blockquote>
+
+<p>导出数据</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/image041.png" alt="" title=""></p>
+</blockquote>
+
+<h5 id="33">3.3 异常分析饼图</h5>
+
+<p>通过内外圈展示每个应用下模块的异常情况</p>
+
+<blockquote>
+  <p><img src="./kibana_discover_help_files/3.9.png" alt="" title=""></p>
+</blockquote>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </main>
+
+        <script src="./kibana_discover_help_files/jquery-2.1.4.min.js.下载"></script>
+        <script src="./kibana_discover_help_files/materialize.min.js.下载"></script>
+        <script src="./kibana_discover_help_files/script.min.js.下载"></script>
+        
+    
+<div class="hiddendiv common"></div></body><div></div></html>

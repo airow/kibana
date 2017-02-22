@@ -142,6 +142,9 @@ module.exports = async function (kbnServer, server, config) {
   server.exposeStaticDir('/ui/fonts/{path*}', resolve(__dirname, '../../ui/public/assets/fonts'));
   server.exposeStaticDir('/ui/favicons/{path*}', resolve(__dirname, '../../ui/public/assets/favicons'));
 
+  // 帮助文档静态文件
+  server.exposeStaticDir('/doc/{path*}', resolve(__dirname, '../../ui/public/assets/doc'));
+
   kbnServer.mixin(versionCheckMixin);
 
   return kbnServer.mixin(require('./xsrf'));
