@@ -110,6 +110,10 @@ uiModules.get('apps/management')
         id: $routeParams.id
       })
       .then(function (obj) {
+
+        /** 处理功能菜单 */
+        obj._source.menus = obj._source.menus || [];
+
         $scope.obj = obj;
         $scope.link = service.urlFor(obj._id);
 
