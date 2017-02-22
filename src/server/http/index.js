@@ -83,6 +83,22 @@ module.exports = async function (kbnServer, server, config) {
   });
 
   server.route({
+    path: "/config",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.redirect("app/kibana#/management/kibana/objects");
+    }
+  });
+
+  server.route({
+    path: "/config/{tab}",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.redirect(`/app/kibana#/management/kibana/objects?_a=(tab:${req.params.tab})`);
+    }
+  });
+
+  server.route({
     path: '/',
     method: 'GET',
     handler: function (req, reply) {
