@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import rison from 'rison-node';/*ÓÃÓÚ½âÎöµØÖ·À¸_a²ÎÊı»ñÈ¡µ±Ç°Ë÷ÒıµÄId*/
+import rison from 'rison-node';/*ç”¨äºè§£æåœ°å€æ _aå‚æ•°è·å–å½“å‰ç´¢å¼•çš„Id*/
 import Scanner from 'ui/utils/scanner';
 import 'plugins/kibana/discover/saved_searches/_saved_search';
 import 'ui/notify';
@@ -67,7 +67,8 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
     return source;
   };
 
-  this.findOld = function (searchString, size = 100) {
+  /** åŸå§‹æ–¹å¼ */
+  this.findOriginal = function (searchString, size = 100) {
     let body;
     if (searchString) {
       body = {
@@ -80,7 +81,7 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
         }
       };
     } else {
-      body = { query: {match_all: {}}};
+      body = { query: { match_all: {} } };
     }
 
     return es.search({
@@ -89,19 +90,17 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
       body: body,
       size: size
     })
-    .then((resp) => {
-      return {
-        total: resp.hits.total,
-        hits: resp.hits.hits.map((hit) => this.mapHits(hit))
-      };
-    });
+      .then((resp) => {
+        return {
+          total: resp.hits.total,
+          hits: resp.hits.hits.map((hit) => this.mapHits(hit))
+        };
+      });
   };
 
-  this.find = function (searchString, size = 100) {
-    debugger;
-    let search=$location.search();//»ñÈ¡µØÖ·À¸²éÑ¯²ÎÊıangular $location ×é¼ş
-    let searchAJson=rison.decode(search["_a"]); //Ê¹ÓÃrison½âÂëµØÖ·À¸²ÎÊı
-    let tagetIndex=searchAJson.index;
+  /** discover ç•Œé¢ open æ“ä½œä½¿ç”¨ */
+  this.findBy = function (searchAJson, searchString, size = 100) {
+    let tagetIndex = searchAJson.index;
 
     let body;
     if (searchString) {
@@ -138,5 +137,21 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
         hits: resp.hits.hits.map((hit) => this.mapHits(hit))
       };
     });
+  }
+
+  this.find = function (searchString, size = 100) {
+    let search = $location.search();//è·å–åœ°å€æ æŸ¥è¯¢å‚æ•°angular $location ç»„ä»¶
+
+    if (search["_a"]) {
+      let searchAJson = rison.decode(search["_a"]); //ä½¿ç”¨risonè§£ç åœ°å€æ å‚æ•°
+      if (searchAJson.index) {
+        return this.findBy(searchAJson, searchString, size);
+      } else {
+        return this.findOriginal(searchString, size);
+      }
+    }
+    else {
+      return this.findOriginal(searchString, size);
+    }
   };
 });
