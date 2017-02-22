@@ -699,7 +699,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   } 
 
   $scope.test=function () {
-    debugger;
+    /** debugger; */
 
     /*在方法中 this===$scope 成立*/
     /*
@@ -733,7 +733,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.callNodejs=function () {
 
-    debugger;
+    /** debugger; */
     // $scope.searchSource 拼接查询条件的数据
     alert($scope.searchSource._fetchStrategy);
     alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
@@ -774,7 +774,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     })
       .catch(notify.fatal);
 
-    debugger;
+    /** debugger; */
     let reqsFetchParams = [
       {
         index: ['logstash-123'],
@@ -783,7 +783,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         body: { foo: 'bar', $foo: 'bar' }
       }
     ];
-    debugger;
+    /** debugger; */
     let value;
     $scope.searchSource._fetchStrategy.reqsFetchParamsToBody(reqsFetchParams)
       .then(val => {
@@ -799,7 +799,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         // this callback will be called asynchronously
         // when the response is available
       }, function errorCallback(response) {
-        debugger;
+        /** debugger; */
         // called asynchronously if an error occurs
         // or server returns response with an error status.
       });

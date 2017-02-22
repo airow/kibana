@@ -178,7 +178,7 @@ export default function discoverExportService($http, Private, Promise) {
           exportAsCsv(response,false);
 
         }, function errorCallback(response) {
-          debugger;
+          /** debugger; */
           // called asynchronously if an error occurs
           // or server returns response with an error status.
         });
