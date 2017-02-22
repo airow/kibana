@@ -28,7 +28,7 @@
           <div class="localSearch">
             <label style="flex: 0 0 auto; margin: auto 10px auto auto;">TOP：</label>
             <input class="localSearchInput" style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" step="50" value="{{opts.sampleSize}}" type="number" placeholder="PageSize">            
-            <label style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤条件：</label>
+            <label style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
             <input
               parse-query
               input-focus
@@ -54,7 +54,6 @@
       </form>
     </div>
   </kbn-top-nav>
-
   <div class="container-fluid" role="main">
     <div class="row">
       <filter-bar state="state"></filter-bar>
