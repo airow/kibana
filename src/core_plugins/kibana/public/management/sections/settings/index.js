@@ -39,8 +39,10 @@ uiModules.get('apps/management')
   };
 });
 
-management.getSection('kibana').register('settings', {
+/**
+//2017-02-23@管理页面中隐藏 management.getSection('kibana').register('settings', {
   display: 'Advanced Settings',
   order: 20,
   url: '#/management/kibana/settings'
 });
+ */
