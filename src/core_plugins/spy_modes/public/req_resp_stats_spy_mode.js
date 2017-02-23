@@ -27,7 +27,8 @@ const linkReqRespStats = function ($scope, config) {
   });
 };
 
-require('ui/registry/spy_modes')
+/** 
+//2017-02-23 require('ui/registry/spy_modes')
 .register(function () {
   return {
     name: 'request',
@@ -55,3 +56,4 @@ require('ui/registry/spy_modes')
     link: linkReqRespStats
   };
 });
+ */
