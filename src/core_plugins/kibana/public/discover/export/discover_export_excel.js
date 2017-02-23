@@ -1,13 +1,5 @@
 import _ from 'lodash';
 
-import RequestQueueProvider from 'ui/courier/_request_queue';
-import CallResponseHandlersProvider from 'ui/courier/fetch/call_response_handlers';
-import ForEachStrategyProvider from 'ui/courier/fetch/for_each_strategy';
-
-import IsRequestProvider from 'ui/courier/fetch/is_request';
-import MergeDuplicatesRequestProvider from 'ui/courier/fetch/merge_duplicate_requests';
-import ReqStatusProvider from 'ui/courier/fetch/req_status';
-
 import { saveAs } from '@spalger/filesaver';
 
 export default function discoverExportExcelService(Private, Promise) {
