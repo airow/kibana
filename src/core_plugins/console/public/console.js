@@ -16,14 +16,14 @@ require('./src/directives/sense_settings');
 require('./src/directives/sense_help');
 require('./src/directives/sense_welcome');
 
-devTools.register(() => ({
-  order: 1,
-  name: 'console',
-  display: 'Console',
-  url: '#/dev_tools/console'
-}));
+// devTools.register(() => ({
+//   order: 1,
+//   name: 'console',
+//   display: 'Console',
+//   url: '#/dev_tools/console'
+// }));
 
-uiRoutes.when('/dev_tools/console', {
-  controller: 'SenseController',
-  template
-});
+// uiRoutes.when('/dev_tools/console', {
+//   controller: 'SenseController',
+//   template
+// });
