@@ -30,15 +30,24 @@ function createProxyExport(server, method, route, config) {
             responseFromUpstream.headers.location = encodeURI(responseFromUpstream.headers.location);
           }
 
+            reply(null,"<h1>hello</h1>").header("Content-Disposition","attachment;filename=FileName.txt");
+          // reply("asdfasdfasdf")
+          //   .type('text/plain')
+          //   response.header("Content-Disposition","attachment; filename=1.txt");
+
+
           //reply(null, responseFromUpstream);
 
-          const Wreck = require('wreck');
-          Wreck.read(responseFromUpstream, {json:true}, (err, body) => {
-            /* do stuff */
+          // const Wreck = require('wreck');
+          // Wreck.read(responseFromUpstream, {json:true}, (err, body) => {
+          //   /* do stuff */
 
-            console.log(JSON.stringify(body));
-            reply(null, body);
-          });
+          //   console.log(JSON.stringify(body));
+          //   const response = reply(null, JSON.stringify(body));
+          //   response.type('text/plain');
+          //   response.header('X-Custom', 'some-value');
+          //   response.header("Content-Disposition","attachment; filename=1.txt");
+          // });
         }
       }
     },
