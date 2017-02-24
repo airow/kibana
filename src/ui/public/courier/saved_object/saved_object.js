@@ -93,6 +93,22 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
           }
         };
 
+        /** 定义ui配置相关参数,不定义使用动态方式设置 */
+        mapping.uiConf = {
+          properties: {
+            // setup the uiConf mapping, even if it is not used but this type yet
+            showTimeDiagram: {
+              type: 'keyword'
+            },
+            menus: {
+              type: 'keyword'
+            },
+            pageSize: {
+              type: 'keyword'
+            }
+          }
+        };        
+
         // tell mappingSetup to set type
         return mappingSetup.setup(type, mapping);
       })
@@ -227,6 +243,15 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
         };
       }
 
+      /** 关键代码，没有这句数据不会保存到ES中 */
+      let extColumns = ["uiConf"];
+
+      extColumns.forEach(function (value) {
+        if (self[value]) {
+          body[value] = self[value];
+        }
+      });
+      
       return body;
     };
 

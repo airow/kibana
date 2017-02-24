@@ -80,7 +80,7 @@ uiModules.get('kibana')
         $scope.indexPattern = $scope.searchSource.get('index');
 
         //$scope.searchSource.size(config.get('discover:sampleSize'));
-        $scope.searchSource.size($scope.savedObj.pageSize || config.get('discover:sampleSize'));
+        $scope.searchSource.size($scope.savedObj.uiConf.pageSize || config.get('discover:sampleSize'));
         $scope.searchSource.sort(getSort($scope.sorting, $scope.indexPattern));
 
         // Set the watcher after initialization
@@ -99,7 +99,7 @@ uiModules.get('kibana')
         $scope.searchSource.onResults().then(function onResults(resp) {
           // Reset infinite scroll limit
           //$scope.limit = 50;
-          $scope.limit = $scope.savedObj.pageSize
+          $scope.limit = $scope.savedObj.uiConf.pageSize
 
           // Abort if something changed
           if ($scope.searchSource !== $scope.searchSource) return;

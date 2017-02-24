@@ -2,13 +2,15 @@ import _ from 'lodash';
 import 'ui/notify';
 import uiModules from 'ui/modules';
 
+import UiConfProvider from 'plugins/kibana/ui_conf_provider';
+
 
 const module = uiModules.get('discover/saved_searches', [
   'kibana/notify',
   'kibana/courier'
 ]);
 
-module.factory('SavedSearch', function (courier,config) {
+module.factory('SavedSearch', function (courier,config,Private) {
   _.class(SavedSearch).inherits(courier.SavedObject);
   function SavedSearch(id) {
     courier.SavedObject.call(this, {
@@ -24,9 +26,10 @@ module.factory('SavedSearch', function (courier,config) {
         hits: 0,
         sort: [],
         version: 1,
-        tagetIndex:'',
-        pageSize: config.get('discover:sampleSize'),
-        menus: []
+        tagetIndex: '',
+        // pageSize: config.get('discover:sampleSize'),
+        // menus: [],
+        uiConf: Private(UiConfProvider).defaultConf
       }
     });
   }
@@ -41,8 +44,8 @@ module.factory('SavedSearch', function (courier,config) {
     sort: 'string',
     version: 'integer',
     tagetIndex: 'string',
-    pageSize: 'integer',
-    menus: 'string',
+    // pageSize: 'integer',
+    // menus: 'string'
   };
 
   SavedSearch.searchSource = true;

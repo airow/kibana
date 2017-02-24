@@ -120,26 +120,45 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
         });
       }
 
-      $scope.topNavMenu = [
-        {
-          key: 'help',
-          description: 'help',
-          run: function () {
-            window.open("/doc/help/kibana_discover_help.htm");
-            //$scope.helpDialog();
+
+      $scope.topNavMenu = getTopNavMenu(dash.uiConf.menus);
+
+      function getTopNavMenu(menuKeys) {
+        let confTopNavMenu = {
+          'help': {
+            key: 'help',
+            description: 'help',
+            run: function () {
+              window.open("/doc/help/kibana_discover_help.htm");
+              //$scope.helpDialog();
+            }
+          }
+          ,
+          'export': {
+            key: 'export',
+            description: 'Export Search',
+            run: function () {
+              $scope.export();
+            },
+            testId: 'discoverExportButton',
+          }
+        };
+
+        let menus = [];
+        if (menuKeys && menuKeys.length == 0) {
+          for (let key in confTopNavMenu) {
+            menuKeys.push(key);
           }
         }
-        ,
-        {
-          key: 'export',
-          description: 'Export Search',
-          run: function () {
-            $scope.export();
-          },
-          testId: 'discoverExportButton',
-        }
-      ];
+        menuKeys.forEach(function (value) {
+          let confMenu = confTopNavMenu[value];
+          if (confMenu) {
+            menus.push(confMenu);
+          }
+        });
 
+        return menus;
+      }
       /*  屏蔽掉功能菜单
 
       $scope.topNavMenu = [{

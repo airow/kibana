@@ -36,11 +36,30 @@ import CallClientProvider from 'ui/courier/fetch/call_client';
 import { saveAs } from '@spalger/filesaver';
 import DiscoverExportExcelProvider from '../export/discover_export_excel';
 
+//import '../../ui_conf_provider/directives/top';
+import 'plugins/kibana/ui_conf_provider/directives/top';
+
+//import uiConfTopTemplate from '../../ui_conf_provider/directives/top.html';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
-  'kibana/index_patterns'
+  'kibana/index_patterns',
 ]);
+
+// app.directive('uiConfTop', function () {
+//   return {
+//     restrict: 'E',
+//     replace: true,
+//     template: uiConfTopTemplate,
+//     scope : {
+//       size: '=sampleSize'
+//     },
+//     controller: function ($scope) {
+//       $scope.sizeArray = [100, 500, 1000, 5000, 10000, 50000];
+//     }
+//   };
+// });
 
 uiRoutes
 .defaults(/discover/, {
@@ -175,7 +194,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
   $scope.$on('$destroy', savedSearch.destroy);  
-  $scope.topNavMenu = getTopNavMenu(savedSearch.menus);
+
+  console.log(savedSearch.uiConf);
+  //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
+  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);  
 
   function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
@@ -223,6 +245,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       }
     });
 
+    // menus.push({
+    //   key: 'callNodejs',
+    //   description: 'callNodejs',
+    //   run: function () {
+    //     $scope.callNodejs();
+    //   },
+    //   testId: 'callNodejsButton',
+    // });
+
     return menus;
   }
 
@@ -262,7 +293,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       query: $scope.searchSource.get('query') || '',
       sort: getSort.array(savedSearch.sort, $scope.indexPattern),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns'),
-      pageSize: savedSearch.pageSize ? savedSearch.pageSize : config.get('discover:sampleSize'),
+      //pageSize: savedSearch.pageSize ? savedSearch.pageSize : config.get('discover:sampleSize'),
+      pageSize: savedSearch.uiConf.pageSize ? savedSearch.uiConf.pageSize : config.get('discover:sampleSize'),
       index: $scope.indexPattern.id,
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
@@ -278,7 +310,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   
   $scope.opts = {
     // number of records to fetch, then paginate through
-    sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
+    //sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
+    sampleSize: parseInt(savedSearch.uiConf.pageSize || config.get('discover:sampleSize')),
     //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,
@@ -426,7 +459,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       savedSearch.id = savedSearch.title;
       savedSearch.columns = $scope.state.columns;
       savedSearch.sort = $scope.state.sort;
-      savedSearch.pageSize = $scope.opts.sampleSize;
+      //savedSearch.pageSize = $scope.opts.sampleSize;
+      savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
 
       return savedSearch.save()
       .then(function (id) {
@@ -727,7 +761,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   const requestQueue = Private(RequestQueueProvider);
   // const isRequest = Private(IsRequestProvider);
   // const mergeDuplicateRequests = Private(MergeDuplicatesRequestProvider);
-  const callClient = Private(CallClientProvider);
+  const callClientExport = Private(require('ui/courier/fetch/call_client_export'));
   const forEachStrategy = Private(require("ui/courier/fetch/for_each_strategy"));
   const ABORTED = { CourierFetchRequestStatus: 'aborted' };
 
@@ -735,8 +769,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     /** debugger; */
     // $scope.searchSource 拼接查询条件的数据
-    alert($scope.searchSource._fetchStrategy);
-    alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
+    // alert($scope.searchSource._fetchStrategy);
+    // alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
 
     const requests = requestQueue.getStartable($scope.searchSource._fetchStrategy);
     
@@ -762,7 +796,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       return startRequests(requests)
       .then(function () {
         replaceAbortedRequests();
-        return callClient(strategy, requests);
+        return callClientExport(strategy, requests);
       })
     }
 
@@ -791,18 +825,18 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         console.log(value);
       });
 
-    let url = "/elasticsearch/export/_msearch";
-    let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
-    $http.post(url, data)
-      .then(function successCallback(response) {
-        console.log(response);
-        // this callback will be called asynchronously
-        // when the response is available
-      }, function errorCallback(response) {
-        /** debugger; */
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-      });
+    // let url = "/elasticsearch/export/_msearch";
+    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
+    // $http.post(url, data)
+    //   .then(function successCallback(response) {
+    //     console.log(response);
+    //     // this callback will be called asynchronously
+    //     // when the response is available
+    //   }, function errorCallback(response) {
+    //     /** debugger; */
+    //     // called asynchronously if an error occurs
+    //     // or server returns response with an error status.
+    //   });
   }
 
   init();
