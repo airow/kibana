@@ -71,8 +71,8 @@ export default function discoverExportExcelService(Private, Promise) {
     // let xls = new Blob([out], { type: 'application/vnd.ms-excel;charset=utf-8' });
     // saveAs(xls, (fileName||'Export_Execl') + ".xls");
 
-    let xls = new Blob([out], { type: 'text/xml;charset=utf-8' });
-    saveAs(xls, (fileName||'Export_Execl') + ".xml");
+    let xls = new Blob([out], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    saveAs(xls, (fileName||'Export_Execl') + ".xls");
   }
 
   
