@@ -108,27 +108,31 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
         query: {
           bool: {
             must: [
-            //   {
-            //   term: {
-            //     tagetIndex
-            //   }
-            // }, 
               {
                 query_string: {
-                  //query: "tagetIndex: \""+tagetIndex+"\"",
-                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\""
-                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
-                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"系统运行日志\\\"\""
-                  query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+                  /**
+                   * 实际数据为：
+                   * "searchSourceJSON": "{\"index\":\"异常日志\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+                   */
+                  //**错误 */ query: "tagetIndex: \"" + tagetIndex + "\"" /** 这个方式不理想 */
+                  //**错误 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\"" /** 这个不成功，因为没有对\转 */
+                  //**错误 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\"index\":\"${tagetIndex}\","` /** 这个不成功，因为没有对\转 */
+
+                  //**不够精确 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+
+                  //**可以,普通字符串方式 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+                  //**可以，对\和"都进行了转义，模板字符串方式可以不转义"见下面的方式 */ query: `kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"${tagetIndex}\\\"\"`
+                  /**完美 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\\"index\\":\\"${tagetIndex}\\","`
                 }
               },
-            {
-              simple_query_string: {
-                query: searchString + '*',
-                fields: ['title^3', 'description'],
-                default_operator: 'AND'
+              {
+                simple_query_string: {
+                  query: searchString + '*',
+                  fields: ['title^3', 'description'],
+                  default_operator: 'AND'
+                }
               }
-            }]
+            ]
           }
         }
       };
@@ -137,11 +141,20 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
       body = {
         query: {
           query_string: {
-            //query: "tagetIndex: \"" + tagetIndex + "\""
-            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\""
-            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
-            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"系统运行日志\\\"\""
-            query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+            /**
+             * 实际数据为：
+             * "searchSourceJSON": "{\"index\":\"异常日志\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+             */
+            //**错误 */ query: "tagetIndex: \"" + tagetIndex + "\"" /** 这个方式不理想 */
+            //**错误 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\"" /** 这个不成功，因为没有对\转 */
+            //**错误 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\"index\":\"${tagetIndex}\","` /** 这个不成功，因为没有对\转 */
+            
+            //**不够精确 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+
+            //**可以,普通字符串方式 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+            //**可以，对\和"都进行了转义，模板字符串方式可以不转义"见下面的方式 */ query: `kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"${tagetIndex}\\\"\"`
+            /**完美 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\\"index\\":\\"${tagetIndex}\\","`
+            
           }
         }
       };
