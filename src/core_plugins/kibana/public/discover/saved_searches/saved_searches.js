@@ -107,12 +107,23 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
       body = {
         query: {
           bool: {
-            must: [{
-              term: {
-                tagetIndex
-              }
-			}, {
-			  simple_query_string: {
+            must: [
+            //   {
+            //   term: {
+            //     tagetIndex
+            //   }
+            // }, 
+              {
+                query_string: {
+                  //query: "tagetIndex: \""+tagetIndex+"\"",
+                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\""
+                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+                  //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"系统运行日志\\\"\""
+                  query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+                }
+              },
+            {
+              simple_query_string: {
                 query: searchString + '*',
                 fields: ['title^3', 'description'],
                 default_operator: 'AND'
@@ -122,7 +133,18 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
         }
       };
     } else {
-      body = {query: {match: {tagetIndex}}};
+      //body = {query: {match: {tagetIndex}}};
+      body = {
+        query: {
+          query_string: {
+            //query: "tagetIndex: \"" + tagetIndex + "\""
+            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\""
+            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+            //query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"系统运行日志\\\"\""
+            query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+          }
+        }
+      };
     }
 
     return es.search({
