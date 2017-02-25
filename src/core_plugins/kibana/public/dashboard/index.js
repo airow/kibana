@@ -349,7 +349,11 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
 
       //2017-02-17 00:35:03
       $scope.$on('doc_table.hits.onResults', function (event, data) {
-        $scope.onResults = data;       
+        $scope.onResults = data;
+
+        //设置滚动条
+        $(window).resize();
+        $('.gridster li[data-sizey]:has(doc-table):last').height('auto');
       });
 
       // $(window).resize(function () {
@@ -362,8 +366,8 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
       //     window.refreshfillHeight = false;
       //   }
       // }, 1000);
-
-      setInterval(fillHeight, 1000);
+      
+      //setInterval(fillHeight, 1000);
 
       function fillHeight() {
         //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
@@ -384,7 +388,7 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           lastLi.height($(".docTable .paginate").height() + 100);
         }
         $(".gridster").height("100%");
-      }
+      }  
       
 
       $scope.export = function () {
