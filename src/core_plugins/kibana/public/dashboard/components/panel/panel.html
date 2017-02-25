@@ -35,15 +35,17 @@
     class="panel-content">
   </visualize>
 
-  <doc-table class="docTable"
-    ng-switch-when="search"
-    search-source="savedObj.searchSource"
-    saved-obj="savedObj"
-    infinite-scroll="true"
-    sorting="panel.sort"
-    columns="panel.columns"
-    render-counter
-    class="panel-content"
-    filter="filter">
-  </doc-table>
+  <div fixed-scroll>
+    <doc-table class="docTable"
+      ng-switch-when="search"
+      search-source="savedObj.searchSource"
+      saved-obj="savedObj"
+      infinite-scroll="true"
+      sorting="panel.sort"
+      columns="panel.columns"
+      render-counter
+      class="panel-content"
+      filter="filter">
+    </doc-table>
+  </div>
 </div>
