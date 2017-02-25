@@ -126,7 +126,9 @@ uiModules.get('apps/management')
         obj._source.uiConf = obj._source.uiConf || {};
 
         for (let key in uiConf_default) {
-          obj._source.uiConf[key] = obj._source.uiConf[key] || uiConf_default[key];
+          if (false === (key in obj._source.uiConf)) {
+            obj._source.uiConf[key] = uiConf_default[key];
+          }
         }      
 
         $scope.obj = obj;
