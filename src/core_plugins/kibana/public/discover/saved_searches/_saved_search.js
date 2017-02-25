@@ -2,7 +2,7 @@ import _ from 'lodash';
 import 'ui/notify';
 import uiModules from 'ui/modules';
 
-import UiConfProvider from 'plugins/kibana/ui_conf_provider';
+import DiscoverUiConfProvider from 'plugins/kibana/ui_conf_provider/discover_uiconf';
 
 
 const module = uiModules.get('discover/saved_searches', [
@@ -29,7 +29,7 @@ module.factory('SavedSearch', function (courier,config,Private) {
         tagetIndex: '',
         // pageSize: config.get('discover:sampleSize'),
         // menus: [],
-        uiConf: Private(UiConfProvider).defaultConf
+        uiConf: Private(DiscoverUiConfProvider).defaultConf
       }
     });
   }

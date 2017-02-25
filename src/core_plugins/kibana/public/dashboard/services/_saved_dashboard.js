@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import uiModules from 'ui/modules';
 
-import UiConfProvider from '../../ui_conf_provider';
+import DashboardUiConfProvider from '../../ui_conf_provider/dashboard_uiconf';
 
 const module = uiModules.get('app/dashboard');
 
@@ -37,7 +37,7 @@ module.factory('SavedDashboard', function (courier, config, Private) {
         timeTo: undefined,
         timeFrom: undefined,
         refreshInterval: undefined,
-        uiConf: Private(UiConfProvider).defaultConf
+        uiConf: Private(DashboardUiConfProvider).defaultConf
       },
 
       // if an indexPattern was saved with the searchsource of a SavedDashboard
