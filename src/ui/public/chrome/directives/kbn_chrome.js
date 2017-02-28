@@ -34,6 +34,7 @@ export default function (chrome, internals) {
       controllerAs: 'chrome',
       controller($scope, $rootScope, $location, $http, Private) {
         const getUnhashableStates = Private(getUnhashableStatesProvider);
+        $rootScope.showNotify = true;
 
         // are we showing the embedded version of the chrome?
         internals.setVisibleDefault(!$location.search().embed);

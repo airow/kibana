@@ -24,6 +24,7 @@ module.exports = function (grunt) {
       //'stop:optimizeBuild',
       // '_build:versionedLinks',
       // '_build:osShellScripts',
+      grunt.option('remove-config') ? ['_build:removeConfig'] : [],
       grunt.option('skip-archives') ? [] : ['_build:archives'],
       grunt.option('skip-os-packages') ? [] : [
         '_build:pleaseRun',

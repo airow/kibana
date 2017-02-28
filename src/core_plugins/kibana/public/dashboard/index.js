@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import angular from 'angular';
+import ngDialog from 'ngDialog'
 import chrome from 'ui/chrome';
 import 'ui/courier';
 import 'ui/config';
@@ -13,10 +14,12 @@ import 'plugins/kibana/dashboard/services/saved_dashboards';
 import 'plugins/kibana/dashboard/styles/main.less';
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 import DocTitleProvider from 'ui/doc_title';
-import stateMonitorFactory  from 'ui/state_management/state_monitor_factory';
+import stateMonitorFactory from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/kibana/dashboard/index.html';
+
+import DiscoverExportExcelProvider from '../discover/export/discover_export_excel';
 
 require('ui/saved_objects/saved_object_registry').register(require('plugins/kibana/dashboard/services/saved_dashboard_register'));
 
@@ -30,36 +33,39 @@ const app = uiModules.get('app/dashboard', [
 ]);
 
 uiRoutes
-.defaults(/dashboard/, {
-  requireDefaultIndex: true
-})
-.when('/dashboard', {
-  template: indexTemplate,
-  resolve: {
-    dash: function (savedDashboards, config) {
-      return savedDashboards.get();
+  .defaults(/dashboard/, {
+    requireDefaultIndex: true
+  })
+  .when('/dashboard', {
+    template: indexTemplate,
+    resolve: {
+      dash: function (savedDashboards, config) {
+        return savedDashboards.get();
+      }
     }
-  }
-})
-.when('/dashboard/:id', {
-  template: indexTemplate,
-  resolve: {
-    dash: function (savedDashboards, Notifier, $route, $location, courier) {
-      return savedDashboards.get($route.current.params.id)
-      .catch(courier.redirectWhenMissing({
-        'dashboard' : '/dashboard'
-      }));
+  })
+  .when('/dashboard/:id', {
+    template: indexTemplate,
+    resolve: {
+      dash: function (savedDashboards, Notifier, $route, $location, courier) {
+        return savedDashboards.get($route.current.params.id)
+          .catch(courier.redirectWhenMissing({
+            'dashboard': '/dashboard'
+          }));
+      }
     }
-  }
-});
+  });
 
-app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
+app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, timefilter, kbnUrl) {
   return {
     restrict: 'E',
     controllerAs: 'dashboardApp',
-    controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState) {
+    controller: function ($scope, $rootScope, $route, $routeParams, $location, ngDialog, Private, getAppState) {
 
       const queryFilter = Private(FilterBarQueryFilterProvider);
+      $rootScope.showNotify = false;
+
+      const discoverExportExcel = Private(DiscoverExportExcelProvider);
 
       const notify = new Notifier({
         location: 'Dashboard'
@@ -89,7 +95,7 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         panels: dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [],
         options: dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {},
         uiState: dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {},
-        query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || {query_string: {query: '*'}},
+        query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } },
         filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter),
       };
 
@@ -104,17 +110,55 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
 
       $scope.$watch('state.options.darkTheme', setDarkTheme);
 
-      $scope.topNavMenu = [
-        {
-          key: 'help',
-          description: 'help',
-          run: function () {
-            window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
-            //window.showModalDialog("http://www.baidu.com");
+      $scope.helpDialog = function () {
+        ngDialog.open({
+          width: '90%',
+          height: '98%',
+          template: '<div style="padding-top: 20px; height: 100%"><iframe style="border: 1px solid;border-radius: 8px;width: 100%;height: inherit;" src="/doc/help/kibana_discover_help.htm"></iframe></div>',
+          className: 'ngdialog-theme-default',
+          plain: true
+        });
+      }
+
+
+      $scope.topNavMenu = getTopNavMenu(dash.uiConf.menus);
+
+      function getTopNavMenu(menuKeys) {
+        let confTopNavMenu = {
+          'help': {
+            key: 'help',
+            description: 'help',
+            run: function () {
+              window.open("/doc/help/kibana_discover_help.htm");
+              //$scope.helpDialog();
+            }
+          }
+          ,
+          'export': {
+            key: 'export',
+            description: 'Export Search',
+            run: function () {
+              $scope.export();
+            },
+            testId: 'discoverExportButton',
+          }
+        };
+
+        let menus = [];
+        if (menuKeys && menuKeys.length == 0) {
+          for (let key in confTopNavMenu) {
+            menuKeys.push(key);
           }
         }
-      ];
+        menuKeys.forEach(function (value) {
+          let confMenu = confTopNavMenu[value];
+          if (confMenu) {
+            menus.push(confMenu);
+          }
+        });
 
+        return menus;
+      }
       /*  屏蔽掉功能菜单
 
       $scope.topNavMenu = [{
@@ -254,17 +298,17 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         dash.optionsJSON = angular.toJson($state.options);
 
         dash.save()
-        .then(function (id) {
-          stateMonitor.setInitialState($state.toJSON());
-          $scope.kbnTopNav.close('save');
-          if (id) {
-            notify.info('Saved Dashboard as "' + dash.title + '"');
-            if (dash.id !== $routeParams.id) {
-              kbnUrl.change('/dashboard/{{id}}', {id: dash.id});
+          .then(function (id) {
+            stateMonitor.setInitialState($state.toJSON());
+            $scope.kbnTopNav.close('save');
+            if (id) {
+              notify.info('Saved Dashboard as "' + dash.title + '"');
+              if (dash.id !== $routeParams.id) {
+                kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
+              }
             }
-          }
-        })
-        .catch(notify.fatal);
+          })
+          .catch(notify.fatal);
       };
 
       let pendingVis = _.size($state.panels);
@@ -302,6 +346,66 @@ app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter,
         addSearch: $scope.addSearch,
         timefilter: $scope.timefilter
       };
+
+      //2017-02-17 00:35:03
+      $scope.$on('doc_table.hits.onResults', function (event, data) {
+        $scope.onResults = data;
+
+        //设置滚动条
+        $(window).resize();
+        $('.gridster li[data-sizey]:has(doc-table):last').height('auto');
+      });
+
+      // $(window).resize(function () {
+      //   window.refreshfillHeight = true;
+      // });
+
+      // setInterval(function () {
+      //   if (window.refreshfillHeight || window.refreshfillHeight === undefined) {
+      //     fillHeight();
+      //     window.refreshfillHeight = false;
+      //   }
+      // }, 1000);
+      
+      //setInterval(fillHeight, 1000);
+
+      function fillHeight() {
+        //$(".docTable").closest("li").height($(".docTable .paginate").height()+55);
+
+        let contentHeight = $(window).height() - $(".localNav").height() - 20;
+        let li = $(".docTable").closest("ul").find("li.gs-w");
+        let liCount = li.size();
+
+        let liSumHeight = 0;
+        for (let index = 0; index < liCount - 1; index++) {
+          liSumHeight += $(li[index]).height();
+        }
+        let lastLi = $(li[liCount - 1]);
+        let fillHeight = contentHeight - liSumHeight;
+        if (true || fillHeight > 400) {
+          lastLi.height(fillHeight);          
+        } else {
+          lastLi.height($(".docTable .paginate").height() + 100);
+        }
+        $(".gridster").height("100%");
+      }  
+      
+
+      $scope.export = function () {
+        // let onResults = {
+        //   indexPattern: $scope.indexPattern,
+        //   columns: $scope.state.columns,
+        //   savedSearch: savedSearch,
+        //   rows: $scope.rows
+        // };
+
+        let onResults = $scope.onResults;
+
+        let indexPattern = onResults.indexPattern;
+        let columns = onResults.columns;
+        let rows = onResults.rows;
+        discoverExportExcel(indexPattern, columns, { title: dash.title }, rows);
+      }
 
       init();
     }

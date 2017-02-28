@@ -9,7 +9,8 @@
 
   <div class="app-wrapper" ng-class="{ 'hidden-chrome': !chrome.getVisible() }">
     <div class="app-wrapper-panel">
-      <kbn-notifications list="notifList"></kbn-notifications>
+      <!--系统消息栏-->
+      <kbn-notifications ng-show="showNotify" list="notifList"></kbn-notifications>
       <kbn-loading-indicator></kbn-loading-indicator>
       <div
         class="application"

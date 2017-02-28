@@ -13,6 +13,13 @@ uiRoutes
 });
 
 uiModules.get('apps/management')
+  .filter('startsWith', function () {
+    return function (input, findStr) {
+      input = input || '';
+      var out = _.startsWith(input, findStr);
+      return out;
+    };
+  })
 .directive('kbnManagementObjectsView', function (kbnIndex, Notifier) {
   return {
     restrict: 'E',
@@ -110,6 +117,20 @@ uiModules.get('apps/management')
         id: $routeParams.id
       })
       .then(function (obj) {
+
+        // /** 处理功能菜单 */
+        // obj._source.menus = obj._source.menus || [];
+
+        /** 默认显示配置项 */
+        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100 };
+        obj._source.uiConf = obj._source.uiConf || {};
+
+        for (let key in uiConf_default) {
+          if (false === (key in obj._source.uiConf)) {
+            obj._source.uiConf[key] = uiConf_default[key];
+          }
+        }      
+
         $scope.obj = obj;
         $scope.link = service.urlFor(obj._id);
 

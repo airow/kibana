@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import angular from 'angular';
+import angular from 'angular'; //貌似非必需
+require("ngDialog"); // 等效于 import ngDialog from 'ngDialog';
 import moment from 'moment';
 import getSort from 'ui/doc_table/lib/get_sort';
 import dateMath from '@elastic/datemath';
@@ -29,11 +30,36 @@ import indexTemplate from 'plugins/kibana/discover/index.html';
 import StateProvider from 'ui/state_management/state';
 import rison from 'rison-node';
 
+import RequestQueueProvider from 'ui/courier/_request_queue';
+import CallClientProvider from 'ui/courier/fetch/call_client';
+
+import { saveAs } from '@spalger/filesaver';
+import DiscoverExportExcelProvider from '../export/discover_export_excel';
+
+//import '../../ui_conf_provider/directives/top';
+import 'plugins/kibana/ui_conf_provider/directives/top';
+
+//import uiConfTopTemplate from '../../ui_conf_provider/directives/top.html';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
-  'kibana/index_patterns'
+  'kibana/index_patterns',
 ]);
+
+// app.directive('uiConfTop', function () {
+//   return {
+//     restrict: 'E',
+//     replace: true,
+//     template: uiConfTopTemplate,
+//     scope : {
+//       size: '=sampleSize'
+//     },
+//     controller: function ($scope) {
+//       $scope.sizeArray = [100, 500, 1000, 5000, 10000, 50000];
+//     }
+//   };
+// });
 
 uiRoutes
 .defaults(/discover/, {
@@ -45,7 +71,6 @@ uiRoutes
   resolve: {
     ip: function (Promise, courier, config, $location, Private) {
       console.log("resolve.ip");
-      debugger;
       const State = Private(StateProvider);
       return courier.indexPatterns.getIds()
       .then(function (list) {
@@ -75,7 +100,6 @@ uiRoutes
     },
     savedSearch: function (courier, savedSearches, $route) {
       console.log("resolve.savedSearch");
-      debugger;
       /*
       * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
       * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
@@ -90,6 +114,35 @@ uiRoutes
         'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
       }));
     }
+    // ,teldConf: function (Promise, courier, savedSearches, $route, es) {
+    //   console.log(es);
+    //   console.log("es"+$route.current.params.id);
+
+    //   // let conf = Promise.props({});
+    //   // if ($route.current.params.id) {
+    //   //   conf = es.get({
+    //   //     index: ".teld.conf",
+    //   //     type: 'search',
+    //   //     id: $route.current.params.id
+    //   //   })
+    //   //     .then(function (resp) {
+    //   //       console.log("es get");
+    //   //       console.log(resp);
+    //   //     });
+    //   // }
+
+    //   // return conf;
+
+    //   return es.get({
+    //       index: ".teld.conf",
+    //       type: 'search',
+    //       id: $route.current.params.id
+    //     })
+    //       .then(function (resp) {
+    //         console.log("es get");
+    //         console.log(resp);
+    //       });
+    // }
   }
 });
 
@@ -101,16 +154,26 @@ app.directive('discoverApp', function () {
   };
 });
 
-function discoverController($http, $scope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags) {
+function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es,ngDialog) {
 
+    $rootScope.showNotify = true;
+
+    // const teldConf = $route.current.locals.teldConf;
+    // console.log(teldConf);
+
+    console.log($route.current.locals.savedSearch);
+    
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
   const filterManager = Private(FilterManagerProvider);
-debugger;
+
+
+  const discoverExportExcel = Private(DiscoverExportExcelProvider);  
+
   const notify = new Notifier({
     location: 'Discover'
   });
@@ -125,81 +188,89 @@ debugger;
   $scope.toggleInterval = function () {
     $scope.showInterval = !$scope.showInterval;
   };
-  $scope.topNavMenu = [
-    {
-      key: 'help',
-      description: 'help',
-      run: function () {
-        window.open("http://log.teld.cn/help_kibana/kibana_discover_help.htm");
-        //window.showModalDialog("http://www.baidu.com");
-      },
-      // run: function () {
-      //   //top.kibana_help();
-      //   ddd();
-      //   // alert(dialog);
-      //   // ngDialog.open({
-      //   //   template: '<p>my template</p>',
-      //   //   plain: true
-      //   // });
-      //   //window.open("http://www.qq.com");
-      //   // ngDialog.open({
-      //   //   template: '<p>my template</p>',
-      //   //   plain: true
-      //   // });
-      // },
-      //template: require('plugins/kibana/discover/partials/help_search.html'),
-      testId: 'discoverHelpButton',
-    },
-  //   {
-  //   key: 'new',
-  //   description: 'New Search',
-  //   run: function () {
-  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-  //     kbnUrl.change(`/discover?_a=(index:'${$scope.indexPattern}')`);// 对当前索引
-  //   },
-  //   testId: 'discoverNewButton',
-  // },
-    {
-    key: 'save',
-    description: 'Save Search',
-    template: require('plugins/kibana/discover/partials/save_search.html'),
-    testId: 'discoverSaveButton',
-  }, {
-    key: 'open',
-    description: 'Open Saved Search',
-    template: require('plugins/kibana/discover/partials/load_search.html'),
-    testId: 'discoverOpenButton',
-  }
-  // , {
-  //   key: 'export',
-  //   description: 'Export Search',
-  //   run: function () {
-  //     /*kbnUrl.change('/discover'); //这样跳转会加载默认的索引 */
-  //     alert(1);
-  //     $scope.export();
-  //   },
-  //   testId: 'discoverExportButton',
-  // },
-  //   ,{
-  //     key: 'share',
-  //     description: 'Share Search',
-  //     run: function () {
-  //
-  //     },
-  //     testId: 'discoverShareButton',
-  //   }
-  ];
-  $scope.timefilter = timefilter;
 
+  $scope.timefilter = timefilter;
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
-  $scope.$on('$destroy', savedSearch.destroy);
+  $scope.$on('$destroy', savedSearch.destroy);  
+
+  console.log(savedSearch.uiConf);
+  //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
+  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);  
+
+  function getTopNavMenu(menuKeys) {
+    let confTopNavMenu = {
+      "help": {
+        key: 'help',
+        description: 'help',
+        run: function () {
+          window.open("/doc/help/kibana_discover_help.htm");
+          //$scope.helpDialog();
+        },
+        testId: 'discoverHelpButton',
+      },
+      'save': {
+        key: 'save',
+        description: 'Save Search',
+        template: require('plugins/kibana/discover/partials/save_search.html'),
+        testId: 'discoverSaveButton',
+      },
+      'open': {
+        key: 'open',
+        description: 'Open Saved Search',
+        template: require('plugins/kibana/discover/partials/load_search.html'),
+        testId: 'discoverOpenButton',
+      },
+      'export': {
+        key: 'export',
+        description: 'Export Search',
+        run: function () {
+          $scope.export();
+        },
+        testId: 'discoverExportButton',
+      }
+    };    
+
+    let menus = [];
+    if (menuKeys && menuKeys.length == 0) {
+      for (let key in confTopNavMenu) {
+        menuKeys.push(key);
+      }
+    }
+    menuKeys.forEach(function (value) {
+      let confMenu = confTopNavMenu[value];
+      if (confMenu) {
+        menus.push(confMenu);
+      }
+    });
+
+    // menus.push({
+    //   key: 'callNodejs',
+    //   description: 'callNodejs',
+    //   run: function () {
+    //     $scope.callNodejs();
+    //   },
+    //   testId: 'callNodejsButton',
+    // });
+
+    return menus;
+  }
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
+
+  $scope.helpDialog = function () {
+    ngDialog.open({
+      width: '90%',
+      height: '98%',
+      template: '<div style="padding-top: 20px; height: 100%"><iframe style="border: 1px solid;border-radius: 8px;width: 100%;height: inherit;" src="/doc/help/kibana_discover_help.htm"></iframe></div>',
+      className: 'ngdialog-theme-default',
+      plain: true
+    });
+  }
 
 
   /*
@@ -222,6 +293,8 @@ debugger;
       query: $scope.searchSource.get('query') || '',
       sort: getSort.array(savedSearch.sort, $scope.indexPattern),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns'),
+      //pageSize: savedSearch.pageSize ? savedSearch.pageSize : config.get('discover:sampleSize'),
+      pageSize: savedSearch.uiConf.pageSize ? savedSearch.uiConf.pageSize : config.get('discover:sampleSize'),
       index: $scope.indexPattern.id,
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
@@ -234,10 +307,12 @@ debugger;
   $scope.$watchCollection('state.columns', function () {
     $state.save();
   });
-
+  
   $scope.opts = {
     // number of records to fetch, then paginate through
-    sampleSize: config.get('discover:sampleSize'),
+    //sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
+    sampleSize: parseInt(savedSearch.uiConf.pageSize || config.get('discover:sampleSize')),
+    //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,
     timefield: $scope.indexPattern.timeFieldName,
@@ -384,6 +459,8 @@ debugger;
       savedSearch.id = savedSearch.title;
       savedSearch.columns = $scope.state.columns;
       savedSearch.sort = $scope.state.sort;
+      //savedSearch.pageSize = $scope.opts.sampleSize;
+      savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
 
       return savedSearch.save()
       .then(function (id) {
@@ -653,54 +730,10 @@ debugger;
       notify.warning(err + ' Using the default index pattern: "' + loaded.id + '"');
     }
     return loaded;
-  }
-
-  $scope.export=function () {
-    let url = "/elasticsearch/export/_search";
-    let data = {"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082};
-    data = {"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]};
-    data={
-      "index": "异常日志",
-      "filter": [],
-      "highlight": {
-        "pre_tags": [
-          "@kibana-highlighted-field@"
-        ],
-        "post_tags": [
-          "@/kibana-highlighted-field@"
-        ],
-        "fields": {
-          "*": {}
-        },
-        "require_field_match": false,
-        "fragment_size": 2147483647
-      },
-      "query": {
-        "query_string": {
-          "query": "*",
-          "analyze_wildcard": true
-        }
-      }
-    };
-    data={
-      "query": {
-        "match_all": {}
-      }
-    }
-    $http.post(url, data)
-      .then(function successCallback(response) {
-        console.log(response);
-        // this callback will be called asynchronously
-        // when the response is available
-      }, function errorCallback(response) {
-        debugger;
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-      });
-  }
+  } 
 
   $scope.test=function () {
-    debugger;
+    /** debugger; */
 
     /*在方法中 this===$scope 成立*/
     /*
@@ -718,5 +751,93 @@ debugger;
     $state.save();
     //或$scope.fetch() 详细分析见http://www.cnblogs.com/xing901022/p/5158425.html
   }
+
+  $scope.export = function(){
+    let indexPattern = $scope.indexPattern;
+    let columns = $scope.state.columns;
+    discoverExportExcel(indexPattern,columns,savedSearch,$scope.rows);
+  }
+
+  const requestQueue = Private(RequestQueueProvider);
+  // const isRequest = Private(IsRequestProvider);
+  // const mergeDuplicateRequests = Private(MergeDuplicatesRequestProvider);
+  const callClientExport = Private(require('ui/courier/fetch/call_client_export'));
+  const forEachStrategy = Private(require("ui/courier/fetch/for_each_strategy"));
+  const ABORTED = { CourierFetchRequestStatus: 'aborted' };
+
+  $scope.callNodejs=function () {
+
+    /** debugger; */
+    // $scope.searchSource 拼接查询条件的数据
+    // alert($scope.searchSource._fetchStrategy);
+    // alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
+
+    const requests = requestQueue.getStartable($scope.searchSource._fetchStrategy);
+    
+    function startRequests(requests) {
+      return Promise.map(requests, function (req) {
+        //return req;
+        return new Promise(function (resolve) {
+          const action = req.started ? req.continue : req.start;
+          resolve(action.call(req));
+        })
+          .catch(err => {
+            console.log(err);
+          });
+      });
+    }
+
+    function fetchWithStrategy(strategy, requests) {
+      function replaceAbortedRequests() {
+        requests = requests.map(r => r.aborted ? ABORTED : r);
+      }
+
+      replaceAbortedRequests();
+      return startRequests(requests)
+      .then(function () {
+        replaceAbortedRequests();
+        return callClientExport(strategy, requests);
+      })
+    }
+
+    let ooo = forEachStrategy(requests, function (strategy, reqsForStrategy) {
+      return fetchWithStrategy(strategy, reqsForStrategy.map(function (req) {
+        if (!req.started) return req;
+        return req.retry();
+      }));
+    })
+      .catch(notify.fatal);
+
+    /** debugger; */
+    let reqsFetchParams = [
+      {
+        index: ['logstash-123'],
+        type: 'blah',
+        search_type: 'blah2',
+        body: { foo: 'bar', $foo: 'bar' }
+      }
+    ];
+    /** debugger; */
+    let value;
+    $scope.searchSource._fetchStrategy.reqsFetchParamsToBody(reqsFetchParams)
+      .then(val => {
+        value = val;
+        console.log(value);
+      });
+
+    // let url = "/elasticsearch/export/_msearch";
+    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
+    // $http.post(url, data)
+    //   .then(function successCallback(response) {
+    //     console.log(response);
+    //     // this callback will be called asynchronously
+    //     // when the response is available
+    //   }, function errorCallback(response) {
+    //     /** debugger; */
+    //     // called asynchronously if an error occurs
+    //     // or server returns response with an error status.
+    //   });
+  }
+
   init();
 };

@@ -1,2 +1,2 @@
-require('ui/autoload/all');
-require('./app');
+// require('ui/autoload/all');
+// require('./app');

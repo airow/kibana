@@ -17,10 +17,11 @@ uiModules.get('kibana')
     template: html,
     scope: {
       sorting: '=',
-      columns: '=',
+      columns: '=',      
       hits: '=?', // You really want either hits & indexPattern, OR searchSource
       indexPattern: '=?',
       searchSource: '=?',
+      savedObj: '=?',
       infiniteScroll: '=?',
       filter: '=?',
     },
@@ -78,7 +79,8 @@ uiModules.get('kibana')
 
         $scope.indexPattern = $scope.searchSource.get('index');
 
-        $scope.searchSource.size(config.get('discover:sampleSize'));
+        //$scope.searchSource.size(config.get('discover:sampleSize'));
+        $scope.searchSource.size($scope.savedObj.uiConf.pageSize || config.get('discover:sampleSize'));
         $scope.searchSource.sort(getSort($scope.sorting, $scope.indexPattern));
 
         // Set the watcher after initialization
@@ -97,11 +99,22 @@ uiModules.get('kibana')
         $scope.searchSource.onResults().then(function onResults(resp) {
           // Reset infinite scroll limit
           $scope.limit = 50;
+          //$scope.limit = $scope.savedObj.uiConf.pageSize
 
           // Abort if something changed
           if ($scope.searchSource !== $scope.searchSource) return;
 
           $scope.hits = resp.hits.hits;
+
+          let results = {
+            indexPattern: $scope.indexPattern,
+            columns: $scope.columns,
+            //savedSearch: savedSearch,
+            rows: resp.hits.hits
+          };
+
+          //2017-02-17 00:32:09 父子通信
+          $scope.$emit('doc_table.hits.onResults', results);  
 
           return $scope.searchSource.onResults().then(onResults);
         }).catch(notify.fatal);

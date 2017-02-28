@@ -2,10 +2,13 @@ import angular from 'angular';
 import _ from 'lodash';
 import moment from 'moment';
 import uiModules from 'ui/modules';
+
+import DashboardUiConfProvider from '../../ui_conf_provider/dashboard_uiconf';
+
 const module = uiModules.get('app/dashboard');
 
 // Used only by the savedDashboards service, usually no reason to change this
-module.factory('SavedDashboard', function (courier, config) {
+module.factory('SavedDashboard', function (courier, config, Private) {
   // SavedDashboard constructor. Usually you'd interact with an instance of this.
   // ID is option, without it one will be generated on save.
   _.class(SavedDashboard).inherits(courier.SavedObject);
@@ -33,7 +36,8 @@ module.factory('SavedDashboard', function (courier, config) {
         timeRestore: false,
         timeTo: undefined,
         timeFrom: undefined,
-        refreshInterval: undefined
+        refreshInterval: undefined,
+        uiConf: Private(DashboardUiConfProvider).defaultConf
       },
 
       // if an indexPattern was saved with the searchsource of a SavedDashboard

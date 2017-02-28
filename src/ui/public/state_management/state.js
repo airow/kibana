@@ -148,7 +148,6 @@ export default function StateProvider(Private, $rootScope, $location, config) {
     if (diffResults.keys.length) {
       this.emit('save_with_changes', diffResults.keys);
     }
-debugger;
     // persist the state in the URL
     let search = $location.search();
     search[this._urlParam] = this.toQueryParam(state);

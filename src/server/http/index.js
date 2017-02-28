@@ -83,6 +83,22 @@ module.exports = async function (kbnServer, server, config) {
   });
 
   server.route({
+    path: "/config",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.redirect("app/kibana#/management/kibana/objects");
+    }
+  });
+
+  server.route({
+    path: "/config/{tab}",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.redirect(`/app/kibana#/management/kibana/objects?_a=(tab:${req.params.tab})`);
+    }
+  });
+
+  server.route({
     path: '/',
     method: 'GET',
     handler: function (req, reply) {
@@ -141,6 +157,9 @@ module.exports = async function (kbnServer, server, config) {
   // Expose static assets (fonts, favicons).
   server.exposeStaticDir('/ui/fonts/{path*}', resolve(__dirname, '../../ui/public/assets/fonts'));
   server.exposeStaticDir('/ui/favicons/{path*}', resolve(__dirname, '../../ui/public/assets/favicons'));
+
+  // 帮助文档静态文件
+  server.exposeStaticDir('/doc/{path*}', resolve(__dirname, '../../ui/public/assets/doc'));
 
   kbnServer.mixin(versionCheckMixin);
 

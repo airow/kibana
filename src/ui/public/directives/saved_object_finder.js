@@ -253,7 +253,7 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
         // and needs to be smart about when it actually searches
         let filter = currentFilter;
         if (prevSearch === filter) return;
-        debugger;
+        /** debugger; */
         prevSearch = filter;
         self.service.find(filter)
         .then(function (hits) {
