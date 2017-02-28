@@ -4,5 +4,6 @@
         "build/**": true,
         "optimize/**": true,
         "**/*.js.map": true
-    }
+    },
+    "vsicons.presets.angular": false
 }
