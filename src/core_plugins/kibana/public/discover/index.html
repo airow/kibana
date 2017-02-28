@@ -12,7 +12,8 @@
             <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
           </span>
           <span data-test-subj="discoverQueryHits" class="localBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
-          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+          <!--<ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>-->
+          <ng-pluralize count="hits" when="{'1':'个已找到', 'other':'个已找到'}"></ng-pluralize>
         </div>
       </div>
 
@@ -37,7 +38,7 @@
               input-focus
               kbn-typeahead-input
               ng-model="state.query"
-              placeholder="Search..."
+              placeholder="搜索..."
               aria-label="Search input"
               type="text"
               class="localSearchInput"
@@ -52,7 +53,7 @@
               <span class="fa fa-search" aria-hidden="true"></span>
             </button>
           </div>
-          <div style="margin-left: 210px;">
+          <div style="margin-left: 240px;">
             <kbn-typeahead-items></kbn-typeahead-items>
           </div>
         </div>
@@ -87,7 +88,8 @@
           <!-- loading -->
           <div ng-show="resultState === 'loading'">
             <div class="discover-overlay">
-              <h2>Searching</h2>
+              <!--<h2>Searching</h2>-->
+              <h2>搜索中</h2>
               <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
             </div>
           </div>
@@ -111,7 +113,7 @@
                     <select
                       class="form-control"
                       ng-model="state.interval"
-                      ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
+                      ng-options="interval.val as (interval.display_zh_CN || interval.display) for interval in intervalOptions | filter: intervalEnabled"
                       >
                     </select>
                   </span>
@@ -140,10 +142,14 @@
               </doc-table>
 
               <div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">
-                <center>
+                <!--<center>
                   These are the first {{opts.sampleSize}} documents matching
                   your search, refine your search to see others.
                   <a ng-click="toTop()" title="Back to top">Back to top.</a>
+                </center>-->
+                <center>
+                  这是匹配到的前{{opts.sampleSize}}笔记录, 看其他内容请细化你的查询.
+                  <a ng-click="toTop()" title="Back to top">返回顶部.</a>
                 </center>
               </div>
             </div>

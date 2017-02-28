@@ -126,8 +126,8 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
       function getTopNavMenu(menuKeys) {
         let confTopNavMenu = {
           'help': {
-            key: 'help',
-            description: 'help',
+            key: '帮助',
+            description: '帮助',
             run: function () {
               window.open("/doc/help/kibana_discover_help.htm");
               //$scope.helpDialog();
@@ -135,8 +135,8 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
           }
           ,
           'export': {
-            key: 'export',
-            description: 'Export Search',
+            key: '导出',
+            description: '导出',
             run: function () {
               $scope.export();
             },

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import 'ui/filters/short_dots';
-import headerHtml from 'ui/doc_table/components/table_header.html';
+import headerHtml from 'ui/doc_table/components/table_header_zh_CN.html';
 import uiModules from 'ui/modules';
 let module = uiModules.get('app/discover');
 

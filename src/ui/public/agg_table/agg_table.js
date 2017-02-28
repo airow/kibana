@@ -3,7 +3,7 @@ import 'ui/compile_recursive_directive';
 import 'ui/agg_table/agg_table.less';
 import _ from 'lodash';
 import uiModules from 'ui/modules';
-import aggTableTemplate from 'ui/agg_table/agg_table.html';
+import aggTableTemplate from 'ui/agg_table/agg_table_zh_CN.html';
 
 uiModules
 .get('kibana')

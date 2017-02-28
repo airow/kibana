@@ -1,4 +1,4 @@
-import html from 'ui/timepicker/timepicker.html';
+import html from 'ui/timepicker/timepicker_zh_CN.html';
 import _ from 'lodash';
 import dateMath from '@elastic/datemath';
 import moment from 'moment';
@@ -27,7 +27,8 @@ module.directive('kbnTimepicker', function (quickRanges, timeUnits, refreshInter
     },
     template: html,
     controller: function ($scope) {
-      $scope.format = 'MMMM Do YYYY, HH:mm:ss.SSS';
+      //$scope.format = 'MMMM Do YYYY, HH:mm:ss.SSS';
+      $scope.format = 'YYYY-MM-DD, HH:mm:ss.SSS';
       $scope.modes = ['quick', 'relative', 'absolute'];
       $scope.activeTab = $scope.activeTab || 'filter';
       /** debugger; */
@@ -51,13 +52,20 @@ module.directive('kbnTimepicker', function (quickRanges, timeUnits, refreshInter
       $scope.units = timeUnits;
 
       $scope.relativeOptions = [
-        {text: 'Seconds ago', value: 's'},
-        {text: 'Minutes ago', value: 'm'},
-        {text: 'Hours ago', value: 'h'},
-        {text: 'Days ago', value: 'd'},
-        {text: 'Weeks ago', value: 'w'},
-        {text: 'Months ago', value: 'M'},
-        {text: 'Years ago', value: 'y'},
+        // {text: 'Seconds ago', value: 's'},
+        // {text: 'Minutes ago', value: 'm'},
+        // {text: 'Hours ago', value: 'h'},
+        // {text: 'Days ago', value: 'd'},
+        // {text: 'Weeks ago', value: 'w'},
+        // {text: 'Months ago', value: 'M'},
+        // {text: 'Years ago', value: 'y'},
+        {text: '秒前', value: 's'},
+        {text: '分钟前', value: 'm'},
+        {text: '小时前', value: 'h'},
+        {text: '天前', value: 'd'},
+        {text: '星期前', value: 'w'},
+        {text: '月前', value: 'M'},
+        {text: '年前', value: 'y'},
       ];
 
       $scope.$watch('from', function (date) {

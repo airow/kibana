@@ -87,6 +87,7 @@
     "angular": "1.4.7",
     "angular-bootstrap-colorpicker": "3.0.19",
     "angular-elastic": "2.5.0",
+    "angular-i18n": "1.6.2",
     "angular-route": "1.4.7",
     "angular-sanitize": "1.5.7",
     "ansicolors": "0.3.2",

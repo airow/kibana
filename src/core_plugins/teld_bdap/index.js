@@ -66,7 +66,7 @@ export default function (kibana) {
           // The require reference to the JavaScript file for this app
           main: 'plugins/teld_bdap/views/login/login',
           // The require reference to the icon of the app
-          icon: 'plugins/teld_bdap/icon.svg'
+          //icon: 'plugins/teld_bdap/icon.svg'
         },
         {
           // The title of the app (will be shown to the user)
@@ -76,7 +76,7 @@ export default function (kibana) {
           // The require reference to the JavaScript file for this app
           main: 'plugins/teld_bdap/views/login/login',
           // The require reference to the icon of the app
-          icon: 'plugins/teld_bdap/icon.svg'
+          //icon: 'plugins/teld_bdap/icon.svg'
         }
       ],
 
