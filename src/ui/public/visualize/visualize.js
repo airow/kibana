@@ -5,7 +5,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import RegistryVisTypesProvider from 'ui/registry/vis_types';
 import uiModules from 'ui/modules';
-import visualizeTemplate from 'ui/visualize/visualize.html';
+import visualizeTemplate from 'ui/visualize/visualize_zh_CN.html';
 import 'angular-sanitize';
 
 import {

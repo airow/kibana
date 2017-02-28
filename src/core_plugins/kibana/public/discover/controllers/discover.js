@@ -39,27 +39,11 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 //import '../../ui_conf_provider/directives/top';
 import 'plugins/kibana/ui_conf_provider/directives/top';
 
-//import uiConfTopTemplate from '../../ui_conf_provider/directives/top.html';
-
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
-  'kibana/index_patterns',
+  'kibana/index_patterns'
 ]);
-
-// app.directive('uiConfTop', function () {
-//   return {
-//     restrict: 'E',
-//     replace: true,
-//     template: uiConfTopTemplate,
-//     scope : {
-//       size: '=sampleSize'
-//     },
-//     controller: function ($scope) {
-//       $scope.sizeArray = [100, 500, 1000, 5000, 10000, 50000];
-//     }
-//   };
-// });
 
 uiRoutes
 .defaults(/discover/, {
@@ -202,8 +186,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
       "help": {
-        key: 'help',
-        description: 'help',
+        key: '帮助',
+        description: '帮助',
         run: function () {
           window.open("/doc/help/kibana_discover_help.htm");
           //$scope.helpDialog();
@@ -211,20 +195,20 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         testId: 'discoverHelpButton',
       },
       'save': {
-        key: 'save',
-        description: 'Save Search',
-        template: require('plugins/kibana/discover/partials/save_search.html'),
+        key: '保存',
+        description: '保存查询',
+        template: require('plugins/kibana/discover/partials/save_search_zh_CN.html'),
         testId: 'discoverSaveButton',
       },
       'open': {
-        key: 'open',
-        description: 'Open Saved Search',
-        template: require('plugins/kibana/discover/partials/load_search.html'),
+        key: '打开',
+        description: '打开查询',
+        template: require('plugins/kibana/discover/partials/load_search_zh_CN.html'),
         testId: 'discoverOpenButton',
       },
       'export': {
-        key: 'export',
-        description: 'Export Search',
+        key: '导出',
+        description: '导出',
         run: function () {
           $scope.export();
         },
@@ -389,7 +373,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           $scope.intervalName = 'by ' + buckets[0].buckets.getInterval().description;
         } else {
           $scope.intervalName = 'auto';
-        }
+        }        
       });
 
       $scope.$watchMulti([

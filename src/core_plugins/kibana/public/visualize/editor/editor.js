@@ -124,7 +124,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   //   testId: 'visualizeShareButton',
   // }, 
   {
-    key: 'refresh',
+    key: '刷新',
     description: 'Refresh',
     run: function () { $scope.fetch(); },
     testId: 'visualizeRefreshButton',

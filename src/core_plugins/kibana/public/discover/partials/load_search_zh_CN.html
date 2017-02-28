@@ -1,0 +1,9 @@
+<form role="form" ng-submit="fetch()">
+  <div class="localDropdownTitle">打开查询</div>
+  <!--use-local-management:设置为true，就不显示“Manage xxxxx”链接了
+    相关代码：src/ui/public/directives/saved_object_finder.js
+            src/ui/public/partials/saved_object_finder.html
+  -->
+  <saved-object-finder type="searches" use-local-management="true"></saved-object-finder>
+</form>
+

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import uiModules from 'ui/modules';
-import noResultsTemplate from '../partials/no_results.html';
+import noResultsTemplate from '../partials/no_results_zh_CN.html';
 
 uiModules
 .get('apps/discover')

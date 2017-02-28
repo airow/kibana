@@ -28,14 +28,26 @@ module.directive('prettyDuration', function (config, quickRanges, timeUnits) {
         if ($scope.from && $scope.to && !moment.isMoment($scope.from) && !moment.isMoment($scope.to)) {
           let tryLookup = lookupByRange[$scope.from.toString() + ' to ' + $scope.to.toString()];
           if (tryLookup) {
-            $elem.text(tryLookup.display);
+            $elem.text(tryLookup.display_zh_CN || tryLookup.display);
           } else {
             let fromParts = $scope.from.toString().split('-');
             if ($scope.to.toString() === 'now' && fromParts[0] === 'now' && fromParts[1]) {
               let rounded = fromParts[1].split('/');
-              text = 'Last ' + rounded[0];
+              //text = 'Last ' + rounded[0];
+              text = '最近' + rounded[0];
+
+              let relativeParts = rounded[0].match(/([0-9]+)([smhdwMy]).*/);
+              if (relativeParts[1] && relativeParts[2]) {
+                let count = parseInt(relativeParts[1], 10);
+                let unit = relativeParts[2];
+
+                //text = '最近 ' + count + timeUnits[unit];
+                text = `最近${count}${timeUnits[unit]}`;
+              }
+
               if (rounded[1]) {
-                text = text + ' rounded to the ' + timeUnits[rounded[1]];
+                //text = text + ' rounded to the ' + timeUnits[rounded[1]];
+                text = text + ' 精确到' + timeUnits[rounded[1]];
               }
               $elem.text(text);
             } else {

@@ -3,7 +3,7 @@ import rison from 'rison-node';
 import keymap from 'ui/utils/key_map';
 import SavedObjectsSavedObjectRegistryProvider from 'ui/saved_objects/saved_object_registry';
 import uiModules from 'ui/modules';
-import savedObjectFinderTemplate from 'ui/partials/saved_object_finder.html';
+import savedObjectFinderTemplate from 'ui/partials/saved_object_finder_zh_CN.html';
 let module = uiModules.get('kibana');
 
 module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Private, config) {

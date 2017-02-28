@@ -8,7 +8,7 @@ import rison from 'rison-node';
 import fieldCalculator from 'plugins/kibana/discover/components/field_chooser/lib/field_calculator';
 import IndexPatternsFieldListProvider from 'ui/index_patterns/_field_list';
 import uiModules from 'ui/modules';
-import fieldChooserTemplate from 'plugins/kibana/discover/components/field_chooser/field_chooser.html';
+import fieldChooserTemplate from 'plugins/kibana/discover/components/field_chooser/field_chooser_zh_CN.html';
 const app = uiModules.get('apps/discover');
 
 
@@ -51,9 +51,12 @@ app.directive('discFieldChooser', function ($location, globalState, config, $rou
           missing: true
         },
         boolOpts: [
-          {label: 'any', value: undefined },
-          {label: 'yes', value: true },
-          {label: 'no', value: false }
+          // {label: 'any', value: undefined },
+          // {label: 'yes', value: true },
+          // {label: 'no', value: false }
+          {label: '所有', value: undefined },
+          {label: '是', value: true },
+          {label: '否', value: false }
         ],
         toggleVal: function (name, def) {
           if (filter.vals[name] !== def) filter.vals[name] = def;

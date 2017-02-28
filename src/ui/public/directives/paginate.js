@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import uiModules from 'ui/modules';
-import paginateControlsTemplate from 'ui/partials/paginate_controls.html';
+import paginateControlsTemplate from 'ui/partials/paginate_controls_zh_CN.html';
 
 let PER_PAGE_DEFAULT = 10;
 
@@ -49,7 +49,7 @@ uiModules.get('kibana')
         { title: '10', value: 10 },
         { title: '25', value: 25 },
         { title: '100', value: 100 },
-        { title: 'All', value: ALL }
+        { title: 'All', title_zh_CH: '全部', value: ALL }
       ];
 
       // setup the watchers, called in the post-link function

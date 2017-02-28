@@ -1,0 +1,79 @@
+<div>
+  <div class="col-md-10 col-md-offset-1" data-test-subj="discoverNoResults">
+
+    <!--<h1>No results found <i aria-hidden="true" class="fa fa-meh-o"></i></h1>-->
+    <h1>没有找到记录 <i aria-hidden="true" class="fa fa-meh-o"></i></h1>
+
+    <p>
+      <!--Unfortunately I could not find any results matching your search. I tried really hard. I looked all over the place and frankly, I just couldn't find anything good. Help me, help you. Here are some ideas:-->
+      很遗憾没有匹配到你想要的结果. 以下是一些建议：
+    </p>
+
+    <div class="shard-failures" ng-show="failures">
+      <h3>Shard Failures</h3>
+      <p>The following shard failures ocurred:</p>
+      <ul>
+        <li ng-repeat="failure in failures | limitTo: failuresShown"><strong>Index:</strong> {{failure.index}} <strong>Shard:</strong> {{failure.shard}} <strong>Reason:</strong> {{failure.reason}} </li>
+      </ul>
+      <a ng-click="showAllFailures()" ng-if="failures.length > failuresShown" title="Show More">Show More</a>
+      <a ng-click="showLessFailures()" ng-if="failures.length === failuresShown && failures.length > 5" title="Show Less">Show Less</a>
+    </div>
+
+    <!--<div ng-show="opts.timefield">
+      <p>
+        <h3>Expand your time range</h3>
+        <p>I see you are looking at an index with a date field. It is possible your query does not match anything in the current time range, or that there is no data at all in the currently selected time range. Click the button below to open the time picker. For future reference you can open the time picker by clicking on the <a class="btn btn-xs navbtn" ng-click="kbnTopNav.toggle('filter')" aria-expanded="kbnTopNav.is('filter')" aria-label="time picker" data-test-subj="discoverNoResultsTimefilter"><i aria-hidden="true" class="fa fa-clock-o"></i> time picker</a> button in the top right corner of your screen.
+      </p>
+    </div>-->
+
+    <div ng-show="opts.timefield">
+      <p>
+        <h3>选择更广的时间范围</h3>
+        <p>我看到你在看一个日期字段的索引。您的查询可能与当前时间范围内的任何内容不匹配，或者在当前选定的时间范围内没有数据。点击下面的按钮来打开时间选择器。备查，你可以通过点击打开时间选择器<a class="btn btn-xs navbtn" ng-click="kbnTopNav.toggle('filter')" aria-expanded="kbnTopNav.is('filter')" aria-label="time icker" data-test-subj="discoverNoResultsTimefilter"><i aria-hidden="true" class="fa fa-clock-o"></i> 选择时间</a> 按钮，在你屏幕的右上方。
+      </p>
+    </div>
+
+    <!--<h3>Refine your query</h3>
+    <p>
+      The search bar at the top uses Elasticsearch's support for Lucene <a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax" target="_blank">Query String syntax</a>. Let's say we're searching web server logs that have been parsed into a few fields.
+    </p>-->
+
+    <h3>细化查询条件</h3>
+
+    <!--<p>
+      <h4>Examples:</h4>
+      Find requests that contain the number 200, in any field:
+      <pre>200</pre>
+
+      Or we can search in a specific field. Find 200 in the status field:
+      <pre>status:200</pre>
+
+      Find all status codes between 400-499:
+      <pre>status:[400 TO 499]</pre>
+
+      Find status codes 400-499 with the extension php:
+      <pre>status:[400 TO 499] AND extension:PHP</pre>
+
+      Or HTML
+      <pre>status:[400 TO 499] AND (extension:php OR extension:html)</pre>
+    </p>-->
+
+    <p>
+      <h4>例子:</h4>
+      在所有字段中，查找包含数字200记录。
+      <pre>200</pre>
+
+      或 你可以在指定字段中查找。 在 status 字段中查找200:
+      <pre>status:200</pre>
+
+      查找一个范围: 使用 TO 连接的两个值，并用方括号（[]）将其包围
+      <pre>status:[400 TO 499]</pre>
+
+      同时查找多个添加，使用 AND(并且) 、OR(或) 进行连接
+      <pre>status:[400 TO 499] AND extension:PHP</pre>
+
+      <pre>status:[400 TO 499] AND (extension:php OR extension:html)</pre>
+    </p>
+
+  </div>
+</div>
