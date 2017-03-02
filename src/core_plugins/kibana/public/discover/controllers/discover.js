@@ -223,8 +223,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       }
     };    
 
-    menuKeys.push("adv");
-
+    if (_.has(menuKeys, "adv") == false) {
+      menuKeys.push("adv");
+    }
+    
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
       for (let key in confTopNavMenu) {
@@ -273,7 +275,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       }
     },
     {
-      "bool": {
+      "bool-bool": {
         "must": [
           {
             "range": {
