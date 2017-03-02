@@ -1,0 +1,34 @@
+<table class="table adv">
+  <!--must-->
+  <tbody data-bool='must'>
+    <tr>
+      <td colspan="5">与<button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus"></button></td>
+    </tr>
+    <tr ng-repeat="x in boolSource.must.must">
+      <td>
+        {{x}}<br/>444444
+        <!--<select class="form-control" ng-options="value in operator" ng-model="x">
+          <option></option>
+        </select>-->
+      </td>
+      <td>
+        <!--<select class="form-control" ng-options="value in operator" ng-model="x">
+          <option></option>
+        </select>-->
+      </td>
+      <td>
+        <input type="text" class="form-control" />
+      </td>
+      <td>
+        <!--<button type="button" class="btn btn-primary btn-xs glyphicon glyphicon-plus"></button>
+        <button type="button" class="btn btn-primary btn-xs glyphicon glyphicon-plus"></button>-->
+        <button type="button" class="glyphicon glyphicon-remove"></button>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="5" data-bool="bool" ng-if='boolSource.must.bool'>
+        <discover-condition bool-source="boolSource.must.bool"></discover-condition>                
+      </td>
+    </tr>
+  </tbody>
+</table>

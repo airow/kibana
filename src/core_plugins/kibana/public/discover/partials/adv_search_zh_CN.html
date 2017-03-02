@@ -1,0 +1,34 @@
+<div class="kbn-timepicker3">
+  <style>
+    table.adv {
+      margin: 0px;
+    }
+    table.adv tbody[data-bool='must'] {
+      border-left:cornflowerblue solid;
+    }
+    table.adv tbody[data-bool='should'] {
+      border-left:yellowgreen solid;
+    }
+  </style>
+  <div class="tab-content">
+
+    <!-- Filters -->
+    <div role="tabpanel" class="tab-pane active">
+      <div class="localDropdownTitle">时间范围</div>
+      <div class="row">
+        <div class="col-md-11 col-md-offset-1">
+          <!--<button ng-class="showBool222()">nn</button>-->
+          <!--【{{bool}}】-->
+          <discover-condition bool-source="bool" field-source='fieldSource'></discover-condition>
+
+          <!--<tree-model
+              tree-id="tree01"              
+              bool-source="roleList1"
+              node-id="roleId"
+              node-label="roleName"
+              node-children="children" >
+              </tree-model>-->
+        </div>
+      </div>
+  </div>
+</div>

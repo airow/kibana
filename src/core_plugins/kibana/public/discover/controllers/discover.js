@@ -38,6 +38,7 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 
 //import '../../ui_conf_provider/directives/top';
 import 'plugins/kibana/ui_conf_provider/directives/top';
+import 'plugins/kibana/condition/directives/condition';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -206,6 +207,12 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         template: require('plugins/kibana/discover/partials/load_search_zh_CN.html'),
         testId: 'discoverOpenButton',
       },
+      'adv': {
+        key: '高级查询',
+        description: '高级查询',
+        template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
+        testId: 'discoverOpenButton',
+      },
       'export': {
         key: '导出',
         description: '导出',
@@ -215,6 +222,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         testId: 'discoverExportButton',
       }
     };    
+
+    menuKeys.push("adv");
 
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
@@ -245,6 +254,156 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
+
+  $scope.boolOriginal = {
+    "must": [
+      {
+      "range": {
+        "1111": {
+          "gte": "20170117174521446+08:00",
+          "lte": "20170117174521446+08:00"
+        }
+      }
+    },
+    {
+      "term": {
+        "1111": {
+          "value": "20170117174521446+08:00"
+        }
+      }
+    },
+    {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "2222": {
+                "gte": "20170117174521446+08:00",
+                "lte": "20170117174521446+08:00"
+              }
+            }
+          },
+          {
+            "term": {
+              "2222": {
+                "value": "20170117174521446+08:00"
+              }
+            }
+          }
+        ]
+      }
+    }],
+    "should": [{}, {
+      "term": {
+        "字段4": {
+          "value": "20170117174521446+08:00"
+        }
+      }
+    }, {}]
+  }
+  $scope.showBool222 = function () {
+    //console.log($scope.roleList1);
+    $scope.roleList1.push({ "roleName": "Guest333", "roleId": "role3333", "children": [] });
+  }
+
+  $scope.roleList1 = [
+    {
+      "roleName": "User", "roleId": "role1", "children": [
+        { "roleName": "subUser1", "roleId": "role11", "children": [] },
+        {
+          "roleName": "subUser2", "roleId": "role12", "children": [
+            {
+              "roleName": "subUser2-1", "roleId": "role121", "children": [
+                { "roleName": "subUser2-1-1", "roleId": "role1211", "children": [] },
+                { "roleName": "subUser2-1-2", "roleId": "role1212", "children": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    { "roleName": "Admin", "roleId": "role2", "children": [] },
+
+    { "roleName": "Guest", "roleId": "role3", "children": [] }
+  ];
+
+  function term(input) {
+    let returnValue = undefined;
+    console.log(input);
+    if ('term' in input) {
+
+      _.forEach(input['term'], function (operator, field) {
+        _.forEach(operator, function (value, op) {
+          returnValue = {
+            "name": field,
+            "op": op,
+            "value": value
+          };
+        });
+      });
+    }
+    console.log(returnValue);
+    return returnValue;
+  }
+
+  function separateBool(bool, key) {
+    let original = bool[key] || [];
+
+    let returnValue = {};
+    returnValue[key] = [];
+
+    original.forEach(function (element) {
+      if ("bool" in element) {
+        let subMust = separateBool(element.bool, "must");
+        let subShould = separateBool(element.bool, "should");
+
+        returnValue.bool = { "must": subMust, "should": subShould };
+      } else {
+
+        element.fieldInfo = term(element);
+        if (element.fieldInfo && element.fieldInfo.name) {
+          element.operatorList = ({
+            "字段4": [20000, 'gle', 40000, 50000, 'value'],
+            "字段3": [1, 2, 44]
+          })[element.fieldInfo.name];
+        }
+
+        returnValue[key].push(element);
+      }
+    });
+
+    return returnValue;
+  }  
+
+  let must = separateBool($scope.boolOriginal, "must");
+  let should = separateBool($scope.boolOriginal, "should");
+  //$scope.bool = { "must": must, "should": should };
+  let bool = { "must": must, "should": should };
+
+  // function toFieldInfo(bool) {
+  //   let returnValue = {};
+
+  //   _.forEach(bool, function (value, key) {
+
+  //   });
+
+  //   return returnValue;
+  // }
+
+  $scope.bool = bool;
+  $scope.fieldSource = ["字段1", "字段2", "字段3", "字段4", "字段5"];
+  debugger;
+
+  // $scope.bool = {
+  //   "must": { "must": [1, 2, 3], "bool": { "must": { "must": [11, 12] } } }
+  // };  
+
+  // $scope.bool = [
+  //   { "must": [1, 2, 3], "bool": [{ "must": [11, 12] }] }
+  // ];  
+
+  console.log(JSON.stringify($scope.bool));
 
   $scope.helpDialog = function () {
     ngDialog.open({
@@ -600,6 +759,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
+    debugger;
     $scope.searchSource
     .size($scope.opts.sampleSize)
     .sort(getSort($state.sort, $scope.indexPattern))

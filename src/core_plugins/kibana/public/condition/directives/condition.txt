@@ -1,0 +1,390 @@
+import _ from 'lodash';
+import $ from 'jquery';
+import conditionTemplate from './condition.html';
+//import template from './tree.html';
+import uiModules from 'ui/modules';
+
+uiModules
+.get('apps/discover')
+.filter("toFieldInfo",function(){
+  return function (input) {
+    let returnValue = {};
+    console.log(input);
+    if ('term' in input) {
+
+      _.forEach(input['term'], function (operator, field) {
+        
+        returnValue["name"] = field;
+
+        _.forEach(operator, function (value, op) {
+          returnValue["op"] = op;
+          returnValue["value"] = value;
+        });
+      });
+    }
+console.log(returnValue);
+    return returnValue;
+  }
+})
+.filter("toFieldInfoArray", function () {
+  return function (inputArray) {
+    let returnValue = [];
+
+    //_(inputArray).forEach(function (input) {
+    for (let i = 0; i < inputArray.length; i++) {
+
+      let input = inputArray[i];
+
+      if ('term' in input) {
+        let fieldInfo = {};
+        returnValue.push(fieldInfo);
+        _.forEach(input['term'], function (operator, field) {
+
+          fieldInfo["name"] = field;
+
+          _.forEach(operator, function (value, op) {
+            fieldInfo["op"] = op;
+            fieldInfo["value"] = value;
+          });
+        });
+      }
+    };
+    return returnValue;
+  }
+})
+.directive('discoverCondition', function (Private, $compile) {
+  return {
+    restrict: 'E',
+    // template: conditionTemplate,/** 不能使用这种方式 */
+    scope : {
+      boolSource: '=',
+      fieldSource: '='
+    },
+    controller: function ($scope) {
+      //$scope.fieldSource = ["字段1", "字段2", "字段3", "字段4", "字段5"];
+
+      $scope.remove = function (key) {
+        _.pull(this.boolSource[key][key], this.x);
+      }
+
+      $scope.addMustGroup = function () {
+
+        let bool = this.boolSource.must.bool || (this.boolSource.must.bool = { "must": { "must": [] } });
+
+        bool.must.must.push({
+          "ter22m": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+
+      $scope.addShouldGroup = function () {
+
+        let bool = this.boolSource.should.bool || (this.boolSource.should.bool = { "should": { "should": [] } });
+
+        bool.should.must.push({
+          "ter22m": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+
+      $scope.addGroup = function (key) {
+
+        let bool = this.boolSource[key].bool || (this.boolSource[key].bool = {}[key][key] = []);
+
+        bool[key][key].push({
+          "ter22m": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+
+      $scope.addMust = function () { 
+        $scope.boolSource.must.must.push({
+          "term": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+
+      $scope.operator = function(){
+        //alert(this.x);
+        //console.log(this.selectedField);
+
+        let mapping = {
+          "字段1": [1, 2, 3, 4, 5],
+          "字段2": [10, 20, 30, 40, 50],
+          "字段3": [100, 200, 300, 400, 500],
+          "字段4": [20000, 'gle', 40000, 50000,'value'],
+          "字段5": [1000000, 2000000, 3000000, 4000000, 5000000]
+        }
+
+        return mapping[this.x.fieldInfo.name];
+      }
+
+      $scope.addShould = function () { 
+        $scope.boolSource.should.should.push({
+          "term": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+    },
+    link: function ($scope, element) {
+      const init = function () {
+        var template = `
+          <table class="table adv">
+            <!--must-->
+            <tbody data-bool='must'>
+              <tr>
+                <td colspan="5">
+                  与
+                  <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+                  <button type="button" ng-click="addMustGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">分组</button>
+                </td>
+              </tr>
+              <tr ng-repeat="x in boolSource.must.must">
+                <td>
+                  <select class="form-control" ng-model="name"  ng-options="field for field in fieldSource">
+                    <option></option>
+                  </select>
+                </td>
+                <td>           
+                {{x.fieldInfo}}     
+                  <select class="form-control" ng-options="value in operator">
+                    <option></option>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="form-control" />
+                </td>
+                <td>
+                  <button type="button" class="glyphicon glyphicon-remove" ng-click='remove("must")'></button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="5" data-bool="bool" ng-if='boolSource.must.bool'>
+                  <discover-condition bool-source="boolSource.must.bool" field-source='fieldSource'></discover-condition>
+                </td>
+              </tr>
+            </tbody>
+            <!--should-->
+            <tbody data-bool='should'>
+              <tr>
+                <td colspan="5">
+                  或
+                  <button type="button" ng-click="addShould()"  class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+                  <button type="button" ng-click="addShouldGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">分组</button>
+                </td>
+              </tr>
+              <tr ng-repeat="x in boolSource.should.should">
+                <td>
+                  <select class="form-control"  ng-model="x.fieldInfo.name"  ng-options="field for field in fieldSource">
+                    <option></option>
+                  </select>
+                </td>
+                <td>
+                  <select class="form-control" ng-model="x.fieldInfo.op"  ng-options="field for field in operator()">
+                    <option></option>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="form-control" ng-model='x.fieldInfo.value' />
+                </td>
+                <td>
+                  <button type="button" class="glyphicon glyphicon-remove" ng-click='remove("should")'></button>
+                </td>
+              </tr>
+              <tr ng-if='boolSource.should.bool'>
+                <td colspan="5" data-bool="bool">
+                  <discover-condition bool-source="boolSource.should.bool" field-source='fieldSource'></discover-condition>                
+                </td>
+              </tr>
+          </table>`;
+
+        element.html('').append($compile(template)($scope));
+      };
+
+      // Start the directive
+      init();
+    }
+  };
+})
+.directive('discoverCondition2', function (Private, $compile) {
+  return {
+    restrict: 'E',
+    template: conditionTemplate,
+    scope : {
+      boolSource: '='
+    },
+    controller: function ($scope) {
+      console.log(JSON.stringify($scope.boolSource));
+      $scope.conditionTemplate = conditionTemplate;
+      $scope.addMust = function () { 
+        $scope.boolSource.must.must.push({
+          "term": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+
+      $scope.addShould = function () { 
+        $scope.boolSource.should.should.push({
+          "term": {
+            "CreateTime": {
+              "value": "20170117174521446+08:00"
+            }
+          }
+        });
+      }
+    },
+    link: function ($scope, element) {
+      const init = function () {
+        
+      };
+
+      // Start the directive
+      init();
+    }
+  };
+})
+  .directive('treeModel', function ($compile) {
+    return {
+      restrict: 'E',
+      scope: {
+        boolSource: '='
+      },
+      controller: function ($scope) {
+        debugger;
+        console.log(($scope.boolSource));
+        $scope.fff = function(){
+          debugger;
+          //$scope.node.children.push({ "roleName": "3333", "roleId": "3333", "children": [] })
+          //console.log($scope.node);
+          $scope.boolSource.push({ "roleName": "3333", "roleId": "3333", "children": [] })
+          //$scope.$parent.boolSource.push({ "roleName": "3333", "roleId": "3333", "children": [] })
+          //console.log($scope.boolSource);
+        }
+      },
+      link: function (scope, element, attrs) {
+       
+        //tree id
+        var treeId = attrs.treeId;
+        
+        //tree model
+        var treeModel = attrs.treeModel;
+
+        //node id
+        var nodeId = attrs.nodeId || 'id';
+
+        //node label
+        var nodeLabel = attrs.nodeLabel || 'label';
+
+        //children
+        var nodeChildren = attrs.nodeChildren || 'children';
+
+        //tree template
+        // var template =
+        //   '<ul>' +
+        //   '<li data-ng-repeat="node in ' + treeModel + '">' +
+        //   '<i class="collapsed" data-ng-show="node.' + nodeChildren + '.length && node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
+        //   '<i class="expanded" data-ng-show="node.' + nodeChildren + '.length && !node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
+        //   '<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i> ' +
+        //   '<span data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
+        //   '<div data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
+        //   '</li>' +
+        //   '</ul>';
+
+        // var template =`
+        //   <ul>
+        //   <li data-ng-repeat="node in ${treeModel}">
+        //   <i class="collapsed" data-ng-show="node.${nodeChildren}.length && node.collapsed"></i>
+        //   <i class="expanded" data-ng-show="node.${nodeChildren}.length && !node.collapsed"></i>
+        //   <i class="normal" data-ng-hide="node.${nodeChildren}.length"></i>
+        //   <span data-ng-class="node.selected">{{node.${nodeLabel}}}</span>
+        //   <div data-ng-hide="node.collapsed" data-tree-model="node.${nodeChildren}" data-node-id=${nodeId} data-node-label=${nodeLabel} data-node-children=${nodeChildren}></div>
+        //   </li>
+        //   </ul>`;
+
+         var template =`
+          <ul>
+          <button ng-click='fff()'></button>
+          <li data-ng-repeat="node in boolSource">
+          <i class="collapsed" data-ng-show="node.children.length && node.collapsed"></i>
+          <i class="expanded" data-ng-show="node.children.length && !node.collapsed"></i>
+          <i class="normal" data-ng-hide="node.children.length"></i>
+          <span data-ng-class="node.selected">{{node.roleName}}</span>
+          <button ng-click='fff()'></button>
+          <tree-model data-ng-hide="node.collapsed" bool-source="node.children" data-node-id=roleId data-node-label=roleName data-node-children=children></tree-model>
+          </li>
+          </ul>`;
+
+        // var template =`
+        //   <ul>
+        //   <li data-ng-repeat="node in ${treeModel}">
+        //   <i class="collapsed" data-ng-show="node.children.length && node.collapsed"></i>
+        //   <i class="expanded" data-ng-show="node.children.length && !node.collapsed"></i>
+        //   <i class="normal" data-ng-hide="node.children.length"></i>
+        //   <span data-ng-class="node.selected">{{node.${nodeLabel}}}</span>
+        //   <div data-ng-hide="node.collapsed" data-tree-model="node.children" data-node-id=${nodeId} data-node-label=${nodeLabel} data-node-children=${nodeChildren}></div>
+        //   </li>
+        //   </ul>`;
+          
+//alert(template);
+
+        
+
+        //check tree id, tree model
+        //if (treeId && treeModel) 
+        {
+
+          //root node
+          // if (attrs.angularTreeview) {
+
+          //   //create tree object if not exists
+          //   scope[treeId] = scope[treeId] || {};
+
+          //   //if node head clicks,
+          //   scope[treeId].selectNodeHead = scope[treeId].selectNodeHead || function (selectedNode) {
+
+          //     //Collapse or Expand
+          //     selectedNode.collapsed = !selectedNode.collapsed;
+          //   };
+
+          //   //if node label clicks,
+          //   scope[treeId].selectNodeLabel = scope[treeId].selectNodeLabel || function (selectedNode) {
+
+          //     //remove highlight from previous node
+          //     if (scope[treeId].currentNode && scope[treeId].currentNode.selected) {
+          //       scope[treeId].currentNode.selected = undefined;
+          //     }
+
+          //     //set highlight to selected node
+          //     selectedNode.selected = 'selected';
+
+          //     //set currentNode
+          //     scope[treeId].currentNode = selectedNode;
+          //   };
+          // }
+
+          //Rendering template.
+          element.html('').append($compile(template)(scope));
+          //alert(treeId);
+          //alert(element.html());
+        }
+      }
+    };
+  });
