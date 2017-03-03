@@ -353,9 +353,33 @@ app.directive('dashboardApp', function ($timeout,Notifier, courier, AppState, ti
 
         //设置滚动条
         $(window).resize();
-        $('.gridster li[data-sizey]:has(doc-table):last').height('auto');
+        $('.gridster li[data-sizey]:has(doc-table):last').height('auto');       
       });
 
+      
+
+      $(window).resize(function () {
+        console.log($(".gridster li").size());
+        $("body").css('overflow', 'auto');
+        if ($(".gridster li").size() == 1) 
+        {
+          console.log($(".gridster li").size());   
+          $(".localNav").hide()       
+          $(".panel-title").css("font-size","30px").css("color","white").css("font-weight","bolder").css("display","block").css("text-align","center").html("近一年全国充电量热力图");
+          //$(".gridster li").height($(window).height());
+          $(".gridster li").height($(window).height());
+          $("body").css('overflow', 'hidden');
+          console.log($(".gridster li").height());
+
+          $(".localNav").hide();
+          $(".leaflet-control-attribution.leaflet-control").hide();
+        }
+      });
+
+      setTimeout(function() {
+        $(window).resize();        
+      }, 1000);
+      
       // $(window).resize(function () {
       //   window.refreshfillHeight = true;
       // });
