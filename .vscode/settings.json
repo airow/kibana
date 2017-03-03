@@ -5,5 +5,7 @@
         "optimize/**": true,
         "**/*.js.map": true
     },
-    "vsicons.presets.angular": false
+    "vsicons.presets.angular": false,
+    "editor.minimap.enabled": true,
+    "editor.dragAndDrop": false
 }
