@@ -260,88 +260,78 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.boolOriginal = {
     "must": [
       {
-      "range": {
-        "1111": {
-          "gte": "20170117174521446+08:00",
-          "lte": "20170117174521446+08:00"
-        }
-      }
-    },
-    {
-      "term": {
-        "1111": {
-          "value": "20170117174521446+08:00"
-        }
-      }
-    },
-    {
-      "bool-bool": {
-        "must": [
-          {
-            "range": {
-              "2222": {
-                "gte": "20170117174521446+08:00",
-                "lte": "20170117174521446+08:00"
-              }
-            }
-          },
-          {
-            "term": {
-              "2222": {
-                "value": "20170117174521446+08:00"
-              }
-            }
+        "range": {
+          "运营能力": {
+            "gte": "1"
           }
-        ]
-      }
-    }],
+        }
+      },
+      {
+        "range": {
+          "运营能力": {
+            "lt": "1"
+          }
+        }
+      },
+      {
+        "term": {
+          "运营能力": {
+            "value": ""
+          }
+        }
+      },
+      {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "运营能力": {
+                  "gte": "20170117174521446+08:00",
+                  "lte": "20170117174521446+08:00"
+                }
+              }
+            },
+            {
+              "term": {
+                "运营能力": {
+                  "value": "20170117174521446+08:00"
+                }
+              }
+            }
+          ]
+        }
+      }],
     "should": [{}, {
       "term": {
-        "字段4": {
+        "运营能力": {
           "value": "20170117174521446+08:00"
         }
       }
     }, {}]
   }
-  $scope.showBool222 = function () {
-    //console.log($scope.roleList1);
-    $scope.roleList1.push({ "roleName": "Guest333", "roleId": "role3333", "children": [] });
-  }
-
-  $scope.roleList1 = [
-    {
-      "roleName": "User", "roleId": "role1", "children": [
-        { "roleName": "subUser1", "roleId": "role11", "children": [] },
-        {
-          "roleName": "subUser2", "roleId": "role12", "children": [
-            {
-              "roleName": "subUser2-1", "roleId": "role121", "children": [
-                { "roleName": "subUser2-1-1", "roleId": "role1211", "children": [] },
-                { "roleName": "subUser2-1-2", "roleId": "role1212", "children": [] }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-
-    { "roleName": "Admin", "roleId": "role2", "children": [] },
-
-    { "roleName": "Guest", "roleId": "role3", "children": [] }
-  ];
 
   function term(input) {
-    let returnValue = undefined;
+    let returnValue = {
+      "name": '',
+      "key": "",
+      "operator": '',
+      "value": ''
+    };
     console.log(input);
     if ('term' in input) {
+      _.forEach(input['term'], function (operatorArray, field) {
+        _.forEach(operatorArray, function (value, operator) {
 
-      _.forEach(input['term'], function (operator, field) {
-        _.forEach(operator, function (value, op) {
-          returnValue = {
-            "name": field,
-            "op": op,
-            "value": value
-          };
+          returnValue.name = field;
+          returnValue.key = term;
+          returnValue.operator = operator;
+          returnValue.value = value;
+          // returnValue = {
+          //   "name": field,
+          //   "key": "term",
+          //   "operator": operator,
+          //   "value": value
+          // };
         });
       });
     }
@@ -359,18 +349,9 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       if ("bool" in element) {
         let subMust = separateBool(element.bool, "must");
         let subShould = separateBool(element.bool, "should");
-
         returnValue.bool = { "must": subMust, "should": subShould };
       } else {
-
         element.fieldInfo = term(element);
-        if (element.fieldInfo && element.fieldInfo.name) {
-          element.operatorList = ({
-            "字段4": [20000, 'gle', 40000, 50000, 'value'],
-            "字段3": [1, 2, 44]
-          })[element.fieldInfo.name];
-        }
-
         returnValue[key].push(element);
       }
     });
@@ -383,27 +364,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   //$scope.bool = { "must": must, "should": should };
   let bool = { "must": must, "should": should };
 
-  // function toFieldInfo(bool) {
-  //   let returnValue = {};
-
-  //   _.forEach(bool, function (value, key) {
-
-  //   });
-
-  //   return returnValue;
-  // }
 
   $scope.bool = bool;
-  $scope.fieldSource = ["字段1", "字段2", "字段3", "字段4", "字段5"];
-  debugger;
-
-  // $scope.bool = {
-  //   "must": { "must": [1, 2, 3], "bool": { "must": { "must": [11, 12] } } }
-  // };  
-
-  // $scope.bool = [
-  //   { "must": [1, 2, 3], "bool": [{ "must": [11, 12] }] }
-  // ];  
 
   console.log(JSON.stringify($scope.bool));
 
@@ -761,7 +723,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
-    debugger;
+    //debugger;
     $scope.searchSource
     .size($scope.opts.sampleSize)
     .sort(getSort($state.sort, $scope.indexPattern))
