@@ -38,7 +38,7 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 
 //import '../../ui_conf_provider/directives/top';
 import 'plugins/kibana/ui_conf_provider/directives/top';
-import 'plugins/kibana/condition/directives/condition';
+import 'plugins/kibana/advanced_search/directives/condition';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -257,117 +257,149 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
 
-  $scope.boolOriginal = {
-    "must": [
-      {
-        "range": {
-          "运营能力": {
-            "gte": "1"
-          }
-        }
-      },
-      {
-        "range": {
-          "运营能力": {
-            "lt": "1"
-          }
-        }
-      },
-      {
-        "term": {
-          "运营能力": {
-            "value": ""
-          }
-        }
-      },
-      {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "运营能力": {
-                  "gte": "20170117174521446+08:00",
-                  "lte": "20170117174521446+08:00"
-                }
-              }
-            },
-            {
-              "term": {
-                "运营能力": {
-                  "value": "20170117174521446+08:00"
-                }
-              }
-            }
-          ]
-        }
-      }],
-    "should": [{}, {
-      "term": {
-        "运营能力": {
-          "value": "20170117174521446+08:00"
+  let mockAdvancedSearch = {
+    "must": [{
+      "query_string": {
+        "query": "*",
+        "analyze_wildcard": true
+      }
+    }, {
+      "match": {
+        "慢充平均服务费": {
+          "query": "0E-8",
+          "type": "phrase"
         }
       }
-    }, {}]
-  }
-
-  function term(input) {
-    let returnValue = {
-      "name": '',
-      "key": "",
-      "operator": '',
-      "value": ''
-    };
-    console.log(input);
-    if ('term' in input) {
-      _.forEach(input['term'], function (operatorArray, field) {
-        _.forEach(operatorArray, function (value, operator) {
-
-          returnValue.name = field;
-          returnValue.key = term;
-          returnValue.operator = operator;
-          returnValue.value = value;
-          // returnValue = {
-          //   "name": field,
-          //   "key": "term",
-          //   "operator": operator,
-          //   "value": value
-          // };
-        });
-      });
+    }, {
+      "match": {
+        "充电快充时长(分)": {
+          "query": "122541.00000000",
+          "type": "phrase"
+        }
+      }
+    }, {
+      "range": {
+        "年月": {
+          "gte": 1457108084385,
+          "format": "epoch_millis"
+        }
+      }
+    }, {
+      "bool": {
+        "must": [{
+          "range": {
+            "年月": {
+              "lte": 1488644084385,
+            }
+          }
+        }
+        ]
+      }
     }
-    console.log(returnValue);
+    ],
+    "must_not": []
+  };
+  $scope.advancedSearch = advancedSearch2UiBind(mockAdvancedSearch, $scope.indexPattern.fields);
+
+  function syncAdvancedSearch() {
+    let returnValue = {};
+    returnValue = syncAdvancedSearchCondition($scope.advancedSearch);
     return returnValue;
   }
 
-  function separateBool(bool, key) {
-    let original = bool[key] || [];
+  function syncAdvancedSearchCondition(boolConditions) {
 
     let returnValue = {};
-    returnValue[key] = [];
 
-    original.forEach(function (element) {
-      if ("bool" in element) {
-        let subMust = separateBool(element.bool, "must");
-        let subShould = separateBool(element.bool, "should");
-        returnValue.bool = { "must": subMust, "should": subShould };
-      } else {
-        element.fieldInfo = term(element);
-        returnValue[key].push(element);
+    for (let guanxi in boolConditions) {
+
+      let conditions = boolConditions[guanxi];
+      let returnValueItem = returnValue[guanxi] = [];
+
+      conditions.forEach(condition => {
+
+        if ('bool' in condition) {
+
+          let childBool = syncAdvancedSearchCondition(condition.bool);
+
+          returnValueItem.push({ "bool": childBool });
+
+        } else {
+          if (condition.selected) {
+            let selected = condition.selected;
+
+            let fieldName = selected.field.name;
+            let fieldVaue = selected.value;
+            let operator = selected.operator;
+
+            let newCondition = {};
+            let newOperator = {};
+            let newLink = {};
+
+            switch (operator.keyword) {
+              case "match":
+              case "range":
+                newCondition[operator.keyword] = newOperator;
+                newOperator[fieldName] = newLink;
+                newLink[operator.link] = fieldVaue;
+                break;
+            }
+
+            if (operator.ext) {
+              for (let key in operator.ext) {
+                newLink[key] = operator.ext[key];
+              }
+            }
+
+            returnValueItem.push(newCondition);
+          }
+        }
+      });
+    }
+
+    return returnValue;
+  }
+
+  function queryField2ViewModel(condition, fieldSource) {
+
+    let selected;
+
+    ['match', 'range'].forEach(keyword => {
+      let keys = _.keys(condition[keyword]);
+      let fieldName = keys[0];
+      if (fieldName) {
+        let link = _.keys(condition[keyword][fieldName])[0];
+        let selectValue = condition[keyword][fieldName][link];
+
+        let selectField = fieldSource.find(field => { return field.name === fieldName });
+        let selectOperator = selectField.typeOperators.find(operator => {
+          return operator.keyword === keyword && operator.link === link;
+        });
+        selected = { value: selectValue, field: selectField, operator: selectOperator };
       }
     });
 
-    return returnValue;
-  }  
+    return selected;
+  }
 
-  let must = separateBool($scope.boolOriginal, "must");
-  let should = separateBool($scope.boolOriginal, "should");
-  //$scope.bool = { "must": must, "should": should };
-  let bool = { "must": must, "should": should };
+  function advancedSearch2UiBind(boolConditions, fieldSource) {
+    for (let guanxi in boolConditions) {
 
+      let conditions = boolConditions[guanxi];
 
-  $scope.bool = bool;
+      conditions.forEach(condition => {
 
-  console.log(JSON.stringify($scope.bool));
+        if ('bool' in condition) {
+
+          advancedSearch2UiBind(condition.bool, fieldSource);
+
+        } else {
+          condition.selected = queryField2ViewModel(condition, fieldSource);
+        }
+      });
+    }
+    return boolConditions;
+  }
 
   $scope.helpDialog = function () {
     ngDialog.open({
@@ -414,6 +446,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.$watchCollection('state.columns', function () {
     $state.save();
   });
+
+  // $scope.$watchCollection('advancedSearch', function () {
+  //   alert(1);
+  // });
   
   $scope.opts = {
     // number of records to fetch, then paginate through
@@ -723,6 +759,9 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
+    let postAS = syncAdvancedSearch();
+    $scope.advancedSearch = advancedSearch2UiBind(postAS, $scope.indexPattern.fields);
+
     //debugger;
     $scope.searchSource
     .size($scope.opts.sampleSize)

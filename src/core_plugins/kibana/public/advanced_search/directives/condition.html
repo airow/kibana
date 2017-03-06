@@ -1,0 +1,46 @@
+<div>
+  <!-- -->
+  <div class="btn-group" role="group" aria-label="...">
+    <button onclick='this.blur();' style="cursor: default; background-color: cornflowerblue;" class="btn btn-primary btn-xs glyphicon">与</button>
+    <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+    <button type="button" ng-click="addMustGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+  </div>
+  <div class="btn-group btn-group-xs" role="group" aria-label="...">
+    <button onclick='this.blur();' style="cursor: default; background-color: yellowgreen;" class="btn btn-primary btn-xs glyphicon">或</button>
+    <button type="button" ng-click="addShould()"  class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+    <button type="button" ng-click="addShouldGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+  </div>
+  <table class="table adv" ng-repeat="(key,conditions) in boolSource">
+    <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
+      <tr ng-if='!condition.bool'>
+        <!--条件-->
+        <td colspan="1" style="width: 26px;">
+          <button type="button" class="btn btn-danger btn-xs glyphicon glyphicon-remove" ng-click='remove()'></button>                             
+        </td>
+        <td colspan="3">
+          <div class="row" ng-init="initSelectField" >
+            <div class="col-xs-2">
+              <select class="form-control" ng-change='' ng-model="condition.selected.field" ng-options="field.name for field in fieldSource">
+                <option></option>
+              </select>
+            </div>
+            <div class="col-xs-1">
+              <select class="form-control" ng-change='' ng-model="condition.selected.operator" ng-options="operator.display for operator in condition.selected.field.typeOperators">
+                <option></option>
+              </select>
+            </div>
+            <div class="col-xs-9">
+              <input type="text" class="form-control" ng-model="condition.selected.value"/>
+            </div>
+          </div>   
+        </td>
+      </tr>      
+      <tr ng-if='condition.bool'>
+        <!--分组-->
+        <td colspan="4" data-bool="bool">
+          <teld-advanced-search index-pattern='indexPattern' bool-source-type='boolSource[key]' bool-source-parent='condition' bool-source="condition.bool"></teld-advanced-search>
+        </td>
+      </tr>
+    </tbody>
+  </table>  
+</div>
