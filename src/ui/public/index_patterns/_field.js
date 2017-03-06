@@ -2,11 +2,13 @@ import ObjDefine from 'ui/utils/obj_define';
 import IndexPatternsFieldFormatFieldFormatProvider from 'ui/index_patterns/_field_format/field_format';
 import IndexPatternsFieldTypesProvider from 'ui/index_patterns/_field_types';
 import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
+import IndexPatternsFieldTypeOperatorsProvider from 'ui/index_patterns/_field_type_operators';
 export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope, Notifier) {
   let notify = new Notifier({ location: 'IndexPattern Field' });
   let FieldFormat = Private(IndexPatternsFieldFormatFieldFormatProvider);
   let fieldTypes = Private(IndexPatternsFieldTypesProvider);
   let fieldFormats = Private(RegistryFieldFormatsProvider);
+  let fieldTypeOperators = Private(IndexPatternsFieldTypeOperatorsProvider);
 
   function Field(indexPattern, spec) {
     // unwrap old instances of Field
@@ -32,7 +34,7 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
     }
 
     if (!type) type = fieldTypes.byName.unknown;
-
+    
     let format = spec.format;
     if (!format || !(format instanceof FieldFormat)) {
       format = indexPattern.fieldFormatMap[spec.name] || fieldFormats.getDefaultInstance(spec.type);
@@ -48,6 +50,13 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
 
     obj.fact('name');
     obj.fact('type');
+    {
+      /**2017-03-05 02:13:03
+       * 扩展Field对象，用于保存字段字段类型可使用的条件运算符 */
+      let findOperators = fieldTypeOperators.byName[spec.type] || fieldTypeOperators.byName.unknown;
+      spec.typeOperators = findOperators.operators;
+      obj.fact('typeOperators');
+    }
     obj.writ('count', spec.count || 0);
 
     // scripted objs
