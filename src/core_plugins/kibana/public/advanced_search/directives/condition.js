@@ -86,7 +86,7 @@ uiModules
 
         let selected;
 
-        ['match', 'range'].forEach(keyword => {
+        ['match', 'range', 'term'].forEach(keyword => {
           let keys = _.keys(condition[keyword]);
           let fieldName = keys[0];
           if (fieldName) {

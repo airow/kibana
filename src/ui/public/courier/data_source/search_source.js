@@ -96,7 +96,8 @@ export default function SearchSourceFactory(Promise, Private, config) {
     'aggs',
     'from',
     'size',
-    'source'
+    'source',
+    'advancedSearch'
   ];
 
   SearchSource.prototype.index = function (indexPattern) {
@@ -238,13 +239,13 @@ export default function SearchSourceFactory(Promise, Private, config) {
           });
         }
         // user a shallow flatten to detect if val is an array, and pull the values out if it is
-        state.filters = _([ state.filters || [], verifiedFilters ])
-        .flatten()
+        let o = state.filters = _([ state.filters || [], verifiedFilters ]);
+        o.flatten()
         // Yo Dawg! I heard you needed to filter out your filters
         .reject(function (filter) {
           return !filter || _.get(filter, 'meta.disabled');
         })
-        .value();
+        o.value();
         return;
       case 'index':
       case 'type':
@@ -261,8 +262,26 @@ export default function SearchSourceFactory(Promise, Private, config) {
         val = normalizeSortRequest(val, this.get('index'));
         addToBody();
         break;
+      case 'advancedSearch':
+        addToBodyWithAdvancedSearch();
+        break;
       default:
         addToBody();
+    }
+
+    function addToBodyWithAdvancedSearch() {
+      state.body = state.body || {};
+      // ignore if we already have a value
+      if (state.body["query"] == null) {
+        if (key === 'query' && _.isString(val)) {
+          val = { query_string: { query: val } };
+        }
+      } else {
+        let query_string = state.body["query"];
+
+        state.body["query"] = { bool: val }
+        state.body["query"].bool.must.push(query_string);
+      }
     }
 
     /**

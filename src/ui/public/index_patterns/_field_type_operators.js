@@ -21,7 +21,7 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'string',     operators: [
-            { display: "=", keyword: "term", link: "value" },
+            { display: "=", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { display: "包含", keyword: "match", link: "query" },
             { display: ">", keyword: "range", link: "gt" },
             { display: ">=", keyword: "range", link: "gte" },

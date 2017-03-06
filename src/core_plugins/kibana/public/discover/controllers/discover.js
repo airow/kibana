@@ -278,18 +278,19 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         }
       }
     }, {
-      "range": {
-        "年月": {
-          "gte": 1457108084385,
-          "format": "epoch_millis"
+      "match": {
+        "充电快充时长(分)": {
+          "query": "122541.00000000",
+          "type": "phrase"
         }
       }
     }, {
       "bool": {
         "must": [{
-          "range": {
-            "年月": {
-              "lte": 1488644084385,
+          "match": {
+            "充电快充时长(分)": {
+              "query": "122541.00000000",
+              "type": "phrase"
             }
           }
         }
@@ -339,6 +340,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
             switch (operator.keyword) {
               case "match":
               case "range":
+              case "term":
                 newCondition[operator.keyword] = newOperator;
                 newOperator[fieldName] = newLink;
                 newLink[operator.link] = fieldVaue;
@@ -364,7 +366,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     let selected;
 
-    ['match', 'range'].forEach(keyword => {
+    ['match', 'range', 'term'].forEach(keyword => {
       let keys = _.keys(condition[keyword]);
       let fieldName = keys[0];
       if (fieldName) {
@@ -759,15 +761,19 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
-    let postAS = syncAdvancedSearch();
-    $scope.advancedSearch = advancedSearch2UiBind(postAS, $scope.indexPattern.fields);
+    let temp = syncAdvancedSearch();
+    let postAS = _.cloneDeep(temp);
 
     //debugger;
-    $scope.searchSource
-    .size($scope.opts.sampleSize)
-    .sort(getSort($state.sort, $scope.indexPattern))
-    .query(!$state.query ? null : $state.query)
-    .set('filter', queryFilter.getFilters());
+    let o = $scope.searchSource
+      .size($scope.opts.sampleSize)
+      .sort(getSort($state.sort, $scope.indexPattern));
+
+    o.query(!$state.query ? null : $state.query);
+    o.set('filter', queryFilter.getFilters());
+    o.set('advancedSearch', postAS);
+
+    $scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
 
     if (config.get('doc_table:highlight')) {
       $scope.searchSource.highlight({
