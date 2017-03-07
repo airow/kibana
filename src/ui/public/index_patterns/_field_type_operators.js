@@ -21,21 +21,18 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'string',     operators: [
-            { display: "=", keyword: "match", link: "query", ext:{"type": "phrase"} },
-            { display: "包含", keyword: "match", link: "query" },
+            { display: "精确", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { display: "模糊", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
+            { display: "分词", keyword: "match", link: "query", strategy: '.keyword' },
+          ]
+      },
+      { name: 'number',     operators: [
+            // { display: "=", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { display: "=", keyword: "term", link: "value" },
             { display: ">", keyword: "range", link: "gt" },
             { display: ">=", keyword: "range", link: "gte" },
             { display: "<", keyword: "range", link: "lt" },
             { display: "<=", keyword: "range", link: "lte" },
-          ]
-      },
-      { name: 'number',     operators: [
-            //{ display: "=", keyword: "term", link: "value" },
-            { display: "=", keyword: "match", link: "query", ext:{"type": "phrase"} },
-            { display: ">", keyword: "range", link: "gt" },
-            { display: ">=", keyword: "range", link: "gte" },
-            { display: "<", keyword: "range", link: "lt" },
-            { display: "<", keyword: "range", link: "lte" },
           ]
       },
       { name: 'boolean',    operators: [

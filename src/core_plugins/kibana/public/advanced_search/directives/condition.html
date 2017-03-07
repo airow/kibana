@@ -18,9 +18,9 @@
           <button type="button" class="btn btn-danger btn-xs glyphicon glyphicon-remove" ng-click='remove()'></button>                             
         </td>
         <td colspan="3">
-          <div class="row" ng-init="initSelectField" >
+          <div class="row" ng-init="initSelectField()" >
             <div class="col-xs-2">
-              <select class="form-control" ng-change='' ng-model="condition.selected.field" ng-options="field.name for field in fieldSource">
+              <select class="form-control" ng-change='' ng-model="condition.selected.field" ng-options="field.asFieldName + '【' + field.type + '】' for field in fieldSource">
                 <option></option>
               </select>
             </div>

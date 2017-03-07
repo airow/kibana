@@ -221,11 +221,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverExportButton',
       }
-    };    
-
-    if (_.has(menuKeys, "adv") == false) {
-      menuKeys.push("adv");
-    }
+    };
     
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
@@ -259,48 +255,29 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   let mockAdvancedSearch = {
     "must": [{
+      "range": {
+        "运营总时长(天)": {
+          "lte": "248"
+        }
+      }
+    }, {
+      "term": {
+        "运营总时长(天)": {
+          "value": "60"
+        }
+      }
+    }, {
       "query_string": {
-        "query": "*",
-        "analyze_wildcard": true
-      }
-    }, {
-      "match": {
-        "慢充平均服务费": {
-          "query": "0E-8",
-          "type": "phrase"
-        }
-      }
-    }, {
-      "match": {
-        "充电快充时长(分)": {
-          "query": "122541.00000000",
-          "type": "phrase"
-        }
-      }
-    }, {
-      "match": {
-        "充电快充时长(分)": {
-          "query": "122541.00000000",
-          "type": "phrase"
-        }
-      }
-    }, {
-      "bool": {
-        "must": [{
-          "match": {
-            "充电快充时长(分)": {
-              "query": "122541.00000000",
-              "type": "phrase"
-            }
-          }
-        }
-        ]
+        "analyze_wildcard": true,
+        "query": "*"
       }
     }
+
     ],
     "must_not": []
   };
-  $scope.advancedSearch = advancedSearch2UiBind(mockAdvancedSearch, $scope.indexPattern.fields);
+  //$scope.advancedSearch = advancedSearch2UiBind(mockAdvancedSearch, $scope.indexPattern.fields);
+  $scope.advancedSearch = mockAdvancedSearch;
 
   function syncAdvancedSearch() {
     let returnValue = {};
@@ -332,6 +309,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
             let fieldName = selected.field.name;
             let fieldVaue = selected.value;
             let operator = selected.operator;
+            
+            //处理字符类型 =,like 
+            if (operator.strategy) {
+              switch (operator.strategy) {
+                case ".keyword":
+                  if (selected.field.type === "string" && selected.field.hasKeyword) {
+                    fieldName = selected.field.asFieldName;
+                  }
+                  break;
+              }
+            }
 
             let newCondition = {};
             let newOperator = {};
@@ -773,7 +761,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     o.set('filter', queryFilter.getFilters());
     o.set('advancedSearch', postAS);
 
-    $scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
+    //$scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
 
     if (config.get('doc_table:highlight')) {
       $scope.searchSource.highlight({

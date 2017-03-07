@@ -5,45 +5,7 @@ import uiModules from 'ui/modules';
 
 uiModules
 .get('apps/advanced_search')
-.directive('teldAdvancedSearch', function (Private, $compile) {
-
-  function term(input) {
-    let returnValue = undefined;
-    console.log(input);
-    if ('term' in input) {
-      _.forEach(input['term'], function (operator, field) {
-        _.forEach(operator, function (value, op) {
-          returnValue = {
-            "name": field,
-            "op": op,
-            "value": value
-          };
-        });
-      });
-    }
-    console.log(returnValue);
-    return returnValue;
-  }
-
-  function separateBool(bool, key) {
-    let original = bool[key] || [];
-
-    let returnValue = {};
-    returnValue[key] = [];
-
-    original.forEach(function (element) {
-      if ("bool" in element) {
-        let subMust = separateBool(element.bool, "must");
-        let subShould = separateBool(element.bool, "should");
-        returnValue.bool = { "must": subMust, "should": subShould };
-      } else {
-        element.fieldInfo = term(element);
-        returnValue[key].push(element);
-      }
-    });
-
-    return returnValue;
-  }  
+.directive('teldAdvancedSearch', function (Private, $compile) { 
 
   return {
     restrict: 'E',
@@ -58,7 +20,19 @@ uiModules
     controller: function ($scope) {
 
       let fieldSource = $scope.fieldSource = $scope.indexPattern.fields
-        .filter(field => { return field.searchable && !field.analyzed; });      
+        .filter(field => { return field.searchable && field.analyzed == false; })
+        .map(field => {
+          debugger;
+          field.asFieldName = field.name;
+          //对字符穿类型进行特殊处理 =，like
+          if (field.type === "string") {
+            field.hasKeyword = _.endsWith(field.name, '.keyword');
+            if (field.hasKeyword) {
+              field.asFieldName = field.name.replace('.keyword', '');
+            }
+          }
+          return field;
+        });
 
       /**删除条件 */
       $scope.remove = function () {
