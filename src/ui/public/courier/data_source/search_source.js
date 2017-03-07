@@ -239,13 +239,13 @@ export default function SearchSourceFactory(Promise, Private, config) {
           });
         }
         // user a shallow flatten to detect if val is an array, and pull the values out if it is
-        let o = state.filters = _([ state.filters || [], verifiedFilters ]);
-        o.flatten()
+        state.filters = _([ state.filters || [], verifiedFilters ])
+        .flatten()
         // Yo Dawg! I heard you needed to filter out your filters
         .reject(function (filter) {
           return !filter || _.get(filter, 'meta.disabled');
         })
-        o.value();
+        .value();
         return;
       case 'index':
       case 'type':
@@ -264,17 +264,24 @@ export default function SearchSourceFactory(Promise, Private, config) {
         break;
       case 'advancedSearch':
         addToBodyWithAdvancedSearch();
+        console.log(val);
         break;
       default:
         addToBody();
     }
 
     function addToBodyWithAdvancedSearch() {
+      debugger;
+      if (_.isEmpty(val)) {
+        return;
+      }
       state.body = state.body || {};
       // ignore if we already have a value
       if (state.body["query"] == null) {
         if (key === 'query' && _.isString(val)) {
           val = { query_string: { query: val } };
+        } else {
+          state.body["query"] = { bool: val }
         }
       } else {
         let query_string = state.body["query"];
