@@ -105,6 +105,9 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
             },
             pageSize: {
               type: 'keyword'
+            },
+            advancedSearchBool: {
+              type: 'keyword'
             }
           }
         };        
@@ -143,6 +146,9 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
       let meta = resp._source.kibanaSavedObjectMeta || {};
       delete resp._source.kibanaSavedObjectMeta;
 
+      let uiConf = resp._source.uiConf || {};
+      //delete resp._source.uiConf.advancedSearchBool;
+
       if (!config.indexPattern && self._source.indexPattern) {
         config.indexPattern = self._source.indexPattern;
         delete self._source.indexPattern;
@@ -163,6 +169,7 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
 
       return Promise.try(function () {
         parseSearchSource(meta.searchSourceJSON);
+        parseAdvancedSearchBool(uiConf.advancedSearchBool);
       })
       .then(hydrateIndexPattern)
       .then(function () {
@@ -191,6 +198,20 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
       }, {});
 
       self.searchSource.set(_.defaults(state, fnProps));
+    }
+
+    function parseAdvancedSearchBool(advancedSearchBoolJson) {
+      if (!self.uiConf.advancedSearchBool) return;
+
+      // if we have a searchSource, set its state based on the advancedSearchBoolJson field
+      let state;
+      try {
+        state = JSON.parse(advancedSearchBoolJson);
+      } catch (e) {
+        state = {};
+      }
+
+      self.uiConf.advancedSearchBool = state;
     }
 
     /**
@@ -245,6 +266,13 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
 
       /** 关键代码，没有这句数据不会保存到ES中 */
       let extColumns = ["uiConf"];
+
+      if (_.has(self, 'uiConf.advancedSearchBool')) {
+        if(_.isObject(self.uiConf.advancedSearchBool))
+        {
+          self.uiConf.advancedSearchBool = angular.toJson(self.uiConf.advancedSearchBool);
+        }
+      }
 
       extColumns.forEach(function (value) {
         if (self[value]) {

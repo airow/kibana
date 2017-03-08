@@ -276,8 +276,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     ],
     "must_not": []
   };
-  //$scope.advancedSearch = advancedSearch2UiBind(mockAdvancedSearch, $scope.indexPattern.fields);
-  $scope.advancedSearch = mockAdvancedSearch;
+
+  $scope.advancedSearch = savedSearch.uiConf.advancedSearchBool || {};
 
   function syncAdvancedSearch() {
     let returnValue = {};
@@ -348,47 +348,6 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     }
 
     return returnValue;
-  }
-
-  function queryField2ViewModel(condition, fieldSource) {
-
-    let selected;
-
-    ['match', 'range', 'term'].forEach(keyword => {
-      let keys = _.keys(condition[keyword]);
-      let fieldName = keys[0];
-      if (fieldName) {
-        let link = _.keys(condition[keyword][fieldName])[0];
-        let selectValue = condition[keyword][fieldName][link];
-
-        let selectField = fieldSource.find(field => { return field.name === fieldName });
-        let selectOperator = selectField.typeOperators.find(operator => {
-          return operator.keyword === keyword && operator.link === link;
-        });
-        selected = { value: selectValue, field: selectField, operator: selectOperator };
-      }
-    });
-
-    return selected;
-  }
-
-  function advancedSearch2UiBind(boolConditions, fieldSource) {
-    for (let guanxi in boolConditions) {
-
-      let conditions = boolConditions[guanxi];
-
-      conditions.forEach(condition => {
-
-        if ('bool' in condition) {
-
-          advancedSearch2UiBind(condition.bool, fieldSource);
-
-        } else {
-          condition.selected = queryField2ViewModel(condition, fieldSource);
-        }
-      });
-    }
-    return boolConditions;
   }
 
   $scope.helpDialog = function () {
@@ -751,6 +710,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.updateDataSource = Promise.method(function () {
     let temp = syncAdvancedSearch();
     let postAS = _.cloneDeep(temp);
+
+    savedSearch.uiConf.advancedSearchBool = postAS;
 
     //debugger;
     let o = $scope.searchSource

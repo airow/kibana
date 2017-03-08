@@ -14,6 +14,7 @@ export default function DashboardUiConfProvider(Private, Promise, config) {
     */
     menus: [],
 
+    advancedSearchBool: {},
 
     pageSize: config.get('discover:sampleSize')/** */
   };

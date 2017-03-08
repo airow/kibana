@@ -21,9 +21,13 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'string',     operators: [
+            /** 配置有效
             { display: "精确", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { display: "模糊", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
             { display: "分词", keyword: "match", link: "query", strategy: '.keyword' },
+            */
+            { display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { display: "包含", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
           ]
       },
       { name: 'number',     operators: [
