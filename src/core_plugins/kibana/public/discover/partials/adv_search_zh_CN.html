@@ -1,15 +1,23 @@
 <div>
   <style>
-    table.adv {
+    .advancedSearch button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
+    .advancedSearch button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
+    .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }
+
+    table.advancedSearch {
       margin: 0px;
     }
 
-    table.adv tbody[data-bool='must'] {
+    table.advancedSearch tbody[data-bool='must'] {
       border-left: cornflowerblue solid;
     }
 
-    table.adv tbody[data-bool='should'] {
+    table.advancedSearch tbody[data-bool='should'] {
       border-left: yellowgreen solid;
+    }
+
+    table.advancedSearch tbody[data-bool='must_not'] {
+      border-left: rosybrown solid;
     }
   </style>
   <div class="localDropdownTitle">高级搜索</div>

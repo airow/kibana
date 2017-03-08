@@ -10,11 +10,13 @@ module.service('advancedSearch', function (Promise) {
 
   this.syncAdvancedSearch = function (advancedSearch) {
     let returnValue = {};
-    returnValue = syncAdvancedSearchCondition(advancedSearch);
+    returnValue = this.syncAdvancedSearchCondition(advancedSearch);
     return returnValue;
   }
 
   this.syncAdvancedSearchCondition = function (boolConditions) {
+
+    let that = this;
 
     let returnValue = {};
 
@@ -27,13 +29,14 @@ module.service('advancedSearch', function (Promise) {
 
         if ('bool' in condition) {
 
-          let childBool = syncAdvancedSearchCondition(condition.bool);
+          let childBool = that.syncAdvancedSearchCondition(condition.bool);
 
           returnValueItem.push({ "bool": childBool });
 
         } else {
           if (condition.selected) {
             let selected = condition.selected;
+            if (selected.disabled) { return; }
 
             let fieldName = selected.field.name;
             let fieldVaue = selected.value;
@@ -94,7 +97,7 @@ module.service('advancedSearch', function (Promise) {
         let selectOperator = selectField.typeOperators.find(operator => {
           return operator.keyword === keyword && operator.link === link;
         });
-        selected = { value: selectValue, field: selectField, operator: selectOperator };
+        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: false };
       }
     });
 
@@ -102,6 +105,9 @@ module.service('advancedSearch', function (Promise) {
   }
 
   this.advancedSearch2UiBind = function (boolConditions, fieldSource) {
+
+    let that = this;
+
     for (let guanxi in boolConditions) {
 
       let conditions = boolConditions[guanxi];
@@ -110,10 +116,10 @@ module.service('advancedSearch', function (Promise) {
 
         if ('bool' in condition) {
 
-          advancedSearch2UiBind(condition.bool, fieldSource);
+          that.advancedSearch2UiBind(condition.bool, fieldSource);
 
         } else {
-          condition.selected = queryField2ViewModel(condition, fieldSource);
+          condition.selected = that.queryField2ViewModel(condition, fieldSource);
         }
       });
     }

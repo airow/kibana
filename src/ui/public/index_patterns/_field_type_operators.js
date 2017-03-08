@@ -40,7 +40,7 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'boolean',    operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'conflict',   operators: [
@@ -48,7 +48,8 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'geo_point',  operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { display: "geo_bounding_box", keyword: "geo_bounding_box", link: "value" },
+            { display: "geo_distance", keyword: "geo_distance", link: "value" }
           ]
       },
       { name: 'geo_shape',  operators: [

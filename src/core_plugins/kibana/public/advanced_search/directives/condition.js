@@ -5,7 +5,7 @@ import uiModules from 'ui/modules';
 
 uiModules
 .get('apps/advanced_search')
-.directive('teldAdvancedSearch', function (Private, $compile) { 
+.directive('teldAdvancedSearch', function (Private, $compile, advancedSearch) { 
 
   return {
     restrict: 'E',
@@ -22,7 +22,6 @@ uiModules
       let fieldSource = $scope.fieldSource = $scope.indexPattern.fields
         .filter(field => { return field.searchable && field.analyzed == false; })
         .map(field => {
-          debugger;
           field.asFieldName = field.name;
           //对字符穿类型进行特殊处理 =，like
           if (field.type === "string") {
@@ -33,6 +32,17 @@ uiModules
           }
           return field;
         });
+      
+      
+      /**初始化选择值 */
+      $scope.initSelectField = function () {
+        advancedSearch.queryField2ViewModel(this.condition, fieldSource);
+      }      
+      
+      $scope.disableChange = function(){
+        this.condition.selected.disabled=!this.condition.selected.disabled
+        $scope.$emit('advancedSearch.condition.disable', {});  
+      }
 
       /**删除条件 */
       $scope.remove = function () {
@@ -50,64 +60,11 @@ uiModules
         if (size == 0 && $scope.boolSourceType) {
           _.pull($scope.boolSourceType, $scope.boolSourceParent);
         }
-      }
+      }      
 
-      $scope.fieldChange = function () {
-        //ithis.condition.selected.op
-      }
-
-      function queryField2ViewModel(condition) {
-
-        let selected;
-
-        ['match', 'range', 'term'].forEach(keyword => {
-          let keys = _.keys(condition[keyword]);
-          let fieldName = keys[0];
-          if (fieldName) {
-            let link = _.keys(condition[keyword][fieldName])[0];
-            let selectValue = condition[keyword][fieldName][link];
-
-            let selectField = fieldSource.find(field => { return field.name === fieldName });
-            let selectOperator = selectField.typeOperators.find(operator => {
-              return operator.keyword === keyword && operator.link === link;
-            });
-            selected = { value: selectValue, field: selectField, operator: selectOperator };
-          }
-        });
-
-        return selected;
-      }
-
-      $scope.initSelectField = function () {
-        this.condition.selected = queryField2ViewModel(this.condition);
-      }
-
-      /**初始化选择值 */
-      $scope.initSelectField2 = function () {
-
-        let that = this;
-        //that.condition.selected = { value: null, field: null, operator: null };
-
-        ['match', 'range'].forEach(keyword => {
-          let keys = _.keys(that.condition[keyword]);
-          let fieldName = keys[0];
-          if (fieldName) {
-            let link = _.keys(that.condition[keyword][fieldName])[0];
-            let selectValue = that.condition[keyword][fieldName][link];
-
-            let selectField = fieldSource.find(field => { return field.name === fieldName });
-            let selectOperator = selectField.typeOperators.find(operator => {
-              return operator.keyword === keyword && operator.link === link;
-            });
-
-            that.condition.selected = { value: selectValue, field: selectField, operator: selectOperator };
-
-            // that.condition.selected.value = selectValue;
-            // that.condition.selected.field = selectField;
-            // that.condition.selected.operator = selectOperator;
-          }
-        });
-        //this.condition.SelectField = indexPattern.fields.
+      $scope.removeGroup = function () {
+        _.pull($scope.boolSourceType, $scope.boolSourceParent);
+        delete $scope.boolSource;
       }
 
       /**条件组 */
@@ -122,6 +79,10 @@ uiModules
 
       $scope.addMustGroup = function () {
         $scope.addConditionGroup("must");
+      }
+
+      $scope.addMustNotGroup = function () {
+        $scope.addConditionGroup("must_not");
       }
 
       /**条件组 */
@@ -154,7 +115,11 @@ uiModules
       /**OR */
       $scope.addShould = function () { 
         $scope.addCondition('should');
-      }      
+      }  
+
+      $scope.addMustNot = function () {
+        $scope.addCondition('must_not');
+      }    
     },
     link: function ($scope, element) {
       const init = function () {

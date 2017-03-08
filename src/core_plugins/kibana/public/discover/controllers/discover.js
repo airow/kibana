@@ -39,6 +39,7 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 //import '../../ui_conf_provider/directives/top';
 import 'plugins/kibana/ui_conf_provider/directives/top';
 import 'plugins/kibana/advanced_search/directives/condition';
+import 'plugins/kibana/advanced_search/services/advanced_search';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -140,7 +141,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags,es,ngDialog) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch) {
 
     $rootScope.showNotify = true;
 
@@ -277,9 +278,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     "must_not": []
   };
 
-  $scope.advancedSearch = savedSearch.uiConf.advancedSearchBool || {};
+  //$scope.advancedSearch = savedSearch.uiConf.advancedSearchBool || {};
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind(savedSearch.uiConf.advancedSearchBool || {}, $scope.indexPattern.fields);
+
+  $scope.$on('advancedSearch.condition.disable', function (d, data) {
+    $scope.fetch();
+  });  
 
   function syncAdvancedSearch() {
+    alert(1);
     let returnValue = {};
     returnValue = syncAdvancedSearchCondition($scope.advancedSearch);
     return returnValue;
@@ -365,7 +372,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   * #设置索引id@2017-02-06 22:11:23
   * savedSearch 对象为src/core_plugins/kibana/public/discover/saved_searches/saved_searches.js，在路由规则的resolve中初始化
   * */
-  savedSearch.tagetIndex=savedSearch.searchSource.get("index").id
+  savedSearch.tagetIndex = savedSearch.searchSource.get("index").id
 
   if (savedSearch.id) {
     docTitle.change(savedSearch.title);
@@ -708,19 +715,14 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
-    let temp = syncAdvancedSearch();
-    let postAS = _.cloneDeep(temp);
-
-    savedSearch.uiConf.advancedSearchBool = postAS;
+    savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
 
     //debugger;
-    let o = $scope.searchSource
+    $scope.searchSource
       .size($scope.opts.sampleSize)
-      .sort(getSort($state.sort, $scope.indexPattern));
-
-    o.query(!$state.query ? null : $state.query);
-    o.set('filter', queryFilter.getFilters());
-    o.set('advancedSearch', postAS);
+      .sort(getSort($state.sort, $scope.indexPattern)).query(!$state.query ? null : $state.query)
+      .set('filter', queryFilter.getFilters())
+      .set('advancedSearch', savedSearch.uiConf.advancedSearchBool);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
 
