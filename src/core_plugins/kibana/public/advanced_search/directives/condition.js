@@ -7,7 +7,7 @@ import uiModules from 'ui/modules';
 
 uiModules
 .get('apps/advanced_search')
-.directive('teldAdvancedSearch', function (Private, $compile, advancedSearch) { 
+.directive('teldAdvancedSearch', function (Private, $compile, advancedSearch, courier) { 
 
   return {
     restrict: 'E',
@@ -21,19 +21,7 @@ uiModules
     },
     controller: function ($scope) {
 
-      let fieldSource = $scope.fieldSource = $scope.indexPattern.fields
-        .filter(field => { return field.searchable && field.analyzed == false; })
-        .map(field => {
-          field.asFieldName = field.name;
-          //对字符穿类型进行特殊处理 =，like
-          if (field.type === "string") {
-            field.hasKeyword = _.endsWith(field.name, '.keyword');
-            if (field.hasKeyword) {
-              field.asFieldName = field.name.replace('.keyword', '');
-            }
-          }
-          return field;
-        });
+      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern.fields);
       
       
       /**初始化选择值 */
@@ -146,24 +134,17 @@ uiModules
       boolSource: '=',
     },
     controller: function ($scope) {
-      let fieldSource = $scope.fieldSource = $scope.indexPattern.fields
-        .filter(field => { return field.searchable && field.analyzed == false; })
-        .map(field => {
-          field.asFieldName = field.name;
-          //对字符穿类型进行特殊处理 =，like
-          if (field.type === "string") {
-            field.hasKeyword = _.endsWith(field.name, '.keyword');
-            if (field.hasKeyword) {
-              field.asFieldName = field.name.replace('.keyword', '');
-            }
-          }
-          return field;
-        });
+      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern.fields);
 
       /**初始化选择值 */
       $scope.initSelectField = function () {
         advancedSearch.queryField2ViewModel(this.condition, fieldSource);
       } 
+
+      $scope.disableChange = function () {
+        this.condition.selected.disabled = !this.condition.selected.disabled
+        $scope.$emit('advancedSearch.condition.disable', {});
+      }
     },
     link: function ($scope, element) {
       const init = function () {

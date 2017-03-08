@@ -7,6 +7,24 @@ const module = uiModules.get('apps/advanced_search');
 // This is the only thing that gets injected into controllers
 module.service('advancedSearch', function (Promise) {
   
+  this.getFieldSource = function (fields) {
+    let fieldSource = fields.filter(field => {
+      return field.searchable && field.analyzed == false;
+    })
+      .map(field => {
+        field.asFieldName = field.name;
+        //对字符穿类型进行特殊处理 =，like
+        if (field.type === "string") {
+          field.hasKeyword = _.endsWith(field.name, '.keyword');
+          if (field.hasKeyword) {
+            field.asFieldName = field.name.replace('.keyword', '');
+          }
+        }
+        return field;
+      });
+
+      return fieldSource;
+  }
 
   this.syncAdvancedSearch = function (advancedSearch) {
     let returnValue = {};
