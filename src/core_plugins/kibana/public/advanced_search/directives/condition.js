@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import conditionTemplate from './condition.html';
+import conditionDisplayTemplate from './condition_display.html';
+import '../styles/advanced_search.css'
 import uiModules from 'ui/modules';
 
 uiModules
@@ -132,4 +134,46 @@ uiModules
       init();
     }
   };
-});
+})
+.directive('teldAdvancedSearchDisplay', function (Private, $compile, advancedSearch) { 
+
+  return {
+    restrict: 'E',
+    // template: conditionTemplate,/** 不能使用这种方式 */
+    scope: {
+      state: '=',
+      indexPattern: '=',
+      boolSource: '=',
+    },
+    controller: function ($scope) {
+      let fieldSource = $scope.fieldSource = $scope.indexPattern.fields
+        .filter(field => { return field.searchable && field.analyzed == false; })
+        .map(field => {
+          field.asFieldName = field.name;
+          //对字符穿类型进行特殊处理 =，like
+          if (field.type === "string") {
+            field.hasKeyword = _.endsWith(field.name, '.keyword');
+            if (field.hasKeyword) {
+              field.asFieldName = field.name.replace('.keyword', '');
+            }
+          }
+          return field;
+        });
+
+      /**初始化选择值 */
+      $scope.initSelectField = function () {
+        advancedSearch.queryField2ViewModel(this.condition, fieldSource);
+      } 
+    },
+    link: function ($scope, element) {
+      const init = function () {
+        //var template = conditionTemplate.template;
+        var template = conditionDisplayTemplate;
+        element.html('').append($compile(template)($scope));
+      };
+
+      // Start the directive
+      init();
+    }
+  };
+})

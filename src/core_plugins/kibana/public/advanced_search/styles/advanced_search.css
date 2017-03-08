@@ -1,0 +1,19 @@
+  .advancedSearch button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
+  .advancedSearch button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
+  .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }
+
+  table.advancedSearch {
+    margin: 0px;
+  }
+
+  table.advancedSearch tbody[data-bool='must'] {
+    border-left: cornflowerblue solid;
+  }
+
+  table.advancedSearch tbody[data-bool='should'] {
+    border-left: yellowgreen solid;
+  }
+
+  table.advancedSearch tbody[data-bool='must_not'] {
+    border-left: rosybrown solid;
+  }
