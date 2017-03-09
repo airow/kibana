@@ -212,6 +212,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         key: '高级查询',
         description: '高级查询',
         template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
+        run: function (menuItem, kbnTopNav) {
+          $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
+          //kbnTopNav.setCurrent(menuItem.key);
+          kbnTopNav.toggle(menuItem.key);
+        },
         testId: 'discoverOpenButton',
       },
       'export': {
@@ -419,6 +424,22 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     indexPatternList: $route.current.locals.ip.list,
     timefilter: $scope.timefilter
   };
+
+  function showAdvancedSearchDisplay() {
+    let returnValue = true;
+    if ($scope.advancedSearch.must && $scope.advancedSearch.must.length > 0) {
+      return true;
+    }
+    if ($scope.advancedSearch.should && $scope.advancedSearch.should.length > 0) {
+      return true;
+    }
+    if ($scope.advancedSearch.must_not && $scope.advancedSearch.must_not.length > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  $scope.showAdvancedSearch = showAdvancedSearchDisplay();
 
   const init = _.once(function () {
     const showTotal = 5;
