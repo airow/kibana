@@ -425,7 +425,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     timefilter: $scope.timefilter
   };
 
-  function showAdvancedSearchDisplay() {
+  $scope.showAdvancedSearchDisplay = function () {
     let returnValue = true;
     if ($scope.advancedSearch.must && $scope.advancedSearch.must.length > 0) {
       return true;
@@ -439,7 +439,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     return false;
   }
 
-  $scope.showAdvancedSearch = showAdvancedSearchDisplay();
+  $scope.showAdvancedSearch = $scope.showAdvancedSearchDisplay();
 
   const init = _.once(function () {
     const showTotal = 5;
