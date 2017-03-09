@@ -17,3 +17,15 @@
   table.advancedSearch tbody[data-bool='must_not'] {
     border-left: rosybrown solid;
   }
+
+  /*.advancedSearchDisplay [data-and='and']:first-child{
+    display: none;
+  }*/
+
+  [data-and='and0']{
+    display: none;
+  }
+
+.advancedSearchDisplay button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
+.advancedSearchDisplay button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
+.advancedSearchDisplay button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }

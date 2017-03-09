@@ -43,18 +43,18 @@
           </div>
           <div class="row" ng-switch-default>
             <div class="col-xs-2">
-              <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" ng-options="field.asFieldName + '【' + field.type + '】' for field in fieldSource">
+              <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.asFieldName + '【' + field.type + '】' for field in fieldSource">
                 <option></option>
               </select>
             </div>
             <div class="col-xs-1">
-              <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" ng-options="operator.display for operator in condition.selected.field.typeOperators">
+              <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">
                 <option></option>
               </select>
             </div>
             <div class="col-xs-2" ng-switch="condition.selected.field.type">
               <div>
-                <input ng-disabled="condition.selected.disabled" ng-switch-when='number' type="text" class="form-control" ng-model="condition.selected.value"/>
+                <input ng-disabled="condition.selected.disabled" ng-switch-when='number' type="number" class="form-control" ng-model="condition.selected.value" required/>
               </div>              
               <div ng-switch-when='boolean' ng-init='condition.selected.value=true' class="btn-group btn-group-justified" role="group">
                 <div class="btn-group" role="group">
@@ -64,7 +64,7 @@
                   <button type="button" class="btn  ng-class:{'btn-success':!condition.selected.value,'btn-default':condition.selected.value}" ng-click="condition.selected.value=false">否</button>
                 </div>
               </div>
-              <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value"/>
+              <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>
             </div>
           </div>   
         </td>

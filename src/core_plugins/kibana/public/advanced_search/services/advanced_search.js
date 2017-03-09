@@ -7,9 +7,32 @@ const module = uiModules.get('apps/advanced_search');
 // This is the only thing that gets injected into controllers
 module.service('advancedSearch', function (Promise) {
   
-  this.getFieldSource = function (fields) {
+  this.fieldTypes = ["string", "number", "date", "boolean"];
+
+  this.getFieldSource = function (indexPattern) {
+    let that = this;
+    let fields = indexPattern.fields;
+    let metaFields = indexPattern.metaFields;
+    let timeFieldName = indexPattern.timeFieldName;
     let fieldSource = fields.filter(field => {
-      return field.searchable && field.analyzed == false;
+
+      let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable && field.analyzed == false;
+
+      if (returnValue) {
+        switch (field.type) {
+          default:
+            returnValue = false;
+            break;
+          case "date":
+            returnValue = !(field.name == timeFieldName);
+            break;
+          case "string":
+          case "number":
+          case "boolean":
+            break;
+        }
+      }
+      return returnValue;
     })
       .map(field => {
         field.asFieldName = field.name;

@@ -21,7 +21,7 @@ uiModules
     },
     controller: function ($scope) {
 
-      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern.fields);
+      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern);
       
       
       /**初始化选择值 */
@@ -134,7 +134,7 @@ uiModules
       boolSource: '=',
     },
     controller: function ($scope) {
-      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern.fields);
+      let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern);
 
       /**初始化选择值 */
       $scope.initSelectField = function () {
@@ -145,6 +145,24 @@ uiModules
         this.condition.selected.disabled = !this.condition.selected.disabled
         $scope.$emit('advancedSearch.condition.disable', {});
       }
+
+      /**删除条件 */
+      $scope.remove = function () {
+        _.pull(this.conditions, this.condition);
+        if (this.conditions.length == 0) {
+          delete this.conditions;
+        }
+
+        let size = 0;
+        _.keys($scope.boolSource).forEach(key => {
+          let length = $scope.boolSource[key].length;
+          size += length;
+        });
+
+        if (size == 0 && $scope.boolSourceType) {
+          _.pull($scope.boolSourceType, $scope.boolSourceParent);
+        }
+      } 
     },
     link: function ($scope, element) {
       const init = function () {
