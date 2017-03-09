@@ -271,7 +271,6 @@ export default function SearchSourceFactory(Promise, Private, config) {
     }
 
     function addToBodyWithAdvancedSearch() {
-      debugger;
       if (_.isEmpty(val)) {
         return;
       }
