@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import Scanner from 'ui/utils/scanner';
 import 'plugins/kibana/dashboard/services/_saved_dashboard';
 import uiModules from 'ui/modules';
@@ -24,7 +25,7 @@ module.service('advancedSearch', function (Promise) {
             returnValue = false;
             break;
           case "date":
-            returnValue = !(field.name == timeFieldName);
+            //returnValue = !(field.name == timeFieldName);
             break;
           case "string":
           case "number":
@@ -97,6 +98,11 @@ module.service('advancedSearch', function (Promise) {
                 case ".keyword":
                   if (selected.field.type === "string" && selected.field.hasKeyword) {
                     fieldName = selected.field.asFieldName;
+                  }
+                  break;
+                case "date":
+                  if (operator.ext && operator.ext.format) {
+                    fieldVaue = moment(fieldVaue).format(operator.ext.format);
                   }
                   break;
               }

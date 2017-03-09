@@ -64,7 +64,11 @@
                   <button type="button" class="btn  ng-class:{'btn-success':!condition.selected.value,'btn-default':condition.selected.value}" ng-click="condition.selected.value=false">否</button>
                 </div>
               </div>
-              <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>
+              <div class="kbn-timepicker" ng-switch-when='date'>
+                <input type="text" class="form-control" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value"
+  is-open="opened" datepicker-options="" clear-text='清除' close-text="关闭" current-text='今天' />
+              </div>
+              <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>              
             </div>
           </div>   
         </td>

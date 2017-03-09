@@ -13,11 +13,11 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'date',       operators: [
-            { display: "=", keyword: "term", link: "value" },
-            { display: ">", keyword: "range", link: "gt" },
-            { display: ">=", keyword: "range", link: "gte" },
-            { display: "<", keyword: "range", link: "lt" },
-            { display: "<=", keyword: "range", link: "lte" },
+            // { display: "=", keyword: "term", link: "value" },
+            { display: ">", keyword: "range", link: "gt", strategy: 'date', ext: {  "format": "YYYY-MM-DD" }},
+            { display: ">=", keyword: "range", link: "gte", strategy: 'date', ext: { "format": "YYYY-MM-DD" } },
+            { display: "<", keyword: "range", link: "lt", strategy: 'date', ext: { "format": "YYYY-MM-DD" } },
+            { display: "<=", keyword: "range", link: "lte", strategy: 'date', ext: {  "format": "YYYY-MM-DD" } },
           ]
       },
       { name: 'string',     operators: [
