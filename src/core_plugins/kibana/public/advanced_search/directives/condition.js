@@ -83,7 +83,13 @@ uiModules
 
       /**单条件 */
       $scope.addCondition = function (type) {
-        $scope.boolSource = $scope.boolSource || {};
+
+        if (_.isEmpty($scope.boolSource)) {
+          //$scope.boolSource = { must: [], should: [], must_not: [] };
+          $scope.boolSource.must = [];
+          $scope.boolSource.should = [];
+          $scope.boolSource.must_not = [];
+        }
         let conditions = $scope.boolSource[type] || ($scope.boolSource[type] = []);
 
         conditions.push({});

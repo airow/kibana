@@ -737,13 +737,14 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.updateDataSource = Promise.method(function () {
     savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
 
     //debugger;
     $scope.searchSource
       .size($scope.opts.sampleSize)
       .sort(getSort($state.sort, $scope.indexPattern)).query(!$state.query ? null : $state.query)
       .set('filter', queryFilter.getFilters())
-      .set('advancedSearch', savedSearch.uiConf.advancedSearchBool);
+      .set('advancedSearch', esQueryDSL);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
 

@@ -55,6 +55,14 @@ module.service('advancedSearch', function (Promise) {
     return returnValue;
   }
 
+  this.syncAdvancedSearch2EsQueryDSL = function (advancedSearch) {
+    let returnValue = {};
+    this.skipDisabled = true;
+    returnValue = this.syncAdvancedSearchCondition(advancedSearch);
+    this.skipDisabled = false;
+    return returnValue;
+  }
+
   this.syncAdvancedSearchCondition = function (boolConditions) {
 
     let that = this;
@@ -77,7 +85,7 @@ module.service('advancedSearch', function (Promise) {
         } else {
           if (condition.selected) {
             let selected = condition.selected;
-            if (selected.disabled) { return; }
+            if (that.skipDisabled && selected.disabled) { return; }
 
             let fieldName = selected.field.name;
             let fieldVaue = selected.value;
@@ -104,6 +112,9 @@ module.service('advancedSearch', function (Promise) {
               case "term":
                 newCondition[operator.keyword] = newOperator;
                 newOperator[fieldName] = newLink;
+                if (false == that.skipDisabled) {
+                  newOperator['disabled'] = selected.disabled;
+                }
                 newLink[operator.link] = fieldVaue;
                 break;
             }
@@ -132,13 +143,14 @@ module.service('advancedSearch', function (Promise) {
       let fieldName = keys[0];
       if (fieldName) {
         let link = _.keys(condition[keyword][fieldName])[0];
+        let disabled = condition[keyword]["disabled"];
         let selectValue = condition[keyword][fieldName][link];
 
         let selectField = fieldSource.find(field => { return field.name === fieldName });
         let selectOperator = selectField.typeOperators.find(operator => {
           return operator.keyword === keyword && operator.link === link;
         });
-        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: false };
+        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: disabled };
       }
     });
 

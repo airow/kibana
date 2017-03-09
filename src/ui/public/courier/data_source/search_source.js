@@ -286,8 +286,11 @@ export default function SearchSourceFactory(Promise, Private, config) {
       } else {
         let query_string = state.body["query"];
 
-        state.body["query"] = { bool: val }
-        state.body["query"].bool.must.push(query_string);
+        state.body["query"] = { bool: val };
+
+        let must = state.body["query"].bool.must || [];
+        must.push(query_string);
+        state.body["query"].bool.must = must;
       }
     }
 
