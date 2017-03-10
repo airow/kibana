@@ -352,11 +352,11 @@ export default function SourceAbstractFactory(Private, Promise, PromiseEmitter) 
             flatState.body.query = {
               bool: {
                 must: (
-                  [flatState.body.query].concat(
+                  [flatState.body.query, flatState.advancedSearchBool || {}].concat(
                     (flatState.filters || [])
-                    .filter(filterNegate(false))
-                    .map(translateToQuery)
-                    .map(cleanFilter)
+                      .filter(filterNegate(false))
+                      .map(translateToQuery)
+                      .map(cleanFilter)
                   )
                 ),
                 must_not: (
@@ -369,6 +369,7 @@ export default function SourceAbstractFactory(Private, Promise, PromiseEmitter) 
             };
           }
           delete flatState.filters;
+          delete flatState.advancedSearchBool;
         }
 
         // re-write filters within filter aggregations

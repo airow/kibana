@@ -263,7 +263,8 @@ export default function SearchSourceFactory(Promise, Private, config) {
         addToBody();
         break;
       case 'advancedSearch':
-        addToBodyWithAdvancedSearch();
+        //addToBodyWithAdvancedSearch();
+        state.advancedSearchBool = { bool: val };
         console.log(val);
         break;
       default:
@@ -274,6 +275,7 @@ export default function SearchSourceFactory(Promise, Private, config) {
       if (_.isEmpty(val)) {
         return;
       }
+      debugger;
       state.body = state.body || {};
       // ignore if we already have a value
       if (state.body["query"] == null) {
@@ -287,9 +289,9 @@ export default function SearchSourceFactory(Promise, Private, config) {
 
         state.body["query"] = { bool: val };
 
-        let must = state.body["query"].bool.must || [];
-        must.push(query_string);
-        state.body["query"].bool.must = must;
+        // let must = state.body["query"].bool.must || [];
+        // must.push(query_string);
+        // state.body["query"].bool.must = must;
       }
     }
 
