@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import moment from 'moment';
 import conditionTemplate from './condition.html';
 import conditionDisplayTemplate from './condition_display.html';
 import '../styles/advanced_search.css'
@@ -20,6 +21,7 @@ uiModules
       boolSourceParent: '=',
     },
     controller: function ($scope) {
+      
 
       let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern);
       
@@ -34,12 +36,22 @@ uiModules
         $scope.$emit('advancedSearch.condition.disable', {});  
       }
 
+      $scope.dateToTime = function () {
+        if (_.isDate(this.condition.selected.value)) {
+          this.condition.selected.value = moment(this.condition.selected.value).format('x');
+        }
+      }
+
       /**删除条件 */
       $scope.remove = function () {
         _.pull(this.conditions, this.condition);
         if (this.conditions.length == 0) {
           delete this.conditions;
         }
+
+        if (_.isEmpty($scope.boolSource[this.key])) {
+          delete $scope.boolSource[this.key];
+        }        
 
         let size = 0;
         _.keys($scope.boolSource).forEach(key => {
@@ -64,7 +76,9 @@ uiModules
         let bool = {};
         bool[type] = [{}];
 
-        conditions.push({ "bool": bool });
+        conditions.push({ "bool": {} });
+
+        $scope.$emit('advancedSearch.add', {});
       }
 
       $scope.addMustGroup = function () {
@@ -84,15 +98,17 @@ uiModules
       /**单条件 */
       $scope.addCondition = function (type) {
 
-        if (_.isEmpty($scope.boolSource)) {
-          //$scope.boolSource = { must: [], should: [], must_not: [] };
-          $scope.boolSource.must = [];
-          $scope.boolSource.should = [];
-          $scope.boolSource.must_not = [];
-        }
+        // if (_.isEmpty($scope.boolSource)) {
+        //   //$scope.boolSource = { must: [], should: [], must_not: [] };
+        //   $scope.boolSource.must = [];
+        //   $scope.boolSource.should = [];
+        //   $scope.boolSource.must_not = [];
+        // }
         let conditions = $scope.boolSource[type] || ($scope.boolSource[type] = []);
 
         conditions.push({});
+
+        $scope.$emit('advancedSearch.add', type);
       }
       /**AND */
       $scope.addMust = function () {
@@ -145,7 +161,9 @@ uiModules
       /**初始化选择值 */
       $scope.initSelectField = function () {
         advancedSearch.queryField2ViewModel(this.condition, fieldSource);
-      } 
+      }
+
+      $scope.keySort = {};  
 
       $scope.disableChange = function () {
         this.condition.selected.disabled = !this.condition.selected.disabled
@@ -158,6 +176,10 @@ uiModules
         if (this.conditions.length == 0) {
           delete this.conditions;
         }
+
+        if (_.isEmpty($scope.boolSource[this.key])) {
+          delete $scope.boolSource[this.key];
+        }        
 
         let size = 0;
         _.keys($scope.boolSource).forEach(key => {

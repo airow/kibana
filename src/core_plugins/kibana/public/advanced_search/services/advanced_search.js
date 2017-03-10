@@ -92,6 +92,8 @@ module.service('advancedSearch', function (Promise) {
             let fieldVaue = selected.value;
             let operator = selected.operator;
 
+            let operatorExt = _.clone(operator.ext);
+
             //处理字符类型 =,like 
             if (operator.strategy) {
               switch (operator.strategy) {
@@ -101,9 +103,16 @@ module.service('advancedSearch', function (Promise) {
                   }
                   break;
                 case "date":
-                  if (operator.ext && operator.ext.format) {
-                    fieldVaue = moment(fieldVaue).format(operator.ext.format);
+                  if (_.isDate(fieldVaue)) {
+                    fieldVaue = moment(fieldVaue).format('x');
                   }
+                  break;
+                case "date_equal":
+                  if (_.isDate(fieldVaue)) {
+                    fieldVaue = moment(fieldVaue).format('x');
+                  }
+                  operatorExt.lte = fieldVaue;
+
                   break;
               }
             }
@@ -125,9 +134,9 @@ module.service('advancedSearch', function (Promise) {
                 break;
             }
 
-            if (operator.ext) {
-              for (let key in operator.ext) {
-                newLink[key] = operator.ext[key];
+            if (operatorExt) {
+              for (let key in operatorExt) {
+                newLink[key] = operatorExt[key];
               }
             }
 

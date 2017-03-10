@@ -14,10 +14,11 @@ export default function IndexPatternFieldType() {
       },
       { name: 'date',       operators: [
             // { display: "=", keyword: "term", link: "value" },
-            { display: ">", keyword: "range", link: "gt", strategy: 'date', ext: {  "format": "YYYY-MM-DD" }},
-            { display: ">=", keyword: "range", link: "gte", strategy: 'date', ext: { "format": "YYYY-MM-DD" } },
-            { display: "<", keyword: "range", link: "lt", strategy: 'date', ext: { "format": "YYYY-MM-DD" } },
-            { display: "<=", keyword: "range", link: "lte", strategy: 'date', ext: {  "format": "YYYY-MM-DD" } },
+            { display: "=", keyword: "range", link: "gte", strategy: 'date_equal', ext: { "format": "epoch_millis" } },
+            { display: ">", keyword: "range", link: "gt", strategy: 'date', ext: {  "format": "epoch_millis" }},
+            { display: ">=", keyword: "range", link: "gte", strategy: 'date', ext: { "format": "epoch_millis" } },
+            { display: "<", keyword: "range", link: "lt", strategy: 'date', ext: { "format": "epoch_millis" } },
+            { display: "<=", keyword: "range", link: "lte", strategy: 'date', ext: {  "format": "epoch_millis" } },
           ]
       },
       { name: 'string',     operators: [

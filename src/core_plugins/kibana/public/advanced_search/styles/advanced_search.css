@@ -2,6 +2,8 @@
   .advancedSearch button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
   .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }
 
+  .advancedSearch .filter-bar{padding: 0px;}
+
   table.advancedSearch {
     margin: 0px;
   }
@@ -22,9 +24,9 @@
     display: none;
   }*/
 
-  [data-and='and0']{
+  /*[data-and='and0']{
     display: none;
-  }
+  }*/
 
 .advancedSearchDisplay button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
 .advancedSearchDisplay button[data-bool='should'] { cursor: default; background-color: yellowgreen; }

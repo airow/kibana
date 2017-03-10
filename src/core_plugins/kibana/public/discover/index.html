@@ -64,8 +64,8 @@
     <div class="row">
       <filter-bar state="state"></filter-bar>
     </div>
-    <div class="row">
-      <div class="filter-bar" ng-show="showAdvancedSearch && showAdvancedSearchDisplay()">
+    <div class="row" ng-show="advancedSearch.must && advancedSearch.must.length>0 || advancedSearch.should && advancedSearch.should.length>0 || advancedSearch.must_not && advancedSearch.must_not.length>0">
+      <div class="filter-bar">
         高级：<teld-advanced-search-display index-pattern='indexPattern' bool-source="advancedSearch"></teld-advanced-search-display>
       </div>
     </div>

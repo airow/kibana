@@ -1,84 +1,100 @@
 <div class="advancedSearch button">
-  <!-- -->
-  <div class="btn-group" role="group">
-    <button onclick='this.blur();' data-bool='must' class="btn btn-xs glyphicon">与</button>
-    <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
-    <button type="button" ng-click="addMustGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
-  </div>  
-  <div class="btn-group btn-group-xs" role="group">
-    <button onclick='this.blur();' data-bool='should' class="btn btn-xs glyphicon">或</button>
-    <button type="button" ng-click="addShould()"  class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
-    <button type="button" ng-click="addShouldGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+  <div class="filter-bar" ng-show="expressionView">
+    <div class="btn-group" role="group">
+      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-open"></button>
+    </div>
+    <teld-advanced-search-display index-pattern='indexPattern' bool-source="boolSource"></teld-advanced-search-display>
   </div>
-  <div class="btn-group" role="group">
-    <button onclick='this.blur();' data-bool='must_not' class="btn btn-xs glyphicon">非</button>
-    <button type="button" ng-click="addMustNot()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
-    <button type="button" ng-click="addMustNotGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
-  </div>
-  <div class="btn-group" role="group" ng-show="boolSourceParent">
-    <button type="button" ng-click="removeGroup()" class="btn btn-danger btn-xs glyphicon glyphicon-trash">删除</button>
-  </div>
-  <table class="table advancedSearch" ng-repeat="(key,conditions) in boolSource">
-    <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
-      <tr ng-if='!condition.bool'>
-        <!--条件-->
-        <td colspan="1" style="width: 113px; vertical-align: inherit;">
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-danger btn-xs glyphicon glyphicon-trash" ng-click='remove()'>删除</button>
-            <button ng-click='disableChange();' ng-show="condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ok-circle">启用</button>
-            <button ng-click='disableChange();' ng-show="!condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ban-circle">禁用</button>
-          </div>
-        </td>
-        <td colspan="3" ng-init="initSelectField()" ng-switch="condition.selected.disabled">
-          <div class="row" ng-switch-when='true'>
-            <div class="col-xs-2" style="text-decoration:line-through">
-              <div class="filter-bar" style="background-color: transparent;">
-                <div class="filter disabled">
-                  <div style="color: black; font-weight: bolder;">
-                    <span>{{condition.selected.field.asFieldName}} {{condition.selected.operator.display}} {{condition.selected.value}}</span>
+  <div ng-hide="expressionView">   
+    <div class="btn-group" role="group">
+      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-close"></button>
+    </div> 
+    <div class="btn-group" role="group">
+      <button onclick='this.blur();' data-bool='must' class="btn btn-xs glyphicon">与</button>
+      <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <button type="button" ng-click="addMustGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+    </div>  
+    <div class="btn-group btn-group-xs" role="group">
+      <button onclick='this.blur();' data-bool='should' class="btn btn-xs glyphicon">或</button>
+      <button type="button" ng-click="addShould()"  class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <button type="button" ng-click="addShouldGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+    </div>
+    <div class="btn-group" role="group">
+      <button onclick='this.blur();' data-bool='must_not' class="btn btn-xs glyphicon">非</button>
+      <button type="button" ng-click="addMustNot()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <button type="button" ng-click="addMustNotGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+    </div>
+    <div class="btn-group" role="group" ng-show="boolSourceParent">
+      <button type="button" ng-click="removeGroup()" class="btn btn-danger btn-xs glyphicon glyphicon-trash"></button>
+    </div>  
+    <table class="table advancedSearch" ng-repeat="(key,conditions) in boolSource">
+      <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
+        <tr ng-if='!condition.bool'>
+          <!--条件-->
+          <td colspan="1" style="width: 65px; vertical-align: inherit;">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-danger btn-xs glyphicon glyphicon-trash" ng-click='remove()'></button>
+              <button ng-click='disableChange();' ng-show="condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ok-circle"></button>
+              <button ng-click='disableChange();' ng-show="!condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ban-circle"></button>
+            </div>
+          </td>
+          <td colspan="3" ng-init="initSelectField()" ng-switch="condition.selected.disabled">
+            <div class="row" ng-switch-when='true'>
+              <div class="col-xs-2" style="text-decoration:line-through">
+                <div class="filter-bar" style="background-color: transparent;">
+                  <div class="filter disabled">
+                    <div style="color: black; font-weight: bolder;">
+                      <span>{{condition.selected.field.asFieldName}}</span>
+                      <span>{{condition.selected.operator.display}}</span>
+                      <span ng-switch="condition.selected.field.type">
+                        <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>
+                        <span ng-switch-default>{{condition.selected.value}}</span>
+                      </span>
+                      <span ng-show="key==='must_not'" style="color: red">不成立</span>
+                    </div>
+                  </div>
+                </div>             
+              </div>
+            </div>
+            <div class="row" ng-switch-default>
+              <div class="col-xs-2">
+                <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.asFieldName + '【' + field.type + '】' for field in fieldSource">
+                  <option></option>
+                </select>
+              </div>
+              <div class="col-xs-1">
+                <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">
+                  <option></option>
+                </select>
+              </div>
+              <div class="col-xs-2" ng-switch="condition.selected.field.type">
+                <div>
+                  <input ng-disabled="condition.selected.disabled" ng-switch-when='number' type="number" class="form-control" ng-model="condition.selected.value" required/>
+                </div>              
+                <div ng-switch-when='boolean' ng-init='condition.selected.value=true' class="btn-group btn-group-justified" role="group">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn ng-class:{'btn-success':condition.selected.value,'btn-default':!condition.selected.value}" ng-click="condition.selected.value=true">是</button>
+                  </div>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn  ng-class:{'btn-success':!condition.selected.value,'btn-default':condition.selected.value}" ng-click="condition.selected.value=false">否</button>
                   </div>
                 </div>
-              </div>             
-            </div>
-          </div>
-          <div class="row" ng-switch-default>
-            <div class="col-xs-2">
-              <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.asFieldName + '【' + field.type + '】' for field in fieldSource">
-                <option></option>
-              </select>
-            </div>
-            <div class="col-xs-1">
-              <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">
-                <option></option>
-              </select>
-            </div>
-            <div class="col-xs-2" ng-switch="condition.selected.field.type">
-              <div>
-                <input ng-disabled="condition.selected.disabled" ng-switch-when='number' type="number" class="form-control" ng-model="condition.selected.value" required/>
-              </div>              
-              <div ng-switch-when='boolean' ng-init='condition.selected.value=true' class="btn-group btn-group-justified" role="group">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn ng-class:{'btn-success':condition.selected.value,'btn-default':!condition.selected.value}" ng-click="condition.selected.value=true">是</button>
+                <div class="kbn-timepicker" ng-switch-when='date'>
+                  <input type="text" class="form-control" ng-change="dateToTime()" ng-click="opened=true" datepicker-popup='yyyy-MM-dd' ng-model="condition.selected.value"
+    is-open="opened" clear-text='清除' close-text="关闭" current-text='今天' />
                 </div>
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn  ng-class:{'btn-success':!condition.selected.value,'btn-default':condition.selected.value}" ng-click="condition.selected.value=false">否</button>
-                </div>
+                <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>              
               </div>
-              <div class="kbn-timepicker" ng-switch-when='date'>
-                <input type="text" class="form-control" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value"
-  is-open="opened" datepicker-options="" clear-text='清除' close-text="关闭" current-text='今天' />
-              </div>
-              <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>              
-            </div>
-          </div>   
-        </td>
-      </tr>      
-      <tr ng-if='condition.bool'>
-        <!--分组-->
-        <td colspan="4" data-bool="bool">
-          <teld-advanced-search index-pattern='indexPattern' bool-source-type='boolSource[key]' bool-source-parent='condition' bool-source="condition.bool"></teld-advanced-search>
-        </td>
-      </tr>
-    </tbody>
-  </table>  
+            </div>   
+          </td>
+        </tr>      
+        <tr ng-if='condition.bool'>
+          <!--分组-->
+          <td colspan="4" data-bool="bool">
+            <teld-advanced-search index-pattern='indexPattern' bool-source-type='boolSource[key]' bool-source-parent='condition' bool-source="condition.bool"></teld-advanced-search>
+          </td>
+        </tr>
+      </tbody>
+    </table>  
+  </div>
 </div>

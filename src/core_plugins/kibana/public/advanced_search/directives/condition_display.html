@@ -1,13 +1,22 @@
 <span class="advancedSearchDisplay">
-  <span class="" ng-repeat="(key,conditions) in boolSource">
-    <span ng-show="conditions.length > 0">
-      <button class="btn btn-success btn-xs" data-and='and{{$index}}' data-bool='must'>AND</button> {{key==='should'?'(':''}}
+  <!--{{keySort}}-->
+  <span class="" ng-repeat="(key,conditions) in boolSource">    
+    <span ng-init="keySort[$index+1]=key" ng-show="conditions.length > 0">
+      <!--{{keySort[$index]}}-->
+      <button class="btn btn-success btn-xs" ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" data-bool='must'>AND</button> {{key==='should'?'(':''}}
+      <!--<button class="btn btn-success btn-xs" ng-hide="$first" data-bool='must'>AND</button> {{key==='should'?'(':''}}-->
     </span>
     <span ng-repeat="condition in conditions" style="background-color: transparent;">
       <span ng-show='!condition.bool && condition.selected'>
         <span class="filter" ng-class="{'disabled':condition.selected.disabled}">
           <span class="filter-description">
-            {{condition.selected.field.asFieldName}} {{condition.selected.operator.display}} {{condition.selected.value}} <span ng-show="key==='must_not'" style="color: red">不成立</span>
+            <span>{{condition.selected.field.asFieldName}}</span>
+            <span>{{condition.selected.operator.display}}</span>
+            <span ng-switch="condition.selected.field.type">
+              <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>
+              <span ng-switch-default>{{condition.selected.value}}</span>
+            </span>
+            <span ng-show="key==='must_not'" style="color: red">不成立</span>
           </span>
           <div class="filter-actions">
             <a class="action filter-toggle" ng-click="disableChange()">
@@ -25,7 +34,7 @@
         </span>
       </span>
       <span ng-show='condition.bool'> 
-        (<teld-advanced-search-display index-pattern='indexPattern' bool-source="condition.bool"></teld-advanced-search-display>)
+        [<teld-advanced-search-display index-pattern='indexPattern' bool-source="condition.bool"></teld-advanced-search-display>]
         <span ng-show="!$last" ng-switch="key">
           <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
           <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>

@@ -283,84 +283,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     "must_not": []
   };
 
-  //$scope.advancedSearch = savedSearch.uiConf.advancedSearchBool || {};
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind(savedSearch.uiConf.advancedSearchBool || {}, $scope.indexPattern.fields);
 
   $scope.$on('advancedSearch.condition.disable', function (d, data) {
     $scope.fetch();
-  });  
-
-  function syncAdvancedSearch() {
-    alert(1);
-    let returnValue = {};
-    returnValue = syncAdvancedSearchCondition($scope.advancedSearch);
-    return returnValue;
-  }
-
-  function syncAdvancedSearchCondition(boolConditions) {
-
-    let returnValue = {};
-
-    for (let guanxi in boolConditions) {
-
-      let conditions = boolConditions[guanxi];
-      let returnValueItem = returnValue[guanxi] = [];
-
-      conditions.forEach(condition => {
-
-        if ('bool' in condition) {
-
-          let childBool = syncAdvancedSearchCondition(condition.bool);
-
-          returnValueItem.push({ "bool": childBool });
-
-        } else {
-          if (condition.selected) {
-            let selected = condition.selected;
-
-            let fieldName = selected.field.name;
-            let fieldVaue = selected.value;
-            let operator = selected.operator;
-            
-            //处理字符类型 =,like 
-            if (operator.strategy) {
-              switch (operator.strategy) {
-                case ".keyword":
-                  if (selected.field.type === "string" && selected.field.hasKeyword) {
-                    fieldName = selected.field.asFieldName;
-                  }
-                  break;
-              }
-            }
-
-            let newCondition = {};
-            let newOperator = {};
-            let newLink = {};
-
-            switch (operator.keyword) {
-              case "match":
-              case "range":
-              case "term":
-                newCondition[operator.keyword] = newOperator;
-                newOperator[fieldName] = newLink;
-                newLink[operator.link] = fieldVaue;
-                break;
-            }
-
-            if (operator.ext) {
-              for (let key in operator.ext) {
-                newLink[key] = operator.ext[key];
-              }
-            }
-
-            returnValueItem.push(newCondition);
-          }
-        }
-      });
-    }
-
-    return returnValue;
-  }
+  });
 
   $scope.helpDialog = function () {
     ngDialog.open({
@@ -439,7 +366,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     return false;
   }
 
-  $scope.showAdvancedSearch = $scope.showAdvancedSearchDisplay();
+  //$scope.showAdvancedSearch = $scope.showAdvancedSearchDisplay();
+  //$scope.showAdvancedSearch = true;
 
   const init = _.once(function () {
     const showTotal = 5;
