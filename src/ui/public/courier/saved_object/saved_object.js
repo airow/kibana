@@ -260,7 +260,7 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
 
       if (self.searchSource) {
         body.kibanaSavedObjectMeta = {
-          searchSourceJSON: angular.toJson(_.omit(self.searchSource.toJSON(), ['sort', 'size']))
+          searchSourceJSON: angular.toJson(_.omit(self.searchSource.toJSON(), ['sort', 'size', 'advancedSearch']))
         };
       }
 
