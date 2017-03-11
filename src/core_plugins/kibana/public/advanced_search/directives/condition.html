@@ -10,20 +10,23 @@
       <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-close"></button>
     </div> 
     <div class="btn-group" role="group" ng-hide="boolSourceType">
-      <button onclick='this.blur();' data-bool='must' class="btn btn-xs glyphicon">与</button>
-      <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <!--<button onclick='this.blur();' data-bool='must' class="btn btn-xs glyphicon">与</button>
+      <button type="button" ng-click="addMust()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>-->
       <!--<button type="button" ng-click="addMustGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>-->
+      <button type="button" ng-click="addMust()" data-bool='must' class="btn btn-primary btn-xs glyphicon glyphicon-plus">　与</button>      
     </div>  
     <div class="btn-group btn-group-xs" role="group">
-      <button onclick='this.blur();' data-bool='should' class="btn btn-xs glyphicon">或</button>
-      <button ng-show="boolSourceType" type="button" ng-click="addShould()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <!--<button onclick='this.blur();' data-bool='should' class="btn btn-xs glyphicon">或</button>
+      <button ng-show="boolSourceType" type="button" ng-click="addShould()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>-->
       <!--<button type="button" ng-click="addShouldGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>-->
-      <button ng-hide="boolSourceType" type="button" ng-click="addMustGroupShould()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>
+      <button ng-show="boolSourceType" type="button" data-bool='should' ng-click="addShould()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">　或</button>
+      <button ng-hide="boolSourceType" type="button" data-bool='should' ng-click="addMustGroupShould()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">　或</button>
     </div>
     <div class="btn-group" role="group" ng-hide="boolSourceType">
-      <button onclick='this.blur();' data-bool='must_not' class="btn btn-xs glyphicon">非</button>
-      <button type="button" ng-click="addMustNot()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>
+      <!--<button onclick='this.blur();' data-bool='must_not' class="btn btn-xs glyphicon">非</button>
+      <button type="button" ng-click="addMustNot()" class="btn btn-primary btn-xs glyphicon glyphicon-plus">条件</button>-->
       <!--<button type="button" ng-click="addMustNotGroup()" class="btn btn-primary btn-xs glyphicon glyphicon-tasks">分组</button>-->
+      <button type="button" ng-click="addMustNot()" data-bool='must_not' class="btn btn-primary btn-xs glyphicon glyphicon-plus">　非</button>      
     </div>
     <div class="btn-group" role="group" ng-show="boolSourceParent">
       <button type="button" ng-click="removeGroup()" class="btn btn-danger btn-xs glyphicon glyphicon-trash"></button>
