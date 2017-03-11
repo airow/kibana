@@ -342,12 +342,14 @@ export default function SourceAbstractFactory(Private, Promise, PromiseEmitter) 
 
         // switch to filtered query if there are filters
         if (flatState.filters) {
-          if (flatState.filters.length) {
-            _.each(flatState.filters, function (filter) {
-              if (filter.query) {
-                decorateQuery(filter.query);
-              }
-            });
+          if (flatState.filters.length || flatState.advancedSearchBool) {
+            if (flatState.filters.length) {
+              _.each(flatState.filters, function (filter) {
+                if (filter.query) {
+                  decorateQuery(filter.query);
+                }
+              });
+            }
 
             flatState.body.query = {
               bool: {
