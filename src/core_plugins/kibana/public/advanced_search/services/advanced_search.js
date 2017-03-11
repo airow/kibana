@@ -15,9 +15,13 @@ module.service('advancedSearch', function (Promise) {
     let fields = indexPattern.fields;
     let metaFields = indexPattern.metaFields;
     let timeFieldName = indexPattern.timeFieldName;
+
+    let keywords = {};
+
     let fieldSource = fields.filter(field => {
 
-      let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable && field.analyzed == false;
+      //let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable && field.analyzed == false;
+      let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable;
 
       if (returnValue) {
         switch (field.type) {
@@ -34,20 +38,30 @@ module.service('advancedSearch', function (Promise) {
         }
       }
       return returnValue;
-    })
-      .map(field => {
-        field.asFieldName = field.name;
-        //对字符穿类型进行特殊处理 =，like
-        if (field.type === "string") {
-          field.hasKeyword = _.endsWith(field.name, '.keyword');
-          if (field.hasKeyword) {
-            field.asFieldName = field.name.replace('.keyword', '');
-          }
+    }).map(field => {
+      field.asFieldName = field.name;
+      //对字符穿类型进行特殊处理 =，like
+      if (field.type === "string") {
+        field.hasKeyword = _.endsWith(field.name, '.keyword');
+        if (field.hasKeyword) {
+          field.asFieldName = field.name.replace('.keyword', '');
+          //keywords.push(field.asFieldName);
+          keywords[field.asFieldName] = field.asFieldName;
+          // if (field.typeOperators.length == 1) {
+          //   field.typeOperators.push({ display: "等于", keyword: "match", link: "query", ext: { "type": "phrase" } });
+          // }
         }
-        return field;
-      });
+      }
+      return field;
+    }).filter(field => {
+      let returnValue = true;
+      if (keywords[field.name] && false === field.hasKeyword) {
+        //returnValue = false;
+      }
+      return returnValue;
+    });
 
-      return fieldSource;
+    return fieldSource;
   }
 
   this.syncAdvancedSearch = function (advancedSearch) {
@@ -151,6 +165,10 @@ module.service('advancedSearch', function (Promise) {
 
   this.queryField2ViewModel = function (condition, fieldSource) {
 
+    // if (condition.selected.field.hasKeyword) {
+    //   condition.selected.field.typeOperators.push({ display: "等于", keyword: "match", link: "query", ext: { "type": "phrase" } });
+    // }
+
     let selected;
 
     ['match', 'range', 'term'].forEach(keyword => {
@@ -162,6 +180,11 @@ module.service('advancedSearch', function (Promise) {
         let selectValue = condition[keyword][fieldName][link];
 
         let selectField = fieldSource.find(field => { return field.name === fieldName });
+        // debugger;
+        // if (selectField.hasKeyword) {
+        //   selectField.typeOperators.push({ display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} });
+        // }
+
         let selectOperator = selectField.typeOperators.find(operator => {
           return operator.keyword === keyword && operator.link === link;
         });

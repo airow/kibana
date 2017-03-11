@@ -1,13 +1,13 @@
 <div class="advancedSearch button">
   <div class="filter-bar" ng-show="expressionView">
     <div class="btn-group" role="group">
-      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-open"></button>
+      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-close"></button>
     </div>
     <teld-advanced-search-display index-pattern='indexPattern' bool-source="boolSource"></teld-advanced-search-display>
   </div>
   <div ng-hide="expressionView">   
     <div class="btn-group" role="group">
-      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-close"></button>
+      <button type="button" ng-click="expressionView=!expressionView" class="btn btn-xs glyphicon glyphicon-eye-open"></button>
     </div> 
     <div class="btn-group" role="group" ng-hide="boolSourceType">
       <!--<button onclick='this.blur();' data-bool='must' class="btn btn-xs glyphicon">与</button>
@@ -35,10 +35,12 @@
       <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
         <tr ng-if='!condition.bool'>
           <!--条件-->
-          <td colspan="1" style="width: 65px; vertical-align: inherit;">
+          <td colspan="1" style="width: 98px; vertical-align: inherit;">
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-danger btn-xs glyphicon glyphicon-trash" ng-click='remove()'></button>
-              <button ng-click='disableChange();' ng-show="condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ok-circle"></button>
+              <button type="button" ng-disabled="!condition.selected || !condition.selected.value" ng-click="copyCondition()" class="btn btn-success btn-xs glyphicon glyphicon-copy"></button>
+
+              <button ng-click='disableChange();' ng-show="condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ok-circle"></button>              
               <button ng-click='disableChange();' ng-show="!condition.selected.disabled" type="button" class="btn btn-info btn-xs glyphicon glyphicon-ban-circle"></button>
             </div>
           </td>
@@ -66,7 +68,7 @@
                   <option></option>
                 </select>
               </div>
-              <div class="col-xs-1">
+              <div class="col-xs-2">
                 <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">
                   <option></option>
                 </select>
@@ -84,8 +86,7 @@
                   </div>
                 </div>
                 <div class="kbn-timepicker" ng-switch-when='date'>
-                  <input type="text" step="border-color:black;" class="form-control" ng-change="dateToTime()" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value"
-    is-open="opened" clear-text='清除' close-text="关闭" current-text='今天' />
+                  <input type="text" step="border-color:black;" class="form-control" ng-change="dateToTime()" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value" is-open="opened" clear-text='清除' close-text="关闭" current-text='今天' />
                 </div>
                 <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>              
               </div>

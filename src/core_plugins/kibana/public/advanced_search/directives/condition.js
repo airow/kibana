@@ -42,6 +42,14 @@ uiModules
         }
       }
 
+      $scope.copyCondition = function () {
+        if (this.condition.selected) {
+          let copy = { field: this.condition.selected.field, operator: this.condition.selected.operator };
+          copy.value = null;
+          this.conditions.push({ selected: copy });          
+        }
+      }
+
       /**删除条件 */
       $scope.remove = function () {
         _.pull(this.conditions, this.condition);

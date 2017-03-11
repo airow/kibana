@@ -201,7 +201,7 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
     }
 
     function parseAdvancedSearchBool(advancedSearchBoolJson) {
-      if (!self.uiConf.advancedSearchBool) return;
+      if (!self.uiConf || !self.uiConf.advancedSearchBool) return;
 
       // if we have a searchSource, set its state based on the advancedSearchBoolJson field
       let state;

@@ -3,10 +3,10 @@
   <span class="" ng-repeat="(key,conditions) in boolSource">    
     <span ng-init="keySort[$index+1]=key" ng-show="conditions.length > 0">
       <!--{{keySort[$index]}}-->
-      <button class="btn btn-success btn-xs" ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" data-bool='must'>AND</button>
+      <button class="btn btn-success btn-xs" ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" data-bool='must'>并且</button>
       <!--<span ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" ng-switch="key">
-        <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
-        <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>
+        <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>或者</button>
+        <button ng-switch-default class="btn btn-xs" data-bool='must'>并且</button>
       </span>-->
       <!--{{key==='should'?'(':''}}-->
     </span>
@@ -33,8 +33,8 @@
           </div>
         </span>
         <span ng-show="!$last" ng-switch="key">
-          <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
-          <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>
+          <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>或者</button>
+          <button ng-switch-default class="btn btn-xs" data-bool='must'>并且</button>
         </span>
       </span>
       <span ng-show='condition.bool'> 
@@ -42,8 +42,8 @@
           <teld-advanced-search-display index-pattern='indexPattern' bool-source="condition.bool"></teld-advanced-search-display>
         )
         <span ng-show="!$last" ng-switch="key">
-          <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
-          <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>
+          <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>或者</button>
+          <button ng-switch-default class="btn btn-xs" data-bool='must'>并且</button>
         </span>
       </span>      
     </span>

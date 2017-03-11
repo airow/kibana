@@ -1,6 +1,6 @@
   .advancedSearch button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
   .advancedSearch button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
-  .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }
+  .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: red; }
 
   .advancedSearch .filter-bar{padding: 0px;}
 
@@ -17,7 +17,7 @@
   }
 
   table.advancedSearch tbody[data-bool='must_not'] {
-    border-left: rosybrown solid;
+    border-left: red solid;
   }
 
   /*.advancedSearchDisplay [data-and='and']:first-child{
@@ -30,7 +30,7 @@
 
 .advancedSearchDisplay button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
 .advancedSearchDisplay button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
-.advancedSearchDisplay button[data-bool='must_not'] { cursor: default; background-color: rosybrown; }
+.advancedSearchDisplay button[data-bool='must_not'] { cursor: default; background-color: red; }
 
 .advancedSearchDisplay .filter.disabled .filter-description{
   color: black; font-weight: bolder;
