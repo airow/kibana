@@ -25,7 +25,7 @@ module.service('advancedSearch', function (Promise) {
             returnValue = false;
             break;
           case "date":
-            //returnValue = !(field.name == timeFieldName);
+            returnValue = !(field.name == timeFieldName);
             break;
           case "string":
           case "number":
