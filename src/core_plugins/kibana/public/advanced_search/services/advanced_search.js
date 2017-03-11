@@ -72,9 +72,23 @@ module.service('advancedSearch', function (Promise) {
 
   this.syncAdvancedSearch2EsQueryDSL = function (advancedSearch) {
     let returnValue = {};
-    this.skipDisabled = true;
+    this.isEsQueryDSL = true;
     returnValue = this.syncAdvancedSearchCondition(advancedSearch);
-    this.skipDisabled = false;
+    this.isEsQueryDSL = false;
+    return returnValue;
+  }
+
+  this.filterOperator = function (field) {
+    let returnValue = [];
+    if (field) {
+      returnValue = field.typeOperators;
+
+      if (false == field.hasKeyword) {
+        returnValue = [field.typeOperators.find(operator => {
+          return operator.operatorKey === "string_contain";
+        })];
+      }
+    }
     return returnValue;
   }
 
@@ -100,7 +114,7 @@ module.service('advancedSearch', function (Promise) {
         } else {
           if (condition.selected) {
             let selected = condition.selected;
-            if (that.skipDisabled && selected.disabled) { return; }
+            if (that.isEsQueryDSL && selected.disabled) { return; }
 
             let fieldName = selected.field.name;
             let fieldVaue = selected.value;
@@ -141,8 +155,11 @@ module.service('advancedSearch', function (Promise) {
               case "term":
                 newCondition[operator.keyword] = newOperator;
                 newOperator[fieldName] = newLink;
-                if (false == that.skipDisabled) {
-                  newOperator['disabled'] = selected.disabled;
+                if (false == that.isEsQueryDSL) {
+                  newOperator.conf = {
+                    "disabled": selected.disabled,
+                    "operatorKey": operator.operatorKey
+                  };
                 }
                 newLink[operator.link] = fieldVaue;
                 break;
@@ -176,19 +193,16 @@ module.service('advancedSearch', function (Promise) {
       let fieldName = keys[0];
       if (fieldName) {
         let link = _.keys(condition[keyword][fieldName])[0];
-        let disabled = condition[keyword]["disabled"];
         let selectValue = condition[keyword][fieldName][link];
 
         let selectField = fieldSource.find(field => { return field.name === fieldName });
-        // debugger;
-        // if (selectField.hasKeyword) {
-        //   selectField.typeOperators.push({ display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} });
-        // }
+
+        let conf = condition[keyword]["conf"] || {};
 
         let selectOperator = selectField.typeOperators.find(operator => {
-          return operator.keyword === keyword && operator.link === link;
+          return operator.operatorKey === conf.operatorKey;
         });
-        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: disabled };
+        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: conf.disabled };
       }
     });
 

@@ -151,6 +151,14 @@ uiModules
       $scope.addMustNot = function () {
         $scope.addCondition('must_not');
       }    
+
+      $scope.filterOperator = function () {
+        let returnValue = [];
+        if (this.condition.selected) {
+          returnValue = advancedSearch.filterOperator(this.condition.selected.field);
+        }
+        return returnValue;
+      }
     },
     link: function ($scope, element) {
       const init = function () {
@@ -180,7 +188,7 @@ uiModules
       /**初始化选择值 */
       $scope.initSelectField = function () {
         advancedSearch.queryField2ViewModel(this.condition, fieldSource);
-      }
+      }      
 
       $scope.keySort = {};  
 

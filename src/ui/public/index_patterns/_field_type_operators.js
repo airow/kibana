@@ -8,17 +8,17 @@ export default function IndexPatternFieldType() {
     initialSet: [
       {
         name: 'ip',         operators: [
-            { display: "=", keyword: "term", link: "value" },
-            { display: "包含", keyword: "term", link: "value" }
+            { operatorKey:'ip_equal', display: "=", keyword: "term", link: "value" },
+            { operatorKey:'ip_contain', display: "包含", keyword: "term", link: "value" }
           ]
       },
       { name: 'date',       operators: [
             // { display: "=", keyword: "term", link: "value" },
-            { display: "=", keyword: "range", link: "gte", strategy: 'date_equal', ext: { "format": "epoch_millis" } },
-            { display: ">", keyword: "range", link: "gt", strategy: 'date', ext: {  "format": "epoch_millis" }},
-            { display: ">=", keyword: "range", link: "gte", strategy: 'date', ext: { "format": "epoch_millis" } },
-            { display: "<", keyword: "range", link: "lt", strategy: 'date', ext: { "format": "epoch_millis" } },
-            { display: "<=", keyword: "range", link: "lte", strategy: 'date', ext: {  "format": "epoch_millis" } },
+            { operatorKey:'date_equal', display: "=", keyword: "range", link: "gte", strategy: 'date_equal', ext: { "format": "epoch_millis" } },
+            { operatorKey:'date_gt', display: ">", keyword: "range", link: "gt", strategy: 'date', ext: {  "format": "epoch_millis" }},
+            { operatorKey:'date_gte', display: ">=", keyword: "range", link: "gte", strategy: 'date', ext: { "format": "epoch_millis" } },
+            { operatorKey:'date_lt', display: "<", keyword: "range", link: "lt", strategy: 'date', ext: { "format": "epoch_millis" } },
+            { operatorKey:'date_lte', display: "<=", keyword: "range", link: "lte", strategy: 'date', ext: {  "format": "epoch_millis" } },
           ]
       },
       { name: 'string',     operators: [
@@ -27,50 +27,50 @@ export default function IndexPatternFieldType() {
             { display: "模糊", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
             { display: "分词", keyword: "match", link: "query", strategy: '.keyword' },
             */
-            { display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
-            { display: "包含", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
+            { operatorKey:'string_equal', display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { operatorKey:'string_contain', display: "包含", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
           ]
       },
       { name: 'number',     operators: [
             // { display: "=", keyword: "match", link: "query", ext:{"type": "phrase"} },
-            { display: "=", keyword: "term", link: "value" },
-            { display: ">", keyword: "range", link: "gt" },
-            { display: ">=", keyword: "range", link: "gte" },
-            { display: "<", keyword: "range", link: "lt" },
-            { display: "<=", keyword: "range", link: "lte" },
+            { operatorKey:'number_equal', display: "=", keyword: "term", link: "value" },
+            { operatorKey:'number_gt', display: ">", keyword: "range", link: "gt" },
+            { operatorKey:'number_gte', display: ">=", keyword: "range", link: "gte" },
+            { operatorKey:'number_lt', display: "<", keyword: "range", link: "lt" },
+            { operatorKey:'number_lte', display: "<=", keyword: "range", link: "lte" },
           ]
       },
       { name: 'boolean',    operators: [
-            { display: "=", keyword: "term", link: "value" }
+            { operatorKey:'boolean_equal', display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'conflict',   operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'conflict_equal', display: "=", keyword: "term", link: "value" }            
           ]
       },
       { name: 'geo_point',  operators: [
-            { display: "geo_bounding_box", keyword: "geo_bounding_box", link: "value" },
-            { display: "geo_distance", keyword: "geo_distance", link: "value" }
+            { operatorKey:'geo_bounding_box', display: "geo_bounding_box", keyword: "geo_bounding_box", link: "value" },
+            { operatorKey:'geo_distance', display: "geo_distance", keyword: "geo_distance", link: "value" }
           ]
       },
       { name: 'geo_shape',  operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'geo_shape', display: "=", keyword: "term", link: "value" }            
           ]
       },
       { name: 'attachment', operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'attachment_equal', display: "=", keyword: "term", link: "value" }            
           ]
       },
       { name: 'murmur3',    operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'murmur3_equal', display: "=", keyword: "term", link: "value" }            
           ]
       },
       { name: 'unknown',    operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'unknown_equal', display: "=", keyword: "term", link: "value" }            
           ]
      },
       { name: '_source',    operators: [
-            { display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'_source_equal', display: "=", keyword: "term", link: "value" }            
           ]
      },
     ]
