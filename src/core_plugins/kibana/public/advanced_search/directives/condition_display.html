@@ -3,8 +3,12 @@
   <span class="" ng-repeat="(key,conditions) in boolSource">    
     <span ng-init="keySort[$index+1]=key" ng-show="conditions.length > 0">
       <!--{{keySort[$index]}}-->
-      <button class="btn btn-success btn-xs" ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" data-bool='must'>AND</button> {{key==='should'?'(':''}}
-      <!--<button class="btn btn-success btn-xs" ng-hide="$first" data-bool='must'>AND</button> {{key==='should'?'(':''}}-->
+      <button class="btn btn-success btn-xs" ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" data-bool='must'>AND</button>
+      <!--<span ng-hide="$first && (boolSource[keySort[$index]]||[]).length==0" ng-switch="key">
+        <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
+        <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>
+      </span>-->
+      <!--{{key==='should'?'(':''}}-->
     </span>
     <span ng-repeat="condition in conditions" style="background-color: transparent;">
       <span ng-show='!condition.bool && condition.selected'>
@@ -34,13 +38,15 @@
         </span>
       </span>
       <span ng-show='condition.bool'> 
-        [<teld-advanced-search-display index-pattern='indexPattern' bool-source="condition.bool"></teld-advanced-search-display>]
+        (
+          <teld-advanced-search-display index-pattern='indexPattern' bool-source="condition.bool"></teld-advanced-search-display>
+        )
         <span ng-show="!$last" ng-switch="key">
           <button ng-switch-when='should'class="btn btn-xs" data-bool='should'>OR</button>
           <button ng-switch-default class="btn btn-xs" data-bool='must'>AND</button>
         </span>
       </span>      
     </span>
-    <span ng-show=" conditions.length > 0">{{key==='should'?')':''}}</span>
+    <!--<span ng-show=" conditions.length > 0">{{key==='should'?')':''}}</span>-->
   </span>
 </span>

@@ -18,7 +18,7 @@ uiModules
       indexPattern: '=',
       boolSource: '=',
       boolSourceType: '=',
-      boolSourceParent: '=',
+      boolSourceParent: '='
     },
     controller: function ($scope) {
       
@@ -38,7 +38,7 @@ uiModules
 
       $scope.dateToTime = function () {
         if (_.isDate(this.condition.selected.value)) {
-          this.condition.selected.value = moment(this.condition.selected.value).format('x');
+          this.condition.selected.value = parseInt(moment(this.condition.selected.value).format('x'));
         }
       }
 
@@ -77,8 +77,15 @@ uiModules
         bool[type] = [{}];
 
         conditions.push({ "bool": {} });
+      }
 
-        $scope.$emit('advancedSearch.add', {});
+      $scope.addConditionGroupAndItem = function (type, conditionType) {
+        $scope.boolSource = $scope.boolSource || {};
+        let conditions = $scope.boolSource[type] || ($scope.boolSource[type] = []);
+        let bool = {};
+        bool[conditionType || type] = [{}];
+
+        conditions.push({ "bool": bool });
       }
 
       $scope.addMustGroup = function () {
@@ -93,6 +100,10 @@ uiModules
       $scope.addShouldGroup = function () {
 
         $scope.addConditionGroup("should");
+      }
+
+      $scope.addMustGroupShould = function () {
+        $scope.addConditionGroupAndItem("must", 'should');
       }
 
       /**单条件 */
