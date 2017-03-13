@@ -108,7 +108,10 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
             },
             advancedSearchBool: {
               type: 'keyword'
-            }
+            },
+            navigation: {
+              type: 'keyword'
+            },
           }
         };        
 

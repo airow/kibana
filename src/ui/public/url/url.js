@@ -11,6 +11,47 @@ uiModules.get('kibana/url')
 function KbnUrlProvider($injector, $location, $rootScope, $parse, Private) {
   let self = this;
 
+  self.changeAttchState = function (url, states, paramObj) {
+    self._changeLocationAttchState('url', url, paramObj, false, states);
+  };
+
+  self._changeLocationAttchState = function (type, url, paramObj, replace, states) {
+    let prev = {
+      path: $location.path(),
+      search: $location.search()
+    };
+
+    url = self.eval(url, paramObj);
+    $location[type](url);
+    if (replace) $location.replace();
+
+    (states || []).forEach(state => {
+      $location.search(state.getQueryParamName(), state.toQueryParam());
+    });
+
+    let next = {
+      path: $location.path(),
+      search: $location.search()
+    };
+
+    if ($injector.has('$route')) {
+      const $route = $injector.get('$route');
+
+      if (self._shouldForceReload(next, prev, $route)) {
+        const appState = Private(AppStateProvider).getAppState();
+        if (appState) appState.destroy();
+
+        reloading = $rootScope.$on('$locationChangeSuccess', function () {
+          // call the "unlisten" function returned by $on
+          reloading();
+          reloading = false;
+
+          $route.reload();
+        });
+      }
+    }
+  };
+
   /**
    * Navigate to a url
    *
@@ -179,6 +220,7 @@ function KbnUrlProvider($injector, $location, $rootScope, $parse, Private) {
       }
     }
   };
+  
 
   // determine if the router will automatically reload the route
   self._shouldForceReload = function (next, prev, $route) {

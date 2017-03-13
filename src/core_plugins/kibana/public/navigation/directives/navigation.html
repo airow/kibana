@@ -1,0 +1,24 @@
+<ul class="li-striped list-group list-group-menu">
+  <!--<li class="list-group-item">
+    <span class="paginate-heading">
+      名称      
+    </span>
+  </li>-->
+  <li
+    class="list-group-item list-group-menu-item"
+    ng-class="{'active': nav.display === referer }"
+    ng-repeat="nav in navigation"
+    ng-click="finder.onChoose(nav, $event)">
+
+    <a ng-href="{{finder.makeUrl(nav)}}"
+        ng-click="finder.preventClick($event)">
+        <span>{{nav.display}}</span>
+    </a>
+  </li>
+  <li
+    class="list-group-item list-group-no-results"
+    ng-if="navigation.length === 0">
+    <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
+    <p ng-bind="'没有匹配到数据'"></p>
+  </li>
+</ul>

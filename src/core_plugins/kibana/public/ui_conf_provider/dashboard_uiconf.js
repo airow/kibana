@@ -14,9 +14,9 @@ export default function DashboardUiConfProvider(Private, Promise, config) {
     */
     menus: [],
 
-    advancedSearchBool: {},
+    // advancedSearchBool: {},
 
-    pageSize: config.get('discover:sampleSize')/** */
+    // pageSize: config.get('discover:sampleSize')/** */
   };
 
 };

@@ -10,6 +10,8 @@ import _ from 'lodash';
 import VisProvider from 'ui/vis';
 import uiModules from 'ui/modules';
 
+import VisualizationUiConfProvider from 'plugins/kibana/ui_conf_provider/visualization_uiconf';
+
 uiModules
 .get('app/visualize')
 .factory('SavedVis', function (config, $injector, courier, Promise, savedSearches, Private, Notifier) {
@@ -43,7 +45,8 @@ uiModules
         uiStateJSON: '{}',
         description: '',
         savedSearchId: opts.savedSearchId,
-        version: 1
+        version: 1,
+        uiConf: Private(VisualizationUiConfProvider).defaultConf
       },
 
       afterESResp: this._afterEsResp

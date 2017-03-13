@@ -1,4 +1,5 @@
 import _ from 'lodash';
+//import require from 'require';
 import angular from 'angular';
 import rison from 'rison-node';
 import registry from 'plugins/kibana/management/saved_object_registry';
@@ -6,6 +7,10 @@ import objectViewHTML from 'plugins/kibana/management/sections/objects/_view.htm
 import IndexPatternsCastMappingTypeProvider from 'ui/index_patterns/_cast_mapping_type';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
+
+import DiscoverUiConfProvider from 'plugins/kibana/ui_conf_provider/discover_uiconf';
+import DashboardUiConfProvider from 'plugins/kibana/ui_conf_provider/dashboard_uiconf';
+import VisualizationUiConfProvider from 'plugins/kibana/ui_conf_provider/visualization_uiconf';
 
 uiRoutes
 .when('/management/kibana/objects/:service/:id', {
@@ -119,10 +124,18 @@ uiModules.get('apps/management')
       .then(function (obj) {
 
         // /** 处理功能菜单 */
-        // obj._source.menus = obj._source.menus || [];
+        // obj._source.menus = obj._source.menus || [];        
 
+        // let uiConfProvider = {
+        //   'search': Private(DiscoverUiConfProvider),
+        //   'dashboard': Private(DashboardUiConfProvider),
+        //   'visualization': Private(VisualizationUiConfProvider)
+        // }
+        // let uiConf_default = uiConfProvider[service.type].defaultConf;
+        
         /** 默认显示配置项 */
-        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100 };
+        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [] };
+
         obj._source.uiConf = obj._source.uiConf || {};
 
         for (let key in uiConf_default) {

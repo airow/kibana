@@ -40,11 +40,13 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 import 'plugins/kibana/ui_conf_provider/directives/top';
 import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
+import 'plugins/kibana/advanced_search/state/advanced_search_state';
+import 'plugins/kibana/navigation/directives/navigation';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
-  'kibana/index_patterns'
+  'kibana/index_patterns',
 ]);
 
 uiRoutes
@@ -141,7 +143,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, AdvancedSearchState) {
 
     $rootScope.showNotify = true;
 
@@ -226,9 +228,19 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           $scope.export();
         },
         testId: 'discoverExportButton',
+      },
+      'navigation': {
+        key: '分析',
+        description: '分析',
+        template: require('plugins/kibana/discover/partials/load_navigation.html'),
+        run: function (menuItem, kbnTopNav) {
+          //kbnTopNav.setCurrent(menuItem.key);
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'discoverNavigationButton',
       }
     };
-    
+
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
       for (let key in confTopNavMenu) {
@@ -258,36 +270,6 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
-
-  let mockAdvancedSearch = {
-    "must": [{
-      "range": {
-        "运营总时长(天)": {
-          "lte": "248"
-        }
-      }
-    }, {
-      "term": {
-        "运营总时长(天)": {
-          "value": "60"
-        }
-      }
-    }, {
-      "query_string": {
-        "analyze_wildcard": true,
-        "query": "*"
-      }
-    }
-
-    ],
-    "must_not": []
-  };
-
-  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind(savedSearch.uiConf.advancedSearchBool || {}, $scope.indexPattern.fields);
-
-  $scope.$on('advancedSearch.condition.disable', function (d, data) {
-    $scope.fetch();
-  });
 
   $scope.helpDialog = function () {
     ngDialog.open({
@@ -327,6 +309,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
     };
   }
+
+  const $advancedSearchState = $scope.advancedSearchState = new AdvancedSearchState();
+  $advancedSearchState.advancedSearchBool = ($advancedSearchState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
+
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($advancedSearchState.advancedSearchBool, $scope.indexPattern.fields);
+
+  $scope.$on('advancedSearch.condition.disable', function (d, data) {
+    $scope.fetch();
+  });
 
   $state.index = $scope.indexPattern.id;
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
@@ -509,6 +500,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       savedSearch.sort = $scope.state.sort;
       //savedSearch.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
+      savedSearch.uiConf.advancedSearchBool = $advancedSearchState.advancedSearchBool;
 
       return savedSearch.save()
       .then(function (id) {
@@ -539,6 +531,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     .then(setupVisualization)
     .then(function () {
       $state.save();
+      $advancedSearchState.save();
       return courier.fetch();
     })
     .catch(notify.error);
@@ -664,8 +657,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   $scope.updateDataSource = Promise.method(function () {
-    savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
-    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
+    //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $advancedSearchState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $advancedSearchState.save();
+    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);    
 
     //debugger;
     $scope.searchSource

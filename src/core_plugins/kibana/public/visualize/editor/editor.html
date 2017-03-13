@@ -70,7 +70,9 @@
 
   <!-- Filters. -->
   <filter-bar state="state"></filter-bar>
-
+  <div class="filter-bar">
+    高级：<teld-advanced-search-display index-pattern='indexPattern' bool-source="advancedSearch"></teld-advanced-search-display>
+  </div>
   <div class="vis-editor-content">
 
     <div class="collapsible-sidebar" ng-if="chrome.getVisible()">

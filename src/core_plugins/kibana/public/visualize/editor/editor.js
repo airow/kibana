@@ -17,6 +17,9 @@ import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import editorTemplate from 'plugins/kibana/visualize/editor/editor.html';
 
+import 'plugins/kibana/advanced_search/state/advanced_search_state';
+import 'plugins/kibana/navigation/directives/navigation';
+
 uiRoutes
 .when('/visualize/create', {
   template: editorTemplate,
@@ -63,7 +66,7 @@ uiModules
   };
 });
 
-function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise) {
+function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, AdvancedSearchState) {
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
@@ -101,7 +104,71 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   // sources.
   const searchSource = savedVis.searchSource;
 
-  $scope.topNavMenu = [
+  const $advancedSearchState = $scope.advancedSearchState = new AdvancedSearchState();
+  $advancedSearchState.advancedSearchBool = ($advancedSearchState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($advancedSearchState.advancedSearchBool, vis.indexPattern.fields);
+
+  $scope.topNavMenu = getTopNavMenu(savedVis.uiConf.menus);
+  $scope.topNavMenu = getTopNavMenu(['refresh','adv','navigation']);  
+
+  function getTopNavMenu(menuKeys) {
+
+    let confTopNavMenu = {
+      'refresh': {
+        key: '刷新',
+        description: 'Refresh',
+        run: function () { $scope.fetch(); },
+        testId: 'visualizeRefreshButton',
+      },
+      "help": {
+        key: '帮助',
+        description: '帮助',
+        run: function () {
+          window.open("/doc/help/kibana_discover_help.htm");
+          //$scope.helpDialog();
+        },
+        testId: 'visualizeHelpButton',
+      },
+      'adv': {
+        key: '高级查询',
+        description: '高级查询',
+        template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
+        run: function (menuItem, kbnTopNav) {
+          $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
+          //kbnTopNav.setCurrent(menuItem.key);
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'visualizeOpenButton',
+      },
+      'navigation': {
+        key: '分析',
+        description: '分析',
+        template: require('plugins/kibana/visualize/editor/panels/load_navigation.html'),
+        run: function (menuItem, kbnTopNav) {
+          //kbnTopNav.setCurrent(menuItem.key);
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'discoverNavigationButton',
+      }
+    };
+    
+    let menus = [];
+    if (menuKeys && menuKeys.length == 0) {
+      for (let key in confTopNavMenu) {
+        menuKeys.push(key);
+      }
+    }
+    menuKeys.forEach(function (value) {
+      let confMenu = confTopNavMenu[value];
+      if (confMenu) {
+        menus.push(confMenu);
+      }
+    });
+
+    return menus;
+  }
+
+  //$scope.topNavMenu = [
   // {
   //   key: 'new',
   //   description: 'New Visualization',
@@ -123,12 +190,12 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   //   template: require('plugins/kibana/visualize/editor/panels/share.html'),
   //   testId: 'visualizeShareButton',
   // }, 
-  {
-    key: '刷新',
-    description: 'Refresh',
-    run: function () { $scope.fetch(); },
-    testId: 'visualizeRefreshButton',
-  }];
+  // {
+  //   key: '刷新',
+  //   description: 'Refresh',
+  //   run: function () { $scope.fetch(); },
+  //   testId: 'visualizeRefreshButton',
+  // }];
 
   if (savedVis.id) {
     docTitle.change(savedVis.title);
@@ -277,9 +344,19 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     });
   }
 
+  $scope.$on('advancedSearch.condition.disable', function (d, data) {
+    $scope.fetch();
+  });
+
   $scope.fetch = function () {
+    //savedVis.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $advancedSearchState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $advancedSearchState.save();
+    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
+
     $state.save();
     searchSource.set('filter', queryFilter.getFilters());
+    searchSource.set('advancedSearch', esQueryDSL);
     if (!$state.linked) searchSource.set('query', $state.query);
     if ($scope.vis.type.requiresSearch) {
       courier.fetch();

@@ -200,7 +200,7 @@ module.service('advancedSearch', function (Promise) {
 
     ['match', 'range', 'term'].forEach(keyword => {
       let keys = _.keys(condition[keyword]);
-      let fieldName = keys[0];
+      let fieldName = keys.find(key => { return key !== "conf" });
       if (fieldName) {
         let link = _.keys(condition[keyword][fieldName])[0];
         let selectValue = condition[keyword][fieldName][link];
