@@ -17,7 +17,7 @@ import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import editorTemplate from 'plugins/kibana/visualize/editor/editor.html';
 
-import 'plugins/kibana/advanced_search/state/advanced_search_state';
+import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
 
 uiRoutes
@@ -66,7 +66,7 @@ uiModules
   };
 });
 
-function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, AdvancedSearchState) {
+function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState) {
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
@@ -104,9 +104,10 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   // sources.
   const searchSource = savedVis.searchSource;
 
-  const $advancedSearchState = $scope.advancedSearchState = new AdvancedSearchState();
-  $advancedSearchState.advancedSearchBool = ($advancedSearchState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
-  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($advancedSearchState.advancedSearchBool, vis.indexPattern.fields);
+  const $TeldState = $scope.TeldState = new TeldState();
+  $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
+  $TeldState.save();
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);
 
   $scope.topNavMenu = getTopNavMenu(savedVis.uiConf.menus);
   $scope.topNavMenu = getTopNavMenu(['refresh','adv','navigation']);  
@@ -350,8 +351,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
 
   $scope.fetch = function () {
     //savedVis.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
-    $advancedSearchState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
-    $advancedSearchState.save();
+    $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $TeldState.save();
     let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
 
     $state.save();

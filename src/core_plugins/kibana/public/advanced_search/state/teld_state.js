@@ -1,5 +1,5 @@
 /**
- * @name AdvancedSearchState
+ * @name TeldState
  *
  * @extends State
  *
@@ -12,16 +12,16 @@ import _ from 'lodash';
 import modules from 'ui/modules';
 import StateManagementStateProvider from 'ui/state_management/state';
 import PersistedStatePersistedStateProvider from 'ui/persisted_state/persisted_state';
-let urlParam = '_as';
+let urlParam = '_ts';
 
-function AdvancedSearchStateProvider(Private, $rootScope, $location) {
+function TeldStateProvider(Private, $rootScope, $location) {
   let State = Private(StateManagementStateProvider);
   let PersistedState = Private(PersistedStatePersistedStateProvider);
   let persistedStates;
   let eventUnsubscribers;
 
-  _.class(AdvancedSearchState).inherits(State);
-  function AdvancedSearchState(defaults) {
+  _.class(TeldState).inherits(State);
+  function TeldState(defaults) {
     // Initialize persistedStates. This object maps "prop" names to
     // PersistedState instances. These are used to make properties "stateful".
     persistedStates = {};
@@ -31,23 +31,23 @@ function AdvancedSearchStateProvider(Private, $rootScope, $location) {
     // are dispatched via the rootScope.
     eventUnsubscribers = [];
 
-    AdvancedSearchState.Super.call(this, urlParam, defaults);
-    AdvancedSearchState.getAdvancedSearchState._set(this);
+    TeldState.Super.call(this, urlParam, defaults);
+    TeldState.getTeldState._set(this);
   }
 
   // if the url param is missing, write it back
-  AdvancedSearchState.prototype._persistAcrossApps = false;
+  TeldState.prototype._persistAcrossApps = false;
 
-  AdvancedSearchState.prototype.destroy = function () {
-    AdvancedSearchState.Super.prototype.destroy.call(this);
-    AdvancedSearchState.getAdvancedSearchState._set(null);
+  TeldState.prototype.destroy = function () {
+    TeldState.Super.prototype.destroy.call(this);
+    TeldState.getTeldState._set(null);
     _.callEach(eventUnsubscribers);
   };
 
   /**
    * @returns PersistedState instance.
    */
-  AdvancedSearchState.prototype.makeStateful = function (prop) {
+  TeldState.prototype.makeStateful = function (prop) {
     if (persistedStates[prop]) return persistedStates[prop];
     let self = this;
 
@@ -77,41 +77,41 @@ function AdvancedSearchStateProvider(Private, $rootScope, $location) {
     handlePersist('on');
     eventUnsubscribers.push(() => handlePersist('off'));
 
-    // if the thing we're making stateful has an AdvancedSearchState value, write to persisted state
+    // if the thing we're making stateful has an TeldState value, write to persisted state
     if (self[prop]) persistedStates[prop].setSilent(self[prop]);
 
     return persistedStates[prop];
   };
 
-  AdvancedSearchState.getAdvancedSearchState = (function () {
-    let currentAdvancedSearchState;
+  TeldState.getTeldState = (function () {
+    let currentTeldState;
 
     function get() {
-      return currentAdvancedSearchState;
+      return currentTeldState;
     }
 
-    // Checks to see if the AdvancedSearchState might already exist, even if it hasn't been newed up
+    // Checks to see if the TeldState might already exist, even if it hasn't been newed up
     get.previouslyStored = function () {
       let search = $location.search();
       return search[urlParam] ? true : false;
     };
 
     get._set = function (current) {
-      currentAdvancedSearchState = current;
+      currentTeldState = current;
     };
 
     return get;
   }());
 
-  return AdvancedSearchState;
+  return TeldState;
 }
 
 modules.get('apps/advanced_search')
-.factory('AdvancedSearchState', function (Private) {
-  return Private(AdvancedSearchStateProvider);
+.factory('TeldState', function (Private) {
+  return Private(TeldStateProvider);
 })
-.service('getAdvancedSearchState', function (Private) {
-  return Private(AdvancedSearchStateProvider).getAdvancedSearchState;
+.service('getTeldState', function (Private) {
+  return Private(TeldStateProvider).getTeldState;
 });
 
-export default AdvancedSearchStateProvider;
+export default TeldStateProvider;

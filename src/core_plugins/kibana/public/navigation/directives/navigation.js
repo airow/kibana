@@ -2,10 +2,11 @@ import _ from 'lodash';
 import $ from 'jquery';
 import template from './navigation.html';
 import uiModules from 'ui/modules';
+import 'plugins/kibana/advanced_search/state/teld_state';
 
 uiModules
 .get('apps/navigation')
-.directive('teldNavigation', function (Private, $compile, kbnUrl, AdvancedSearchState) { 
+.directive('teldNavigation', function (Private, $compile, kbnUrl, TeldState) { 
 
   return {
     restrict: 'E',
@@ -23,7 +24,8 @@ uiModules
       $scope.referer = $scope.savedObject.title;       
 
       if ($scope.savedObject.uiConf) {
-        $scope.navigation = $scope.savedObject.uiConf.navigation.filter(nav => {
+        let navigationArray = $scope.savedObject.uiConf.navigation || [];
+        $scope.navigation = navigationArray.filter(nav => {
           return !nav.disabled;
         });
       }
@@ -60,7 +62,7 @@ uiModules
 
         // we want the '/path', not '#/path'
         //kbnUrl.change(url.substr(1));
-        kbnUrl.changeAttchState(url.substr(1), [new AdvancedSearchState()]);
+        kbnUrl.changeAttchState(url.substr(1), [new TeldState()]);
       };
     }
   };

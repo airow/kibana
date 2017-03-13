@@ -40,7 +40,7 @@ import DiscoverExportExcelProvider from '../export/discover_export_excel';
 import 'plugins/kibana/ui_conf_provider/directives/top';
 import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
-import 'plugins/kibana/advanced_search/state/advanced_search_state';
+import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
 
 const app = uiModules.get('apps/discover', [
@@ -143,7 +143,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, AdvancedSearchState) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState) {
 
     $rootScope.showNotify = true;
 
@@ -310,10 +310,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     };
   }
 
-  const $advancedSearchState = $scope.advancedSearchState = new AdvancedSearchState();
-  $advancedSearchState.advancedSearchBool = ($advancedSearchState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
-
-  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($advancedSearchState.advancedSearchBool, $scope.indexPattern.fields);
+  const $TeldState = $scope.TeldState = new TeldState();
+  $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
+  $TeldState.save();
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, $scope.indexPattern.fields);
 
   $scope.$on('advancedSearch.condition.disable', function (d, data) {
     $scope.fetch();
@@ -500,7 +500,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       savedSearch.sort = $scope.state.sort;
       //savedSearch.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
-      savedSearch.uiConf.advancedSearchBool = $advancedSearchState.advancedSearchBool;
+      savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
 
       return savedSearch.save()
       .then(function (id) {
@@ -531,7 +531,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     .then(setupVisualization)
     .then(function () {
       $state.save();
-      $advancedSearchState.save();
+      $TeldState.save();
       return courier.fetch();
     })
     .catch(notify.error);
@@ -658,8 +658,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.updateDataSource = Promise.method(function () {
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
-    $advancedSearchState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
-    $advancedSearchState.save();
+    $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
+    $TeldState.save();
     let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);    
 
     //debugger;
