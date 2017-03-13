@@ -56,7 +56,7 @@ module.service('advancedSearch', function (Promise) {
     }).filter(field => {
       let returnValue = true;
       if (keywords[field.name] && false === field.hasKeyword) {
-        //returnValue = false;
+        returnValue = false;
       }
       return returnValue;
     });
@@ -83,11 +83,21 @@ module.service('advancedSearch', function (Promise) {
     if (field) {
       returnValue = field.typeOperators;
 
-      if (false == field.hasKeyword) {
-        returnValue = [field.typeOperators.find(operator => {
-          return operator.operatorKey === "string_contain";
-        })];
-      }
+      switch (field.type) {
+        case "string":
+          if (false == field.hasKeyword) {
+
+            let operatorKey = "string_equal";
+            if (field.analyzed) {
+              operatorKey = "string_contain";
+            }
+
+            returnValue = [field.typeOperators.find(operator => {
+              return operator.operatorKey === operatorKey;
+            })];
+          }
+          break;
+      }      
     }
     return returnValue;
   }
