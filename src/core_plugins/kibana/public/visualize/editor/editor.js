@@ -110,7 +110,6 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);
 
   $scope.topNavMenu = getTopNavMenu(savedVis.uiConf.menus);
-  $scope.topNavMenu = getTopNavMenu(['refresh','adv','navigation']);  
 
   function getTopNavMenu(menuKeys) {
 
