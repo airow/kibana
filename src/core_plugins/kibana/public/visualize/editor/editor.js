@@ -121,6 +121,18 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         run: function () { $scope.fetch(); },
         testId: 'visualizeRefreshButton',
       },
+      // 'save': {
+      //   key: 'save',
+      //   description: '保存',
+      //   template: require('plugins/kibana/visualize/editor/panels/save.html'),
+      //   testId: 'visualizeSaveButton',
+      // },
+      // 'open': {
+      //   key: 'open',
+      //   description: '打开',
+      //   template: require('plugins/kibana/visualize/editor/panels/load.html'),
+      //   testId: 'visualizeOpenButton',
+      // },
       "help": {
         key: '帮助',
         description: '帮助',
@@ -142,8 +154,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         testId: 'visualizeOpenButton',
       },
       'navigation': {
-        key: '分析',
-        description: '分析',
+        key: '统计分析',
+        description: '统计分析',
         template: require('plugins/kibana/visualize/editor/panels/load_navigation.html'),
         run: function (menuItem, kbnTopNav) {
           //kbnTopNav.setCurrent(menuItem.key);

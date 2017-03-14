@@ -230,8 +230,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         testId: 'discoverExportButton',
       },
       'navigation': {
-        key: '分析',
-        description: '分析',
+        key: '统计分析',
+        description: '统计分析',
         template: require('plugins/kibana/discover/partials/load_navigation.html'),
         run: function (menuItem, kbnTopNav) {
           //kbnTopNav.setCurrent(menuItem.key);
