@@ -27,7 +27,7 @@
     </div>
   </div>
 </form>
-<paginate list="finder.hits" per-page="20">
+<paginate list="finder.hits | filter:public" per-page="20">
   <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
     <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
       <span class="paginate-heading">

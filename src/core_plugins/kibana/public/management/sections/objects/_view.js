@@ -134,7 +134,7 @@ uiModules.get('apps/management')
         // let uiConf_default = uiConfProvider[service.type].defaultConf;
         
         /** 默认显示配置项 */
-        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [] };
+        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [], owner: [] };
 
         obj._source.uiConf = obj._source.uiConf || {};
 

@@ -18,6 +18,7 @@ export default function UiConfProvider(Private, Promise, config) {
 
     pageSize: config.get('discover:sampleSize'),/** */
 
+    owner:[],
     /** */
     navigation: []
   };

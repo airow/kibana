@@ -33,6 +33,10 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
       // The number of items to show in the list
       $scope.perPage = config.get('savedObjects:perPage');
 
+      $scope.public = function(value, index, array){
+        return !value.uiConf.owner || !value.uiConf.owner.UserId || value.uiConf.owner.UserId ==='';
+      }
+
       // the list that will hold the suggestions
       let $list = $element.find('ul');
 

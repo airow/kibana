@@ -112,6 +112,23 @@ modules.get('apps/advanced_search')
 })
 .service('getTeldState', function (Private) {
   return Private(TeldStateProvider).getTeldState;
+})
+.service('teldSession', function (TeldState) {
+
+  let _ts = new TeldState();
+
+  let user = {};
+
+  this.getUser = function () {
+    if (_.isEmpty(user)) {
+      user = _ts.s;
+    }
+    return user;
+  }
+
+  this.getUserId = function () {
+    return (this.getUser() || { UserId: "" }).UserId;
+  }
 });
 
 export default TeldStateProvider;

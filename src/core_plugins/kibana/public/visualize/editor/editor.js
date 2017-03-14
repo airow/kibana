@@ -66,7 +66,7 @@ uiModules
   };
 });
 
-function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState) {
+function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState, teldSession) {
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
@@ -105,6 +105,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   const searchSource = savedVis.searchSource;
 
   const $TeldState = $scope.TeldState = new TeldState();
+  let teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
   $TeldState.save();
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);

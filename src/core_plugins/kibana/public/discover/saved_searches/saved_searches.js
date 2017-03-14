@@ -5,6 +5,8 @@ import 'plugins/kibana/discover/saved_searches/_saved_search';
 import 'ui/notify';
 import uiModules from 'ui/modules';
 
+import 'plugins/kibana/advanced_search/state/teld_state';
+
 
 const module = uiModules.get('discover/saved_searches', [
   'kibana/notify'
@@ -17,7 +19,7 @@ require('plugins/kibana/management/saved_object_registry').register({
   title: 'searches'
 });
 
-module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl,$location) {
+module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl,$location, TeldState, teldSession) {
   const scanner = new Scanner(es, {
     index: kbnIndex,
     type: 'search'
@@ -104,62 +106,74 @@ module.service('savedSearches', function (Promise, config, kbnIndex, es, createN
   this.findBy = function (searchAJson, searchString, size = 100) {
     let tagetIndex = searchAJson.index;
 
-    let body;
-    if (searchString) {
-      body = {
-        query: {
-          bool: {
-            must: [
-              {
-                query_string: {
-                  /**
-                   * 实际数据为：
-                   * "searchSourceJSON": "{\"index\":\"异常日志\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
-                   */
-                  //**错误 */ query: "tagetIndex: \"" + tagetIndex + "\"" /** 这个方式不理想 */
-                  //**错误 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\"" /** 这个不成功，因为没有对\转 */
-                  //**错误 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\"index\":\"${tagetIndex}\","` /** 这个不成功，因为没有对\转 */
+    //let _ts = new TeldState();
 
-                  //**不够精确 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+    let userId = teldSession.getUserId();
 
-                  //**可以,普通字符串方式 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
-                  //**可以，对\和"都进行了转义，模板字符串方式可以不转义"见下面的方式 */ query: `kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"${tagetIndex}\\\"\"`
-                  /**完美 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\\"index\\":\\"${tagetIndex}\\","`
-                }
-              },
-              {
-                simple_query_string: {
-                  query: searchString + '*',
-                  fields: ['title^3', 'description'],
-                  default_operator: 'AND'
-                }
+    let ownerFilter = {
+      bool: {
+        should: [          
+          {
+            term: {
+              "uiConf.owner.UserId.keyword": {
+                value: userId
               }
-            ]
+            }            
+          },
+          {
+            terms: {
+              "uiConf.owner.UserId.keyword": ['', 'public']
+            }
+          },          
+          {
+            bool: {
+              must_not: [
+                { exists: { field: "uiConf.owner.UserId" } }
+              ]
+            }
           }
-        }
-      };
-    } else {
-      //body = {query: {match: {tagetIndex}}};
-      body = {
-        query: {
-          query_string: {
-            /**
-             * 实际数据为：
-             * "searchSourceJSON": "{\"index\":\"异常日志\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
-             */
-            //**错误 */ query: "tagetIndex: \"" + tagetIndex + "\"" /** 这个方式不理想 */
-            //**错误 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\"" /** 这个不成功，因为没有对\转 */
-            //**错误 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\"index\":\"${tagetIndex}\","` /** 这个不成功，因为没有对\转 */
-            
-            //**不够精确 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+        ]
+      }
+    };
 
-            //**可以,普通字符串方式 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
-            //**可以，对\和"都进行了转义，模板字符串方式可以不转义"见下面的方式 */ query: `kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"${tagetIndex}\\\"\"`
-            /**完美 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\\"index\\":\\"${tagetIndex}\\","`
-            
-          }
+    let query_string = {
+      query_string: {
+      /**
+       * 实际数据为：
+       * "searchSourceJSON": "{\"index\":\"异常日志\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+       */
+      //**错误 */ query: "tagetIndex: \"" + tagetIndex + "\"" /** 这个方式不理想 */
+      //**错误 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\"index\":\""+tagetIndex+"\"" /** 这个不成功，因为没有对\转 */
+      //**错误 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\"index\":\"${tagetIndex}\","` /** 这个不成功，因为没有对\转 */
+
+      //**不够精确 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"" + tagetIndex + "\""
+
+      //**可以,普通字符串方式 */ query: "kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\""+tagetIndex+"\\\"\""
+      //**可以，对\和"都进行了转义，模板字符串方式可以不转义"见下面的方式 */ query: `kibanaSavedObjectMeta.searchSourceJSON:\"{\\\"index\\\":\\\"${tagetIndex}\\\"\"`
+      /**完美 */ query: `kibanaSavedObjectMeta.searchSourceJSON:"{\\"index\\":\\"${tagetIndex}\\","`
+      }
+    };
+
+    let simple_query_string = {
+      simple_query_string: {
+        query: searchString + '*',
+        fields: ['title^3', 'description'],
+        default_operator: 'AND'
+      }
+    };
+
+    let body = {
+      query: {
+        bool: {
+          must: [
+            query_string,
+            ownerFilter
+          ]
         }
-      };
+      }
+    };
+    if (searchString) {
+      body.query.bool.must.push(simple_query_string);
     }
 
     return es.search({

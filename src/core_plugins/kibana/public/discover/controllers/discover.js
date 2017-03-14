@@ -143,7 +143,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, teldSession) {
 
     $rootScope.showNotify = true;
 
@@ -310,7 +310,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     };
   }
 
-  const $TeldState = $scope.TeldState = new TeldState();
+  const $TeldState = $scope.TeldState = new TeldState();  
+  let teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
   $TeldState.save();
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, $scope.indexPattern.fields);
@@ -501,6 +502,12 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       //savedSearch.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+      if (teldUser) {
+        if (teldUser.UserId) {
+          savedSearch.id += '@' + teldUser.UserId
+        }
+        savedSearch.uiConf.owner = [teldUser];
+      }    
 
       return savedSearch.save()
       .then(function (id) {
