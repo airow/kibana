@@ -131,10 +131,17 @@ uiModules.get('apps/management')
         //   'dashboard': Private(DashboardUiConfProvider),
         //   'visualization': Private(VisualizationUiConfProvider)
         // }
-        // let uiConf_default = uiConfProvider[service.type].defaultConf;
+        // let uiConf_default = uiConfProvider[service.type].defaultConf;        
         
+        let timefilter_Schema = { disabled: true, timeFrom: '', timeTo: '' };
+        //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
+        let navigation_Schema = {
+          "display": "显示的名称",
+          "url": "#/visualize/edit/{visualize name} 或 #/discover/{discover name}",
+          "disabled": true
+        }
         /** 默认显示配置项 */
-        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [] };
+        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
 
         obj._source.uiConf = obj._source.uiConf || {};
 

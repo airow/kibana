@@ -66,7 +66,7 @@ uiModules
   };
 });
 
-function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState) {
+function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState, globalState) {
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
@@ -104,6 +104,19 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   // sources.
   const searchSource = savedVis.searchSource;
 
+  if (vis.indexPattern.hasTimeField() && !globalState.time && savedVis.uiConf.timefilter) {
+
+    let uiConf_timefilter = angular.fromJson(savedVis.uiConf.timefilter);
+
+    if (!uiConf_timefilter.disabled && uiConf_timefilter.timeTo && uiConf_timefilter.timeFrom) {
+      timefilter.time.to = uiConf_timefilter.timeTo;
+      timefilter.time.from = uiConf_timefilter.timeFrom;
+      if (uiConf_timefilter.refreshInterval) {
+        timefilter.refreshInterval = uiConf_timefilter.refreshInterval;
+      }
+    }
+  }
+
   const $TeldState = $scope.TeldState = new TeldState();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
   $TeldState.save();
@@ -120,18 +133,18 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         run: function () { $scope.fetch(); },
         testId: 'visualizeRefreshButton',
       },
-      // 'save': {
-      //   key: 'save',
-      //   description: '保存',
-      //   template: require('plugins/kibana/visualize/editor/panels/save.html'),
-      //   testId: 'visualizeSaveButton',
-      // },
-      // 'open': {
-      //   key: 'open',
-      //   description: '打开',
-      //   template: require('plugins/kibana/visualize/editor/panels/load.html'),
-      //   testId: 'visualizeOpenButton',
-      // },
+      'save': {
+        key: '保存',
+        description: '保存',
+        template: require('plugins/kibana/visualize/editor/panels/save_zh_CN.html'),
+        testId: 'visualizeSaveButton',
+      },
+      'open': {
+        key: '打开',
+        description: '打开',
+        template: require('plugins/kibana/visualize/editor/panels/load_zh_CN.html'),
+        testId: 'visualizeOpenButton',
+      },
       "help": {
         key: '帮助',
         description: '帮助',
@@ -142,8 +155,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         testId: 'visualizeHelpButton',
       },
       'adv': {
-        key: '高级查询',
-        description: '高级查询',
+        key: '高级过滤',
+        description: '高级过滤',
         template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
         run: function (menuItem, kbnTopNav) {
           $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
@@ -221,11 +234,13 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     linked: !!savedVis.savedSearchId,
     query: searchSource.getOwn('query') || {query_string: {query: '*'}},
     filters: searchSource.getOwn('filter') || [],
+    index: vis.indexPattern.id,
     vis: savedVisState
   };
 
   // Instance of app_state.js.
   let $state = $scope.$state = (function initState() {
+    debugger;
     // This is used to sync visualization state with the url when `appState.save()` is called.
     const appState = new AppState(stateDefaults);
 
@@ -365,7 +380,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.save();
     let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
-
+    $scope.kbnTopNav.close();
     $state.save();
     searchSource.set('filter', queryFilter.getFilters());
     searchSource.set('advancedSearch', esQueryDSL);
@@ -388,6 +403,14 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $state.vis.title = savedVis.title;
     savedVis.visState = $state.vis;
     savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
+    
+    savedVis.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+    if (vis.indexPattern.hasTimeField()) {
+      let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
+      //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
+
+      savedVis.uiConf.timefilter = angular.toJson(uiConf_timefilter);
+    }
 
     savedVis.save()
     .then(function (id) {

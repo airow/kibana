@@ -143,7 +143,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, globalState) {
 
     $rootScope.showNotify = true;
 
@@ -211,8 +211,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         testId: 'discoverOpenButton',
       },
       'adv': {
-        key: '高级查询',
-        description: '高级查询',
+        key: '高级过滤',
+        description: '高级过滤',
         template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
         run: function (menuItem, kbnTopNav) {
           $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
@@ -308,6 +308,19 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
     };
+  }
+
+  if ($scope.indexPattern.hasTimeField() && !globalState.time && savedSearch.uiConf.timefilter) {
+
+    let uiConf_timefilter = angular.fromJson(savedSearch.uiConf.timefilter);
+
+    if (!uiConf_timefilter.disabled && uiConf_timefilter.timeTo && uiConf_timefilter.timeFrom) {
+      timefilter.time.to = uiConf_timefilter.timeTo;
+      timefilter.time.from = uiConf_timefilter.timeFrom;
+      if (uiConf_timefilter.refreshInterval) {
+        timefilter.refreshInterval = uiConf_timefilter.refreshInterval;
+      }
+    }
   }
 
   const $TeldState = $scope.TeldState = new TeldState();
@@ -502,6 +515,12 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
 
+      if ($scope.indexPattern.hasTimeField()) {
+        let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
+        //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
+
+        savedSearch.uiConf.timefilter = angular.toJson(uiConf_timefilter);
+      }
       return savedSearch.save()
       .then(function (id) {
         stateMonitor.setInitialState($state.toJSON());
@@ -532,6 +551,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     .then(function () {
       $state.save();
       $TeldState.save();
+      $scope.kbnTopNav.close();
       return courier.fetch();
     })
     .catch(notify.error);

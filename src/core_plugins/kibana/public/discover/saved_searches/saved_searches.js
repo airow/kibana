@@ -17,7 +17,7 @@ require('plugins/kibana/management/saved_object_registry').register({
   title: 'searches'
 });
 
-module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl,$location) {
+module.service('savedSearches', function (Promise, config, kbnIndex, es, createNotifier, SavedSearch, kbnUrl, $location) {
   const scanner = new Scanner(es, {
     index: kbnIndex,
     type: 'search'
