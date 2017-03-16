@@ -66,7 +66,7 @@ uiModules
   };
 });
 
-function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState, teldSession) {
+function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, advancedSearch, TeldState, globalState, teldSession) {
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
@@ -104,6 +104,19 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   // sources.
   const searchSource = savedVis.searchSource;
 
+  if (vis.indexPattern.hasTimeField() && !globalState.time && savedVis.uiConf.timefilter) {
+
+    let uiConf_timefilter = angular.fromJson(savedVis.uiConf.timefilter);
+
+    if (!uiConf_timefilter.disabled && uiConf_timefilter.timeTo && uiConf_timefilter.timeFrom) {
+      timefilter.time.to = uiConf_timefilter.timeTo;
+      timefilter.time.from = uiConf_timefilter.timeFrom;
+      if (uiConf_timefilter.refreshInterval) {
+        timefilter.refreshInterval = uiConf_timefilter.refreshInterval;
+      }
+    }
+  }
+
   const $TeldState = $scope.TeldState = new TeldState();
   let teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
@@ -111,7 +124,6 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);
 
   $scope.topNavMenu = getTopNavMenu(savedVis.uiConf.menus);
-  $scope.topNavMenu = getTopNavMenu(['refresh','adv','navigation']);  
 
   function getTopNavMenu(menuKeys) {
 
@@ -121,6 +133,18 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         description: 'Refresh',
         run: function () { $scope.fetch(); },
         testId: 'visualizeRefreshButton',
+      },
+      'save': {
+        key: '保存',
+        description: '保存',
+        template: require('plugins/kibana/visualize/editor/panels/save_zh_CN.html'),
+        testId: 'visualizeSaveButton',
+      },
+      'open': {
+        key: '打开',
+        description: '打开',
+        template: require('plugins/kibana/visualize/editor/panels/load_zh_CN.html'),
+        testId: 'visualizeOpenButton',
       },
       "help": {
         key: '帮助',
@@ -132,8 +156,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         testId: 'visualizeHelpButton',
       },
       'adv': {
-        key: '高级查询',
-        description: '高级查询',
+        key: '高级过滤',
+        description: '高级过滤',
         template: require('plugins/kibana/discover/partials/adv_search_zh_CN.html'),
         run: function (menuItem, kbnTopNav) {
           $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
@@ -143,8 +167,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         testId: 'visualizeOpenButton',
       },
       'navigation': {
-        key: '分析',
-        description: '分析',
+        key: '统计分析',
+        description: '统计分析',
         template: require('plugins/kibana/visualize/editor/panels/load_navigation.html'),
         run: function (menuItem, kbnTopNav) {
           //kbnTopNav.setCurrent(menuItem.key);
@@ -211,6 +235,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     linked: !!savedVis.savedSearchId,
     query: searchSource.getOwn('query') || {query_string: {query: '*'}},
     filters: searchSource.getOwn('filter') || [],
+    index: vis.indexPattern.id,
     vis: savedVisState
   };
 
@@ -355,7 +380,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.save();
     let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
-
+    $scope.kbnTopNav.close();
     $state.save();
     searchSource.set('filter', queryFilter.getFilters());
     searchSource.set('advancedSearch', esQueryDSL);
@@ -378,6 +403,14 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $state.vis.title = savedVis.title;
     savedVis.visState = $state.vis;
     savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
+    
+    savedVis.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+    if (vis.indexPattern.hasTimeField()) {
+      let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
+      //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
+
+      savedVis.uiConf.timefilter = angular.toJson(uiConf_timefilter);
+    }
 
     savedVis.save()
     .then(function (id) {

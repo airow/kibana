@@ -6,7 +6,7 @@ import uiModules from 'ui/modules';
 import savedObjectFinderTemplate from 'ui/partials/saved_object_finder_zh_CN.html';
 let module = uiModules.get('kibana');
 
-module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Private, config) {
+module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Private, config, globalState) {
 
   let services = Private(SavedObjectsSavedObjectRegistryProvider).byLoaderPropertiesName;
 
@@ -106,6 +106,7 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
 
         $event.preventDefault();
 
+        delete globalState.time;
         // we want the '/path', not '#/path'
         kbnUrl.change(url.substr(1));
       };
