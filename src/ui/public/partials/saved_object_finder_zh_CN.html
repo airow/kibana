@@ -27,7 +27,7 @@
     </div>
   </div>
 </form>
-<div class="row" ng-init="mode = 'public'">
+<div class="row" ng-init="mode = 'public'" ng-show="owner">
   <div class="col-md-1">
     <ul class="nav nav-pills nav-stacked kbn-timepicker-modes">
       <li ng-class="{active: mode === 'public' }">
