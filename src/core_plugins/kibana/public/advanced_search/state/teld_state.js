@@ -145,8 +145,8 @@ modules.get('apps/advanced_search')
   this.setSavedObjOwner = function (savedObj) {
     let returnValue = false;
     if (user && user.UserId) {
-      if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {
-        savedObj.id = `${savedObj.title}@${user.UserId}@${user.UserName}`;
+      savedObj.id = `${savedObj.title}@${user.UserId}@${user.UserName}`;
+      if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {        
         savedObj.uiConf.owner = [user];
         returnValue = true;
       }
