@@ -6,7 +6,7 @@ import uiModules from 'ui/modules';
 import savedObjectFinderTemplate from 'ui/partials/saved_object_finder_zh_CN.html';
 let module = uiModules.get('kibana');
 
-module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Private, config, globalState) {
+module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Private, config, globalState, es, kbnIndex) {
 
   let services = Private(SavedObjectsSavedObjectRegistryProvider).byLoaderPropertiesName;
 
@@ -20,7 +20,8 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
       // optional on-choose attr, sets the userOnChoose in our scope
       userOnChoose: '=?onChoose',
       // optional useLocalManagement attr,  removes link to management section
-      useLocalManagement: '=?useLocalManagement'
+      useLocalManagement: '=?useLocalManagement',
+      owner: '=?'
     },
     template: savedObjectFinderTemplate,
     controllerAs: 'finder',
@@ -33,8 +34,28 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
       // The number of items to show in the list
       $scope.perPage = config.get('savedObjects:perPage');
 
-      $scope.public = function(value, index, array){
-        return !value.uiConf.owner || !value.uiConf.owner.UserId || value.uiConf.owner.UserId ==='';
+      $scope.public = function (value, index, array) {
+        // debugger;
+        let owner = value.uiConf.owner;
+        return !owner || owner.length === 0;
+        // return !value.uiConf.owner || !value.uiConf.owner.UserId || value.uiConf.owner.UserId === '';
+      }
+
+      $scope.private = function (value, index, array) {
+        let owner = value.uiConf.owner;
+        if (_.isArray(owner)) {
+          owner = value.uiConf.owner.find(o => o.UserId === $scope.owner.UserId);
+        }
+        return owner;
+      }
+
+      self.delete = function (hit, $event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        this.service.delete(hit.id).then(function (resp) {
+          prevSearch = undefined;
+          filterResults();
+        });
       }
 
       // the list that will hold the suggestions

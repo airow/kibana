@@ -113,11 +113,27 @@ modules.get('apps/advanced_search')
 .service('getTeldState', function (Private) {
   return Private(TeldStateProvider).getTeldState;
 })
-.service('teldSession', function (TeldState) {
-
-  let _ts = new TeldState();
-
+.service('teldSession', function (TeldState,getTeldState) {
+  let _ts = getTeldState() || new TeldState();
   let user = {};
+
+  let pageState = {};
+
+  this.init = function (state) {
+    for (let key in state) {
+      if (!pageState[key]) {
+        pageState[key] = state[key];
+      }
+    }
+  }
+
+  this.getPageState = function (key) {
+    return pageState[key] || '';
+  }
+
+  this.setPageState = function (key, value) {
+    pageState[key] = value;
+  }
 
   this.getUser = function () {
     if (_.isEmpty(user)) {
@@ -126,9 +142,32 @@ modules.get('apps/advanced_search')
     return user;
   }
 
+  this.setSavedObjOwner = function (savedObj) {
+    let returnValue = false;
+    if (user && user.UserId) {
+      if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {
+        savedObj.id = `${savedObj.title}@${user.UserId}@${user.UserName}`;
+        savedObj.uiConf.owner = [user];
+        returnValue = true;
+      }
+    }
+    return returnValue;
+  }
+
   this.getUserId = function () {
     return (this.getUser() || { UserId: "" }).UserId;
   }
 });
 
 export default TeldStateProvider;
+
+
+
+/** WEBPACK FOOTER **
+ ** ./src/core_plugins/kibana/public/advanced_search/state/teld_state.js
+ **/
+
+
+/** WEBPACK FOOTER **
+ ** ./src/core_plugins/kibana/public/advanced_search/state/teld_state.js
+ **/

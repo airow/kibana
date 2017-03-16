@@ -16,7 +16,7 @@
           type="text"
           autocomplete="off" />
       </div>
-      <div class="finder-hit-count col-md-2">
+      <div class="finder-hit-count col-md-2" ng-if="!useLocalManagement">
         <span>{{finder.hitCount}} / {{finder.hitCount}}</span>
       </div>
       <div class="finder-manage-object col-md-2" ng-if="!useLocalManagement">
@@ -27,37 +27,97 @@
     </div>
   </div>
 </form>
-<paginate list="finder.hits | filter:public" per-page="20">
-  <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
-    <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
-      <span class="paginate-heading">
-        名称
-        <i
-          class="fa"
-          ng-class="finder.isAscending ? 'fa-caret-up' : 'fa-caret-down'">
-        </i>
-      </span>
-    </li>
-    <li
-      class="list-group-item list-group-menu-item"
-      ng-class="{'active': finder.selector.index === $index && finder.selector.enabled}"
-      ng-repeat="hit in page"
-      ng-keydown="finder.hitKeyDown($event, page, paginate)"
-      ng-click="finder.onChoose(hit, $event)">
+<div class="row" ng-init="mode = 'public'">
+  <div class="col-md-1">
+    <ul class="nav nav-pills nav-stacked kbn-timepicker-modes">
+      <li ng-class="{active: mode === 'public' }">
+        <a ng-click="mode='public'">公共方案</a>
+      </li>          
+    </ul>
+  </div>
+  <div class="col-md-1">
+    <ul class="nav nav-pills nav-stacked kbn-timepicker-modes">
+      <li ng-class="{active: mode === 'private' }">
+        <a ng-click="mode='private'">私有方案</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12" ng-switch on="mode">
+    <paginate ng-switch-when="public" list="finder.hits | filter:public" per-page="20">
+      <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
+        <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
+          <span class="paginate-heading">
+            名称
+            <i
+              class="fa"
+              ng-class="finder.isAscending ? 'fa-caret-up' : 'fa-caret-down'">
+            </i>
+          </span>
+        </li>
+        <li
+          class="list-group-item list-group-menu-item"
+          ng-class="{'active': finder.selector.index === $index && finder.selector.enabled}"
+          ng-repeat="hit in page"
+          ng-keydown="finder.hitKeyDown($event, page, paginate)"
+          ng-click="finder.onChoose(hit, $event)">            
+          <a ng-href="{{finder.makeUrl(hit)}}"
+              ng-blur="finder.hitBlur($event)"
+              ng-click="finder.preventClick($event)">
+              <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
+              <span>{{hit.title}}</span>
+              <p ng-if="hit.description" ng-bind="hit.description"></p>
+          </a>
+        </li>
+        <li
+          class="list-group-item list-group-no-results"
+          ng-if="finder.hits.length === 0">
+          <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
+          <p ng-bind="'没有匹配到' + finder.properties.nouns"></p>
+        </li>
+      </ul>
+    </paginate>
 
-      <a ng-href="{{finder.makeUrl(hit)}}"
-          ng-blur="finder.hitBlur($event)"
-          ng-click="finder.preventClick($event)">
-          <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
-          <span>{{hit.title}}</span>
-          <p ng-if="hit.description" ng-bind="hit.description"></p>
-      </a>
-    </li>
-    <li
-      class="list-group-item list-group-no-results"
-      ng-if="finder.hits.length === 0">
-      <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
-      <p ng-bind="'没有匹配到' + finder.properties.nouns"></p>
-    </li>
-  </ul>
-</paginate>
+    <paginate ng-switch-when="private" ng-show="owner" list="finder.hits | filter:private" per-page="20">
+      <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
+        <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
+          <span class="paginate-heading">
+            名称
+            <i
+              class="fa"
+              ng-class="finder.isAscending ? 'fa-caret-up' : 'fa-caret-down'">
+            </i>
+          </span>
+        </li>
+        <li
+          class="list-group-item list-group-menu-item"
+          ng-class="{'active': finder.selector.index === $index && finder.selector.enabled}"
+          ng-repeat="hit in page"
+          ng-keydown="finder.hitKeyDown($event, page, paginate)"
+          ng-click="finder.onChoose(hit, $event)">
+          <div class="actions pull-right" style="margin-top: -6px;"">
+            <button ng-click="finder.delete(hit, $event)" class="btn btn-default" aria-label="Delete">
+              <span class="sr-only">Delete</span>
+              <i aria-hidden="true" class="fa fa-trash"></i>
+            </button>
+          </div>
+          <a ng-href="{{finder.makeUrl(hit)}}"
+              ng-blur="finder.hitBlur($event)"
+              ng-click="finder.preventClick($event)">
+              <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
+              <span>{{hit.title}}</span>
+              <p ng-if="hit.description" ng-bind="hit.description"></p>
+          </a>
+        </li>
+        <li
+          class="list-group-item list-group-no-results"
+          ng-if="finder.hits.length === 0">
+          <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
+          <p ng-bind="'没有匹配到' + finder.properties.nouns"></p>
+        </li>
+      </ul>
+    </paginate>
+  </div>
+</div>
+

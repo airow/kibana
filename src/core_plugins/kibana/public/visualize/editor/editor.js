@@ -118,7 +118,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   }
 
   const $TeldState = $scope.TeldState = new TeldState();
-  let teldUser = teldSession.getUser();
+  let teldUser = $scope.teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
   $TeldState.save();
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);
@@ -405,6 +405,8 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
     
     savedVis.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+    teldSession.setSavedObjOwner(savedVis);
+
     if (vis.indexPattern.hasTimeField()) {
       let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
       //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);

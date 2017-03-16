@@ -324,7 +324,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   }
 
   const $TeldState = $scope.TeldState = new TeldState();
-  let teldUser = teldSession.getUser();
+  let teldUser = $scope.teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
   $TeldState.save();
   $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, $scope.indexPattern.fields);
@@ -515,12 +515,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       //savedSearch.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
       savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
-      if (teldUser) {
-        if (teldUser.UserId) {
-          savedSearch.id += '@' + teldUser.UserId
-        }
-        savedSearch.uiConf.owner = [teldUser];
-      }    
+      teldSession.setSavedObjOwner(savedSearch);
 
       if ($scope.indexPattern.hasTimeField()) {
         let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
