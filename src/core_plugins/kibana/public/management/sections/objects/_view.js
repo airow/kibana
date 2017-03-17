@@ -141,7 +141,7 @@ uiModules.get('apps/management')
           "disabled": true
         }
         /** 默认显示配置项 */
-        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], owner: [], timefilter: angular.toJson(timefilter_Schema) };
+        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
 
         obj._source.uiConf = obj._source.uiConf || {};
 

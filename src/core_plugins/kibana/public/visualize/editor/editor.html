@@ -8,7 +8,7 @@
         data-transclude-slot="topLeftCorner"
         class="localTitle"
       >
-        <i class="fa fa-envelope-o" aria-hidden="true" ng-show="savedVis.uiConf.owner.length>0"></i>
+        <i class="fa fa-envelope-o" aria-hidden="true" ng-show="savedVis.uiConf.owner && savedVis.uiConf.owner.UserId"></i>
         <span
           ng-show="savedVis.id"
           ng-bind="::savedVis.title"

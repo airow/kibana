@@ -146,12 +146,8 @@ modules.get('apps/advanced_search')
     let returnValue = false;
     if (user && user.UserId) {
       savedObj.id = `${savedObj.title}@${user.UserId}`;
-      savedObj.uiConf.owner = [user];
-      returnValue = true;
-      // if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {        
-      //   savedObj.uiConf.owner = [user];
-      //   returnValue = true;
-      // }
+      savedObj.uiConf.owner = user;
+      returnValue = true;      
     }
     return returnValue;
   }

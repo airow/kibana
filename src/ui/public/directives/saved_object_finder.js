@@ -36,17 +36,19 @@ module.directive('savedObjectFinder', function ($location, $injector, kbnUrl, Pr
 
       $scope.public = function (value, index, array) {
         // debugger;
-        let owner = value.uiConf.owner;
-        return !owner || owner.length === 0;
-        // return !value.uiConf.owner || !value.uiConf.owner.UserId || value.uiConf.owner.UserId === '';
+        let uiConf = value.uiConf;
+        return !uiConf || !uiConf.owner || !uiConf.owner.UserId;
       }
 
       $scope.private = function (value, index, array) {
-        let owner = value.uiConf.owner;
-        if (_.isArray(owner)) {
-          owner = value.uiConf.owner.find(o => o.UserId === $scope.owner.UserId);
+        let returnValue = false;
+
+        let uiConf = value.uiConf || {};
+        let owner = uiConf.owner;
+        if (owner) {
+          returnValue = $scope.owner.UserId === owner.UserId;
         }
-        return owner;
+        return returnValue;
       }
 
       self.delete = function (hit, $event) {
