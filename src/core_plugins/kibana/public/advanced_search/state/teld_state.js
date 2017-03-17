@@ -113,7 +113,7 @@ modules.get('apps/advanced_search')
 .service('getTeldState', function (Private) {
   return Private(TeldStateProvider).getTeldState;
 })
-.service('teldSession', function (TeldState,getTeldState) {
+.service('teldSession', function (TeldState, getTeldState) {
   let _ts = getTeldState() || new TeldState();
   let user = {};
 
@@ -145,11 +145,13 @@ modules.get('apps/advanced_search')
   this.setSavedObjOwner = function (savedObj) {
     let returnValue = false;
     if (user && user.UserId) {
-      savedObj.id = `${savedObj.title}@${user.UserId}@${user.UserName}`;
-      if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {        
-        savedObj.uiConf.owner = [user];
-        returnValue = true;
-      }
+      savedObj.id = `${savedObj.title}@${user.UserId}`;
+      savedObj.uiConf.owner = [user];
+      returnValue = true;
+      // if (!savedObj.uiConf.owner || savedObj.uiConf.owner.length === 0) {        
+      //   savedObj.uiConf.owner = [user];
+      //   returnValue = true;
+      // }
     }
     return returnValue;
   }
@@ -160,14 +162,3 @@ modules.get('apps/advanced_search')
 });
 
 export default TeldStateProvider;
-
-
-
-/** WEBPACK FOOTER **
- ** ./src/core_plugins/kibana/public/advanced_search/state/teld_state.js
- **/
-
-
-/** WEBPACK FOOTER **
- ** ./src/core_plugins/kibana/public/advanced_search/state/teld_state.js
- **/

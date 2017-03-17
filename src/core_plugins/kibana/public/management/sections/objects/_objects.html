@@ -68,8 +68,9 @@
                 type="checkbox" >
             </div>
 
-            <div class="item-title">
+            <div class="item-title">              
               <a ng-click="edit(service, item)">{{ item.title }}</a>
+              <i ng-show="item.uiConf.owner && item.uiConf.owner.length>0">&nbsp;&nbsp;By:{{item.uiConf.owner[0].UserName}}</i>
             </div>
           </li>
           <li ng-if="!service.data.length" class="empty">No "{{service.title}}" found.</li>
