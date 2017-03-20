@@ -121,7 +121,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   let teldUser = $scope.teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
   $TeldState.save();
-  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, vis.indexPattern.fields);
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, advancedSearch.getFieldSource(vis.indexPattern));
 
   $scope.topNavMenu = getTopNavMenu(savedVis.uiConf.menus);
 
