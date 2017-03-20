@@ -205,7 +205,7 @@ module.service('advancedSearch', function (Promise) {
         let link = _.keys(condition[keyword][fieldName])[0];
         let selectValue = condition[keyword][fieldName][link];
 
-        let selectField = fieldSource.find(field => { return field.name === fieldName });
+        let selectField = fieldSource.find(field => { return field.asFieldName === fieldName || field.name === fieldName });
 
         let conf = condition[keyword]["conf"] || {};
 

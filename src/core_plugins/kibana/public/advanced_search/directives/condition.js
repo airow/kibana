@@ -5,6 +5,7 @@ import conditionTemplate from './condition.html';
 import conditionDisplayTemplate from './condition_display.html';
 import '../styles/advanced_search.css'
 import uiModules from 'ui/modules';
+import './value_selector';
 
 uiModules
 .get('apps/advanced_search')

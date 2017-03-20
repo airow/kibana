@@ -1,0 +1,32 @@
+<div>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">I'm a modal!</h3>
+  </div>
+  <div class="modal-body" id="modal-body">
+    <input/>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Code</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody ng-repeat="item in dataSources">
+        <tr>
+          <th scope="row">{{$index}}</th>
+          <td>{{item.Code}}</td>
+          <td>{{item.Name}}</td>
+          <td>
+            <a href="#" ng-click="$event.preventDefault(); clickSelected = item">{{ item }}</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    Selected: <b>{{ clickSelected }}</b>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+  </div>
+</div>

@@ -327,7 +327,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   let teldUser = $scope.teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedSearch.uiConf.advancedSearchBool) || {};
   $TeldState.save();
-  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, $scope.indexPattern.fields);
+  $scope.advancedSearch = advancedSearch.advancedSearch2UiBind($TeldState.advancedSearchBool, advancedSearch.getFieldSource($scope.indexPattern));
 
   $scope.$on('advancedSearch.condition.disable', function (d, data) {
     $scope.fetch();
@@ -691,7 +691,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       .set('filter', queryFilter.getFilters())
       .set('advancedSearch', esQueryDSL);
 
-    //$scope.advancedSearch = advancedSearch2UiBind(temp, $scope.indexPattern.fields);
+    //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));
 
     if (config.get('doc_table:highlight')) {
       $scope.searchSource.highlight({
