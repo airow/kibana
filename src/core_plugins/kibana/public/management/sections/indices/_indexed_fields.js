@@ -20,7 +20,7 @@ uiModules.get('apps/management')
     scope: true,
     link: function ($scope) {
       const rowScopes = []; // track row scopes, so they can be destroyed as needed
-      $scope.perPage = 25;
+      $scope.perPage = 0;//全部
       $scope.columns = [
         { title: 'name' },
         { title: 'type' },
