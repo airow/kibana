@@ -46,7 +46,7 @@ module.directive('fieldName', function ($compile, $rootScope, $filter) {
       ], function () {
 
         let type = $scope.field ? $scope.field.type : $scope.fieldType;
-        let name = $scope.field ? $scope.field.name : $scope.fieldName;
+        let name = $scope.field ? $scope.field.alias || $scope.field.name : $scope.fieldName;
         let results = $scope.field ? !$scope.field.rowCount && !$scope.field.scripted : false;
         let scripted = $scope.field ? $scope.field.scripted : false;
 

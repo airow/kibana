@@ -5,7 +5,7 @@
   </th>
   <th ng-repeat="name in columns">
     <span class="table-header-name">
-      {{name | shortDots}} <i ng-class="headerClass(name)" ng-click="sort(name)" tooltip="{{tooltip(name)}}" tooltip-append-to-body="1"></i>
+      {{name | fieldAlias:indexPattern.fields | shortDots}} <i ng-class="headerClass(name)" ng-click="sort(name)" tooltip="{{tooltip(name)}}" tooltip-append-to-body="1"></i>
     </span>
     <span class="table-header-move">
       <i ng-click="toggleColumn(name)" ng-show="canRemove(name)" class="fa fa-remove" tooltip="移除列" tooltip-append-to-body="1"></i>

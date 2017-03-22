@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import docViewsRegistry from 'ui/registry/doc_views';
 
-import tableHtml from './table.html';
+import tableHtml from './table_zh_CN.html';
 
 docViewsRegistry.register(function () {
   return {
