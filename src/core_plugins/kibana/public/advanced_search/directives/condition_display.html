@@ -14,7 +14,7 @@
       <span ng-show='!condition.bool && condition.selected'>
         <span class="filter" ng-class="{'disabled':condition.selected.disabled}">
           <span class="filter-description">
-            <span>{{condition.selected.field.asFieldName}}</span>
+            <span>{{condition.selected.field.alias||condition.selected.field.asFieldName}}</span>
             <span>{{condition.selected.operator.display}}</span>
             <span ng-switch="condition.selected.field.type">
               <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>

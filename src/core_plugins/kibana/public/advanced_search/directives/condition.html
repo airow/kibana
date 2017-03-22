@@ -64,7 +64,7 @@
             </div>
             <div class="row" ng-switch-default>
               <div class="col-xs-2">
-                <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.asFieldName for field in fieldSource">
+                <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.alias||field.asFieldName for field in fieldSource">
                   <option></option>
                 </select>
               </div>
