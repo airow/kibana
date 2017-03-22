@@ -62,7 +62,7 @@
   </kbn-top-nav>
   <div class="container-fluid" role="main">
     <div class="row">
-      <filter-bar state="state"></filter-bar>
+      <filter-bar state="state" index-pattern="indexPattern"></filter-bar>
     </div>
     <div class="row" ng-show="advancedSearch.must && advancedSearch.must.length>0 || advancedSearch.should && advancedSearch.should.length>0 || advancedSearch.must_not && advancedSearch.must_not.length>0">
       <div class="filter-bar">
