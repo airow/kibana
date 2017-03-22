@@ -29,6 +29,7 @@ uiModules.get('apps/management')
         { title: 'aggregatable' , info: 'These fields can be used in visualization aggregations' },
         { title: 'analyzed', info: 'Analyzed fields may require extra memory to visualize' },
         { title: 'excluded', info: 'Fields that are excluded from _source when it is fetched' },
+        { title: 'selectable', info: 'selectable' },
         { title: 'controls', sortable: false }
       ];
 
@@ -75,6 +76,10 @@ uiModules.get('apps/management')
             {
               markup: excluded ? yesTemplate : noTemplate,
               value: excluded
+            },
+            {
+              markup: field.selectable ? yesTemplate : noTemplate,
+              value: field.selectable
             },
             {
               markup: controlsHtml,

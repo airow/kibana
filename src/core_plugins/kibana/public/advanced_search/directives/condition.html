@@ -75,8 +75,8 @@
                 </select>
               </div>
               <div class="col-xs-4" ng-switch="condition.selected.field.type">
-                <div>
-                  <input ng-disabled="condition.selected.disabled" ng-switch-when='number' type="number" class="form-control" ng-model="condition.selected.value" required/>
+                <div ng-switch-when='number'>
+                  <input ng-disabled="condition.selected.disabled" type="number" class="form-control" ng-model="condition.selected.value" required/>
                 </div>              
                 <div ng-switch-when='boolean' ng-init='condition.selected.value=true' class="btn-group btn-group-justified" role="group">
                   <div class="btn-group" role="group">
@@ -89,9 +89,11 @@
                 <div class="kbn-timepicker" ng-switch-when='date'>
                   <input type="text" step="border-color:black;" class="form-control" ng-change="dateToTime()" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value" is-open="opened" clear-text='清除' close-text="关闭" current-text='今天' />
                 </div>
-                <input ng-disabled="condition.selected.disabled" ng-switch-default type="text" class="form-control" ng-model="condition.selected.value" required/>              
-              </div>
-              <!--<teld-value-selector field='condition.selected.field' selected='condition.selected.value'></teld-value-selector>-->
+                <div ng-switch-default>
+                  <input ng-if="!condition.selected.field.selectable" ng-disabled="condition.selected.disabled" type="text" class="form-control" ng-model="condition.selected.value" required/>
+                  <teld-value-selector ng-if="condition.selected.field.selectable"  field='condition.selected.field' selected='condition.selected.value'></teld-value-selector>
+                </div>                
+              </div>              
             </div>   
           </td>
         </tr>      

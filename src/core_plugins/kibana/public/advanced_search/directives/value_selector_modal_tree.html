@@ -1,0 +1,23 @@
+<div>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">帮助</h3>
+  </div>
+  <div class="modal-body" id="modal-body">
+    <!--当前值:{{selected.item[field.selectConf.valueKey||"code"]}}-->
+    <input type="text" class="form-control" placeholder="过滤" ng-model="filterString">
+    <tree-grid 
+        tree-data     = "tree_data"
+        expand-on     = "expanding_property"
+        col-defs      = "col_defs"
+        tree-control  = "treeControl"
+        on-select     = "selectHandler(branch)"
+        template-url  = "/tmpl/treegrid_template.html"
+        icon-leaf     = "glyphicon glyphicon-leaf"
+        >
+    </tree-grid>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">确定</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+  </div>
+</div>

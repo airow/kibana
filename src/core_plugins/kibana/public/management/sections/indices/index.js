@@ -51,10 +51,10 @@ uiModules.get('apps/management')
   };
 });
 
-/**
-//2017-02-23@管理页面中隐藏 management.getSection('kibana').register('indices', {
+/***/
+//2017-02-23@管理页面中隐藏 
+management.getSection('kibana').register('indices', {
   display: 'Index Patterns',
   order: 0,
   url: '#/management/kibana/indices/'
 });
-*/

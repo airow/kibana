@@ -1,32 +1,28 @@
 <div>
   <div class="modal-header">
-    <h3 class="modal-title" id="modal-title">I'm a modal!</h3>
+    <h3 class="modal-title" id="modal-title">帮助</h3>
   </div>
   <div class="modal-body" id="modal-body">
-    <input/>
+    <input type="text" class="form-control" placeholder="过滤" ng-model="filterString">
     <table class="table table-bordered">
-      <thead>
+      <thead style="display:table; width: 97%; table-layout:fixed;">
         <tr>
-          <th>#</th>
-          <th>Code</th>
-          <th>Value</th>
+          <!--<th>#</th>-->
+          <th>编码</th>
+          <th>值</th>
         </tr>
       </thead>
-      <tbody ng-repeat="item in dataSources">
-        <tr>
-          <th scope="row">{{$index}}</th>
-          <td>{{item.Code}}</td>
-          <td>{{item.Name}}</td>
-          <td>
-            <a href="#" ng-click="$event.preventDefault(); clickSelected = item">{{ item }}</a>
-          </td>
+      <tbody style="overflow-y:scroll; display:block; min-height: 300px; height: 300px;">
+        <tr style="display:table; width:100%; table-layout:fixed;" ng-repeat="item in items | filter:filterString" ng-click="selected.item = item;" ng-class="{'active':item===selected.item}">
+          <!--<th scope="row">{{$index+1}}</th>-->
+          <td>{{item.code}}</td>
+          <td>{{item.value}}</td>
         </tr>
       </tbody>
     </table>
-    Selected: <b>{{ clickSelected }}</b>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-primary" type="button" ng-click="ok()">确定</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
   </div>
 </div>

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
 import IndexPatternsFieldProvider from 'ui/index_patterns/_field';
 import uiModules from 'ui/modules';
-import fieldEditorTemplate from 'ui/field_editor/field_editor.html';
+import fieldEditorTemplate from 'ui/field_editor/field_editor_zh_CN.html';
 import chrome from 'ui/chrome';
 import IndexPatternsCastMappingTypeProvider from 'ui/index_patterns/_cast_mapping_type';
 import { scriptedFields as docLinks } from '../documentation_links/documentation_links';

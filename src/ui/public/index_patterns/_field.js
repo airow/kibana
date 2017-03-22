@@ -56,6 +56,11 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       let findOperators = fieldTypeOperators.byName[spec.type] || fieldTypeOperators.byName.unknown;
       spec.typeOperators = findOperators.operators;
       obj.fact('typeOperators');
+
+
+      let selectable = spec.selectConf && spec.selectConf.enable;
+      obj.fact('selectable', selectable);
+      obj.writ('selectConf', selectable ? spec.selectConf : null);
     }
     obj.writ('count', spec.count || 0);
 
