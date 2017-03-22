@@ -61,6 +61,8 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       let selectable = spec.selectConf && spec.selectConf.enable;
       obj.fact('selectable', selectable);
       obj.writ('selectConf', selectable ? spec.selectConf : null);
+
+      obj.writ('alias');
     }
     obj.writ('count', spec.count || 0);
 

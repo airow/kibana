@@ -1,4 +1,4 @@
-<span>{{field.displayName}}</span>
+<span>{{field.displayName}}</span><span ng-if='field.alias'>({{field.alias}})</span>
 &nbsp;
 <span
   ng-if="indexPattern.timeFieldName === field.name"
