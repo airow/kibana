@@ -30,9 +30,9 @@ module.service('valueSelectorService', function (Promise, es, kbnIndex) {
                             let item = hit._source;
                             let code = item.code;
                             let value = item.value;
-                            let pCode = item.pCode;
+                            //let pCode = item.pCode;
                             let pid = item.pid;
-                            return { id, pid, code, value, pCode };
+                            return { id, pid, code, value };
                         });
                         caches[groupKey] = returnValue;
                         resolve(returnValue);
