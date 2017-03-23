@@ -1,0 +1,30 @@
+2017-03-23 正式数据
+充电用户分类.用户类型
+POST _bulk
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00031" } }
+{ "groupKey" : "E0003", "code":"1", "value":"A" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00032" } }
+{ "groupKey" : "E0003", "code":"2", "value":"U" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00033" } }
+{ "groupKey" : "E0003", "code":"3", "value":"X" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00034" } }
+{ "groupKey" : "E0003", "code":"4", "value":"WD" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00035" } }
+{ "groupKey" : "E0003", "code":"5", "value":"WN" }
+
+电站周边设施明细.配套类型
+POST _bulk
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00041" } }
+{ "groupKey" : "E0004", "code":"1", "value":"交通站点" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00042" } }
+{ "groupKey" : "E0004", "code":"2", "value":"住宅" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00043" } }
+{ "groupKey" : "E0004", "code":"3", "value":"写字楼" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00044" } }
+{ "groupKey" : "E0004", "code":"4", "value":"厕所" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00045" } }
+{ "groupKey" : "E0004", "code":"5", "value":"商场" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00046" } }
+{ "groupKey" : "E0004", "code":"6", "value":"餐饮" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "E00047" } }
+{ "groupKey" : "E0004", "code":"7", "value":"酒店" }

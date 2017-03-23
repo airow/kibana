@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody style="overflow-y:scroll; display:block; min-height: 300px; height: 300px;">
-        <tr style="display:table; width:100%; table-layout:fixed;" ng-repeat="item in items | filter:filterString" ng-click="selected.item = item;" ng-class="{'active':item===selected.item}">
+        <tr style="display:table; width:100%; table-layout:fixed;" ng-repeat="item in items | filter:filterString | orderBy:'code':false" ng-click="selected.item = item;" ng-class="{'active':item===selected.item}">
           <!--<th scope="row">{{$index+1}}</th>-->
           <td>{{item.code}}</td>
           <td>{{item.value}}</td>
