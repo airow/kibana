@@ -23,6 +23,7 @@ uiModules.get('apps/management')
       $scope.perPage = 0;//全部
       $scope.columns = [
         { title: 'name' },
+        { title: 'alias' },
         { title: 'type' },
         { title: 'format' },
         { title: 'searchable', info: 'These fields can be used in the filter bar' },
@@ -54,6 +55,10 @@ uiModules.get('apps/management')
               markup: nameHtml,
               scope: childScope,
               value: field.displayName
+            },
+            {
+              markup: `<span>${field.alias}</span>`,
+              value: field.alias
             },
             {
               markup: typeHtml,
