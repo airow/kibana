@@ -114,9 +114,8 @@ uiModules
   };
 })
 .controller('teldValueSelectorModalInstanceTreeCtrl', function ($scope, $modalInstance, valueSelectorService, items, current) {    
-
     $scope.field = current.field;
-    $scope.tree_data = valueSelectorService.getTreeForDueToAnalysis(_.cloneDeep(items), "code", "pCode");
+    $scope.tree_data = valueSelectorService.getTreeForDueToAnalysis(_.cloneDeep(items), "id", "pid");
     $scope.expanding_property = {
         field: "code",
         displayName: "编码",
@@ -159,4 +158,84 @@ uiModules
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
     };
+})
+.filter('teldValueSelectorSearchFor', function () {
+    return function (arr, filterString, expandingProperty, colDefinitions, expand) {
+        var filtered = [];
+        //only apply filter for strings 3 characters long or more
+        if (!filterString || filterString.length < 0) {
+            for (var i = 0; i < arr.length; i++) {
+                var item = arr[i];
+                if (item.visible) {
+                    filtered.push(item);
+                }
+            }
+        } else {
+            var ancestorStack = [];
+            var currentLevel = 0;
+            for (var i = 0; i < arr.length; i++) {
+                var item = arr[i];
+                while (currentLevel >= item.level) {
+                    var throwAway = ancestorStack.pop();
+                    currentLevel--;
+                }
+                ancestorStack.push(item);
+                currentLevel = item.level;
+                if (include(item, filterString, expandingProperty, colDefinitions)) {
+                    for (var ancestorIndex = 0; ancestorIndex < ancestorStack.length; ancestorIndex++) {
+                        var ancestor = ancestorStack[ancestorIndex];
+                        if (ancestor.visible) {
+                            if (expand)
+                                ancestor.branch.expanded = true;
+                            filtered.push(ancestor);
+                        }
+                    }
+                    ancestorStack = [];
+                }
+            }
+        }
+        return filtered;
+    };
+
+    function include(item, filterString, expandingProperty, colDefinitions) {
+        var includeItem = false;
+        var filterApplied = false;
+        //first check the expandingProperty
+        if (expandingProperty.filterable) {
+            filterApplied = true;
+            if (checkItem(item, filterString, expandingProperty)) {
+                includeItem = true;
+            }
+        }
+        //then check each of the other columns
+        var arraySize = colDefinitions.length;
+        for (var i = 0; i < arraySize; i++) {
+            var col = colDefinitions[i];
+            if (col.filterable) {
+                filterApplied = true;
+                if (checkItem(item, filterString, col)) {
+                    includeItem = true;
+                }
+            }
+        }
+        if (filterApplied) {
+            return includeItem;
+        } else {
+            return true;
+        }
+    }
+
+    function checkItem(item, filterString, col) {
+        if (col.sortingType === "number") {
+            if (item.branch[col.field] != null
+                && parseFloat(item.branch[col.field]) === parseFloat(filterString)) {
+                return true;
+            }
+        } else {
+            if (item.branch[col.field] != null
+                && item.branch[col.field].toLowerCase().indexOf(filterString.toLowerCase()) !== -1) {
+                return true;
+            }
+        }
+    }
 });

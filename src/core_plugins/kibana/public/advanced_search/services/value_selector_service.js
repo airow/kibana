@@ -3,39 +3,44 @@ import uiModules from 'ui/modules';
 const module = uiModules.get('apps/advanced_search');
 
 // This is the only thing that gets injected into controllers
-module.service('valueSelectorService', function (Promise, es) {
-    debugger;
+module.service('valueSelectorService', function (Promise, es, kbnIndex) {
+
+    let caches = {};
+
     this.getDataSources = function (field) {
-
         let returnValue = new Promise((resolve, reject) => {
-
             if (field.selectable) {
                 let groupKey = field.selectConf.groupKey;
-                es.search({
-                    index: '.kibana',
-                    type: 'selectConf',
-                    body: {
-                        size:1000,
-                        query: {
-                            term: { groupKey: groupKey }
+                if (caches[groupKey]) {
+                    resolve(caches[groupKey]);
+                } else {
+                    es.search({
+                        index: (kbnIndex || '.kibana'),
+                        type: 'selectConf',
+                        body: {
+                            size: 1000,
+                            query: {
+                                term: { groupKey: groupKey }
+                            }
                         }
-                    }
-                }).then(function (resp) {
-                    var hits = resp.hits.hits;
-
-                    let returnValue = hits.map(hit => {
-                        let item = hit._source;
-                        let code = item.code;
-                        let value = item.value;
-                        let pCode = item.pCode;
-                        return { code, value, pCode };
+                    }).then(function (resp) {
+                        var hits = resp.hits.hits;
+                        let returnValue = hits.map(hit => {
+                            let id = hit._id;
+                            let item = hit._source;
+                            let code = item.code;
+                            let value = item.value;
+                            //let pCode = item.pCode;
+                            let pid = item.pid;
+                            return { id, pid, code, value };
+                        });
+                        caches[groupKey] = returnValue;
+                        resolve(returnValue);
+                    }).catch(err => {
+                        resolve();
+                        console.trace(err.message);
                     });
-
-                    resolve(returnValue);
-                }).catch(err => {
-                    resolve();
-                    console.trace(err.message);
-                });
+                }
             } else {
                 reject();
             }

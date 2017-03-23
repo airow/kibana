@@ -79,3 +79,55 @@ POST _bulk
 { "groupKey" : "CityTree", "code":"0534", "value":"枣庄市", "pCode":"370000" }
 
 GET /.kibana/selectConf/_search
+
+2017-03-23
+
+PUT /.kibana/_mapping/selectConf
+{
+  "properties": {
+    "groupKey": {
+      "type": "keyword"
+    },
+    "code": {
+      "type": "keyword"
+    },
+    "value": {
+      "type": "keyword"
+    },
+    "pid": {
+      "type": "keyword"
+    }
+  }
+}
+
+GET /.kibana/_mapping/selectConf
+
+POST _bulk
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-110000" } }
+{ "groupKey" : "CityTree", "code":"110000", "value":"北京市" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-120000" } }
+{ "groupKey" : "CityTree", "code":"120000", "value":"天津市" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-130000" } }
+{ "groupKey" : "CityTree", "code":"130000", "value":"河北省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-140000" } }
+{ "groupKey" : "CityTree", "code":"140000", "value":"山西省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-150000" } }
+{ "groupKey" : "CityTree", "code":"150000", "value":"内蒙古自治区" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-210000" } }
+{ "groupKey" : "CityTree", "code":"210000", "value":"辽宁省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-220000" } }
+{ "groupKey" : "CityTree", "code":"220000", "value":"吉林省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-230000" } }
+{ "groupKey" : "CityTree", "code":"230000", "value":"黑龙江省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-370000" } }
+{ "groupKey" : "CityTree", "code":"370000", "value":"山东省" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-0531" } }
+{ "groupKey" : "CityTree", "code":"0531", "value":"济南市", "pid":"CityTree-370000" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-0532" } }
+{ "groupKey" : "CityTree", "code":"0532", "value":"青岛市", "pid":"CityTree-370000" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-0533" } }
+{ "groupKey" : "CityTree", "code":"0533", "value":"淄博市", "pid":"CityTree-370000" }
+{ "index" : { "_index" : ".kibana", "_type" : "selectConf", "_id" : "CityTree-0534" } }
+{ "groupKey" : "CityTree", "code":"0534", "value":"枣庄市", "pid":"CityTree-370000" }
+
+GET /.kibana/selectConf/_search
