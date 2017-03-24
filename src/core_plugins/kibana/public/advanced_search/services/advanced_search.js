@@ -64,9 +64,13 @@ module.service('advancedSearch', function (Promise) {
     return fieldSource;
   }
 
+  this.isEsQueryDSL = false;  
+
   this.syncAdvancedSearch = function (advancedSearch) {
     let returnValue = {};
+    this.isEsQueryDSL = false;
     returnValue = this.syncAdvancedSearchCondition(advancedSearch);
+    this.isEsQueryDSL = !this.isEsQueryDSL;
     return returnValue;
   }
 
@@ -74,7 +78,7 @@ module.service('advancedSearch', function (Promise) {
     let returnValue = {};
     this.isEsQueryDSL = true;
     returnValue = this.syncAdvancedSearchCondition(advancedSearch);
-    this.isEsQueryDSL = false;
+    this.isEsQueryDSL = !this.isEsQueryDSL;
     return returnValue;
   }
 
