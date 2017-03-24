@@ -21,12 +21,19 @@ uiModules
             field: '=',
             selected: '='
         },
-        controller: function ($scope) {
-            if ($scope.field.selectable) {
-                valueSelectorService.getDataSources($scope.field).then(function (data) {
-                    $scope.dataSources = data;
-                });
+        controller: function ($scope) {           
+
+            function loadDataSources() {
+                if ($scope.field.selectable) {
+                    valueSelectorService.getDataSources($scope.field).then(function (data) {
+                        $scope.dataSources = data;
+                    });
+                }
             }
+
+            $scope.$watch('field', function (newValue, oldValue) {
+                loadDataSources();
+            });
 
             $scope.open = function (size) {
                 if ($scope.field.selectable) {
