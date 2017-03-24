@@ -64,21 +64,15 @@ module.service('advancedSearch', function (Promise) {
     return fieldSource;
   }
 
-  this.isEsQueryDSL = false;  
-
   this.syncAdvancedSearch = function (advancedSearch) {
     let returnValue = {};
-    this.isEsQueryDSL = false;
-    returnValue = this.syncAdvancedSearchCondition(advancedSearch);
-    this.isEsQueryDSL = !this.isEsQueryDSL;
+    returnValue = this.syncAdvancedSearchCondition(advancedSearch, false);
     return returnValue;
   }
 
   this.syncAdvancedSearch2EsQueryDSL = function (advancedSearch) {
     let returnValue = {};
-    this.isEsQueryDSL = true;
-    returnValue = this.syncAdvancedSearchCondition(advancedSearch);
-    this.isEsQueryDSL = !this.isEsQueryDSL;
+    returnValue = this.syncAdvancedSearchCondition(advancedSearch, true);
     return returnValue;
   }
 
@@ -106,7 +100,9 @@ module.service('advancedSearch', function (Promise) {
     return returnValue;
   }
 
-  this.syncAdvancedSearchCondition = function (boolConditions) {
+  this.syncAdvancedSearchCondition = function (boolConditions, isEsQueryDSL) {
+
+    isEsQueryDSL = isEsQueryDSL || false;
 
     let that = this;
 
@@ -121,14 +117,14 @@ module.service('advancedSearch', function (Promise) {
 
         if ('bool' in condition) {
 
-          let childBool = that.syncAdvancedSearchCondition(condition.bool);
+          let childBool = that.syncAdvancedSearchCondition(condition.bool, isEsQueryDSL);
 
           returnValueItem.push({ "bool": childBool });
 
         } else {
           if (condition.selected) {
             let selected = condition.selected;
-            if (that.isEsQueryDSL && selected.disabled) { return; }
+            if (isEsQueryDSL && selected.disabled) { return; }
 
             let fieldName = selected.field.name;
             let fieldVaue = selected.value;
@@ -169,7 +165,7 @@ module.service('advancedSearch', function (Promise) {
               case "term":
                 newCondition[operator.keyword] = newOperator;
                 newOperator[fieldName] = newLink;
-                if (false == that.isEsQueryDSL) {
+                if (false == isEsQueryDSL) {
                   newOperator.conf = {
                     "disabled": selected.disabled,
                     "operatorKey": operator.operatorKey
