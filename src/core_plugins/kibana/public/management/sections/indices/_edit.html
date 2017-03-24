@@ -52,11 +52,11 @@
         ng-show="state.tab == 'indexedFields'"
         class="fields indexed-fields"
       ></indexed-fields>
-      <scripted-fields
+      <scripted-fields ng-if="false"
         ng-show="state.tab == 'scriptedFields'"
         class="fields scripted-fields"
       ></scripted-fields>
-      <source-filters
+      <source-filters ng-if="false"
         ng-show="state.tab == 'sourceFilters'"
         index-pattern="indexPattern"
         class="fields source-filters"

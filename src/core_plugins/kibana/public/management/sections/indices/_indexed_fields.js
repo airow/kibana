@@ -57,7 +57,7 @@ uiModules.get('apps/management')
               value: field.displayName
             },
             {
-              markup: `<span>${field.alias}</span>`,
+              markup: `<span>${field.alias || ''}</span>`,
               value: field.alias
             },
             {

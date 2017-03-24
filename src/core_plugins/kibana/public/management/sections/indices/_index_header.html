@@ -3,7 +3,7 @@
     <i aria-hidden="true" ng-if="defaultIndex === indexPattern.id" class="fa fa-star"></i>
     {{indexPattern.id}}
   </h1>
-  <div class="controls">
+  <div class="controls" ng-hide="true">
     <button
       ng-if="setDefault"
       ng-click="setDefault()"
