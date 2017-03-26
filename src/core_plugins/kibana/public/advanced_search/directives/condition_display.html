@@ -18,6 +18,7 @@
             <span>{{condition.selected.operator.display}}</span>
             <span ng-switch="condition.selected.field.type">
               <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>
+              <span ng-switch-when='string'>'{{condition.selected.value}}'</span>
               <span ng-switch-default>{{condition.selected.value}}</span>
             </span>
             <span ng-show="key==='must_not'" style="color: red">不成立</span>

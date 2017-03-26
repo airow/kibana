@@ -35,3 +35,19 @@
 .advancedSearchDisplay .filter.disabled .filter-description{
   color: black; font-weight: bolder;
 }
+
+.teld-modal .modal-header{
+  background-color: #f5f5f5; 
+  padding: 10px 15px 10px 20px;
+}
+
+.teld-modal .modal-body{
+  padding-bottom: 0px;
+}
+
+.teld-modal .modal-footer{
+  padding-top: 12px; 
+  padding-bottom: 14px; 
+  border-top: 0; 
+  background-color: #f5f5f5;
+}

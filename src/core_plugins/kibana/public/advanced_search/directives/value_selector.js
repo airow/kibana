@@ -107,13 +107,29 @@ uiModules
 
   $scope.items = items;
   $scope.selected = {
-    item: {}
+      item: null
   };
 
   $scope.filterString = '';
 
+  let clickTime = new Date().getTime();
+  $scope.select = function (item) {
+      let isSameItem = $scope.selected.item === item;
+      let c = new Date().getTime();
+      if (c - clickTime < 500 && isSameItem) {
+          $modalInstance.close(item);
+      } else {
+          clickTime = c;
+          $scope.selected.item = (isSameItem ? null : item);
+      }
+  }
+
+  $scope.clear = function () {
+      $modalInstance.close({ code: '', value: '' });
+  };
+
   $scope.ok = function () {
-    $modalInstance.close($scope.selected.item);
+      $modalInstance.close($scope.selected.item || { code: '', value: '' });
   };
 
   $scope.cancel = function () {
@@ -140,9 +156,9 @@ uiModules
     ];
 
     let selected = $scope.selected = {
-        item: {}
+        item: null
     };
-    selected.item[current.field.selectConf.valueKey] = current.value;
+    //selected.item[current.field.selectConf.valueKey] = current.value;
     //$scope.filterString = current.value;
     let treeControl = $scope.treeControl = {};
     $scope.my_tree_handler = function (branch) {
@@ -157,6 +173,10 @@ uiModules
             selected.item = branch;
         }
     }
+
+    $scope.clear = function () {
+        $modalInstance.close({ code: '', value: '' });
+    };
 
     $scope.ok = function () {
         $modalInstance.close($scope.selected.item);

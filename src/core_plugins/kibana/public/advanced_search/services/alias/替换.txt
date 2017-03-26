@@ -1,0 +1,7 @@
+"typeOperators": \[(\n.+)+]
+
+,\n.+"typeOperators": \[(\n.+)+]
+
+,"typeOperators":\[(\n.+)+]
+
+\\"typeOperators\\":.+\}\],\"

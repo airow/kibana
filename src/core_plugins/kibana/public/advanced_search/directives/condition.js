@@ -160,6 +160,11 @@ uiModules
         }
         return returnValue;
       }
+
+      $scope.fieldChange = function () {
+        this.condition.selected.operator = advancedSearch.filterOperator(this.condition.selected.field)[0];
+        this.condition.selected.value = this.condition.selected.field.type == 'number' ? 0 : '';
+      }
     },
     link: function ($scope, element) {
       const init = function () {

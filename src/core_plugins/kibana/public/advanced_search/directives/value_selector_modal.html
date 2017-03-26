@@ -1,7 +1,8 @@
-<div>
+<div class="teld-modal">
   <div class="modal-header">
-    <h3 class="modal-title" id="modal-title">帮助</h3>
-  </div>
+    <button type="button" ng-click="cancel()" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true">×</button> 
+    <h6 class="modal-title">帮助</h6>
+  </div>  
   <div class="modal-body" id="modal-body">
     <input type="text" class="form-control" placeholder="过滤" ng-model="filterString">
     <table class="table table-bordered">
@@ -12,8 +13,8 @@
           <th>值</th>
         </tr>
       </thead>
-      <tbody style="overflow-y:scroll; display:block; min-height: 300px; height: 300px;">
-        <tr style="display:table; width:100%; table-layout:fixed;" ng-repeat="item in items | filter:filterString | orderBy:'code':false" ng-click="selected.item = item;" ng-class="{'active':item===selected.item}">
+      <tbody style="overflow-y:scroll; display:block; min-height: 280px; height: 280px;">
+        <tr style="display:table; width:100%; table-layout:fixed;" ng-repeat="item in items | filter:filterString | orderBy:'code':false" ng-db3lclick="okClose(item);" ng-click="select(item);" ng-class="{'active':item===selected.item}">
           <!--<th scope="row">{{$index+1}}</th>-->
           <td>{{item.code}}</td>
           <td>{{item.value}}</td>
@@ -22,7 +23,7 @@
     </table>
   </div>
   <div class="modal-footer">
+    <button ng-hide="true" class="btn btn-default" type="button" ng-click="clear()">清除</button>
     <button class="btn btn-primary" type="button" ng-click="ok()">确定</button>
-    <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
   </div>
 </div>

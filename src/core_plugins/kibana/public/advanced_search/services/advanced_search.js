@@ -72,7 +72,12 @@ module.service('advancedSearch', function (Promise) {
 
   this.syncAdvancedSearch2EsQueryDSL = function (advancedSearch) {
     let returnValue = {};
-    returnValue = this.syncAdvancedSearchCondition(advancedSearch, true);
+    try {
+      returnValue = this.syncAdvancedSearchCondition(advancedSearch, true);
+    } catch (err) {
+      alert(err);
+      returnValue = false;
+    }
     return returnValue;
   }
 
@@ -180,7 +185,6 @@ module.service('advancedSearch', function (Promise) {
                 newLink[key] = operatorExt[key];
               }
             }
-
             returnValueItem.push(newCondition);
           }
         }

@@ -31,7 +31,7 @@
     <div class="btn-group" role="group" ng-show="boolSourceParent">
       <button type="button" ng-click="removeGroup()" class="btn btn-danger btn-xs glyphicon glyphicon-trash"></button>
     </div>  
-    <table class="table advancedSearch" ng-repeat="(key,conditions) in boolSource">
+    <table class="table table-condensed advancedSearch" ng-repeat="(key,conditions) in boolSource">
       <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
         <tr ng-if='!condition.bool'>
           <!--条件-->
@@ -54,6 +54,7 @@
                       <span>{{condition.selected.operator.display}}</span>
                       <span ng-switch="condition.selected.field.type">
                         <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>
+                        <span ng-switch-when='string'>'{{condition.selected.value}}'</span>
                         <span ng-switch-default>{{condition.selected.value}}</span>
                       </span>
                       <span ng-show="key==='must_not'" style="color: red">不成立</span>
@@ -64,19 +65,19 @@
             </div>
             <div class="row" ng-switch-default>
               <div class="col-xs-2">
-                <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='condition.selected.value=""' ng-model="condition.selected.field" required ng-options="field.alias||field.asFieldName for field in fieldSource">
-                  <option></option>
+                <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='fieldChange()' ng-model="condition.selected.field" ng-options="field.alias||field.asFieldName for field in fieldSource">
+                  <!--<option></option>-->
                 </select>
               </div>
               <div class="col-xs-2">
                 <!--<select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">-->
-                <select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in filterOperator()">
-                  <option></option>
+                <select class="form-control" ng-disabled="condition.selected.disabled"  ng-model="condition.selected.operator" ng-options="operator.display for operator in filterOperator()">
+                  <!--<option></option>-->
                 </select>
               </div>
               <div class="col-xs-4" ng-switch="condition.selected.field.type">
                 <div ng-switch-when='number'>
-                  <input ng-disabled="condition.selected.disabled" type="number" class="form-control" ng-model="condition.selected.value" required/>
+                  <input ng-disabled="condition.selected.disabled" type="number" class="form-control" ng-model="condition.selected.value"/>
                 </div>              
                 <div ng-switch-when='boolean' ng-init='condition.selected.value=true' class="btn-group btn-group-justified" role="group">
                   <div class="btn-group" role="group">
@@ -90,7 +91,7 @@
                   <input type="text" step="border-color:black;" class="form-control" ng-change="dateToTime()" ng-click="opened=true" datepicker-popup ng-model="condition.selected.value" is-open="opened" clear-text='清除' close-text="关闭" current-text='今天' />
                 </div>
                 <div ng-switch-default>
-                  <input ng-if="!condition.selected.field.selectable" ng-disabled="condition.selected.disabled" type="text" class="form-control" ng-model="condition.selected.value" required/>
+                  <input ng-if="!condition.selected.field.selectable" ng-disabled="condition.selected.disabled" type="text" class="form-control" ng-model="condition.selected.value"/>
                   <teld-value-selector ng-if="condition.selected.field.selectable"  field='condition.selected.field' selected='condition.selected.value'></teld-value-selector>
                 </div>                
               </div>              
