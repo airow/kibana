@@ -96,6 +96,9 @@ uiModules
 
         // listen for scroll events
         listen();
+
+        //2017-03-26 结果集少，横向双滚动条
+        $el.css("overflow-x",'hidden');
       }
 
       // reset when the width or scrollWidth of the $el changes

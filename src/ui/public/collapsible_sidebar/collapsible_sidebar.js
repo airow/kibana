@@ -23,6 +23,9 @@ uiModules
 
       $collapser.on('click', function () {
         $elem.toggleClass('closed');
+        //$("disc-field-chooser").toggle();
+        $elem.children().toggle();
+        $(this).show();
         // if there is are only two elements we can assume the other one will take 100% of the width
         if ($siblings.length === 1 && siblingsClass) {
           $siblings.toggleClass(siblingsClass + ' col-md-12');
