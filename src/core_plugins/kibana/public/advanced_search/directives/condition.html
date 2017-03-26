@@ -31,7 +31,7 @@
     <div class="btn-group" role="group" ng-show="boolSourceParent">
       <button type="button" ng-click="removeGroup()" class="btn btn-danger btn-xs glyphicon glyphicon-trash"></button>
     </div>  
-    <table class="table table-condensed advancedSearch" ng-repeat="(key,conditions) in boolSource">
+    <table class="table table-condensed advancedSearch" style="background-color: rgb(246,246,246);" ng-repeat="(key,conditions) in boolSource">
       <tbody data-bool='{{key}}' ng-repeat="condition in conditions">
         <tr ng-if='!condition.bool'>
           <!--条件-->
@@ -64,7 +64,7 @@
               </div>
             </div>
             <div class="row" ng-switch-default>
-              <div class="col-xs-2">
+              <div class="col-xs-4">
                 <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='fieldChange()' ng-model="condition.selected.field" ng-options="field.alias||field.asFieldName for field in fieldSource">
                   <!--<option></option>-->
                 </select>
