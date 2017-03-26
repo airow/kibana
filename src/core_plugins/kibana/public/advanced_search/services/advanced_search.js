@@ -6,11 +6,14 @@ import uiModules from 'ui/modules';
 const module = uiModules.get('apps/advanced_search');
 
 // This is the only thing that gets injected into controllers
-module.service('advancedSearch', function (Promise) {
+module.service('advancedSearch', function (Promise, getAppState) {
   
   this.fieldTypes = ["string", "number", "date", "boolean"];
 
   this.getFieldSource = function (indexPattern) {
+
+    let columns = getAppState().columns;
+
     let that = this;
     let fields = indexPattern.fields;
     let metaFields = indexPattern.metaFields;
@@ -60,8 +63,27 @@ module.service('advancedSearch', function (Promise) {
       }
       return returnValue;
     });
+    
+    /**
+     * 排序，用户定义的字段排在前边
+     */
+    let masterFieldNameMapping = {};
+    let secondaryFields = fieldSource.filter(field => {
+      let findKey = field.asFieldName || field.name;
+      let returnValue = _.indexOf(columns, findKey) < 0;
+      if (returnValue === false) {
+        masterFieldNameMapping[findKey] = field;
+      }
+      return returnValue;
+    });
 
-    return fieldSource;
+    let masterFields = [];
+    columns.forEach(function (column) {
+      let field = masterFieldNameMapping[column];
+      if (field) { masterFields.push(field); }
+    });
+    let sortFields = masterFields.concat(secondaryFields);
+    return sortFields;
   }
 
   this.syncAdvancedSearch = function (advancedSearch) {
