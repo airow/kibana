@@ -172,7 +172,7 @@ block content
     .ball-pulse > div {
       animation-fill-mode: both;
       animation: bouncedelay 1.4s infinite ease-in-out;
-      background-color: #47a447;
+      /*background-color: #47a447;*/
       width: 12px;
       height: 12px;
       /*height: 1em;*/
@@ -184,9 +184,57 @@ block content
       display: inline-block;
     }
 
+    .teld-blue > div {
+      background-color: #5DB2FF;
+    }
+
+    .teld-azure > div {
+      background-color: #2dc3e8;
+    }
+
+    .teld-teal > div {
+      background-color: #03B3B2;
+    }
+
+    .teld-teld > div {
+      background-color: #47a447;
+    }
+
+    .teld-orange > div {
+      background-color: #FF8F32;
+    }
+
+    .teld-pink > div {
+      background-color: #cc324b;
+    }
+
+    .teld-darkred > div {
+      background-color: #AC193D;
+    }
+
+    .teld-purple > div {
+      background-color: #8C0095;
+    }
+
+    .teld-darkblue > div {
+      background-color: #0072C6;
+    }
+
+    .teld-gray > div {
+      background-color: #585858;
+    }
+
+    .teld-black > div {
+      background-color: #474544;
+    }
+
+    .teld-deepblue > div {
+      background-color: #001940;
+    }
+
 
   .kibanaWelcomeView
-    .ball-pulse()
+    .ball-pulse
       div
       div
       div
@@ -201,9 +249,39 @@ block content
     //  good stuff will be cached up for next time!
 
 
+  script.
+    function getCookie(name)
+    {
+      var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+      if(arr=document.cookie.match(reg))
+      return unescape(arr[2]);
+      else
+      return null;
+    }
+
+  script.
+    function setLoadAnimationColor(){
+      var defalut='teld';
+      var skinName = getCookie('current-skin') || "";
+      var arr,reg = new RegExp("http[s]?://.+/Content/css/skins/(.+[^\.min])(\.min)?\.css");
+      if(arr = skinName.match(reg))
+      {
+        defalut = arr[1];
+      }
+      var ele = document.querySelector(".ball-pulse");
+      ele.className = 'ball-pulse teld-' + defalut +' teld-bgcolor';
+
+      var backgroundColor= window.getComputedStyle(ele.querySelector("div")).backgroundColor;
+      var sheet=document.styleSheets[0];      
+      //- vsr Rules =sheet.cssRules||sheet[0].rules;   //W3C用cssRules //微软rules
+      sheet.insertRule(".teld-bgcolor { background-color: "+backgroundColor+" !important }", 0);
+    }
 
   script.
     window.onload = function () {
+       
+      setLoadAnimationColor();
+      
       var hideLoadingMessage = /#.*[?&]embed(&|$|=true)/.test(window.location.href);
       if (hideLoadingMessage) {
         var loading = document.querySelector('.kibanaWelcomeView');
@@ -217,6 +295,7 @@ block content
         anchor.setAttribute('href', !{JSON.stringify(bundlePath)} + '/' + filename + cacheParam);
         return anchor.href;
       }
+
       var files = [
         bundleFile('commons.style.css'),
         bundleFile('#{app.id}.style.css'),
