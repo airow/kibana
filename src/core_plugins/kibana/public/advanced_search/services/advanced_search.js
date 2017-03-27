@@ -11,8 +11,8 @@ module.service('advancedSearch', function (Promise, getAppState) {
   this.fieldTypes = ["string", "number", "date", "boolean"];
 
   this.getFieldSource = function (indexPattern) {
-
-    let columns = getAppState().columns;
+    let appState = getAppState();
+    let columns = appState && appState.columns ? appState.columns : [];
 
     let that = this;
     let fields = indexPattern.fields;
