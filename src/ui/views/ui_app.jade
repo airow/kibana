@@ -186,9 +186,9 @@ block content
 
   .kibanaWelcomeView
     .ball-pulse
-      teld-bgcolor
-      teld-bgcolor
-      teld-bgcolor
+      .teld-bgcolor
+      .teld-bgcolor
+      .teld-bgcolor
 
     //.kibanaLoader
       //.kibanaLoader__logo
@@ -219,13 +219,14 @@ block content
       {
         defalut = arr[1];
       }
-      var ele = document.querySelector(".ball-pulse");
-      ele.className = 'ball-pulse teld-' + defalut +' teld-bgcolor';
 
       var backgroundColor= window.getComputedStyle(ele.querySelector("div")).backgroundColor;
       var sheet=document.styleSheets[0];      
       //- vsr Rules =sheet.cssRules||sheet[0].rules;   //W3C用cssRules //微软rules
       sheet.insertRule(".teld-bgcolor { background-color: "+backgroundColor+" !important }", 0);
+
+      var ele = document.querySelector(".ball-pulse");
+      ele.className = 'ball-pulse teld-' + defalut +' teld-bgcolor';
     }
 
   script.
