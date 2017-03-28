@@ -184,60 +184,11 @@ block content
       display: inline-block;
     }
 
-    .teld-blue > div {
-      background-color: #5DB2FF;
-    }
-
-    .teld-azure > div {
-      background-color: #2dc3e8;
-    }
-
-    .teld-teal > div {
-      background-color: #03B3B2;
-    }
-
-    .teld-teld > div {
-      background-color: #47a447;
-    }
-
-    .teld-orange > div {
-      background-color: #FF8F32;
-    }
-
-    .teld-pink > div {
-      background-color: #cc324b;
-    }
-
-    .teld-darkred > div {
-      background-color: #AC193D;
-    }
-
-    .teld-purple > div {
-      background-color: #8C0095;
-    }
-
-    .teld-darkblue > div {
-      background-color: #0072C6;
-    }
-
-    .teld-gray > div {
-      background-color: #585858;
-    }
-
-    .teld-black > div {
-      background-color: #474544;
-    }
-
-    .teld-deepblue > div {
-      background-color: #001940;
-    }
-
-
   .kibanaWelcomeView
     .ball-pulse
-      div
-      div
-      div
+      teld-bgcolor
+      teld-bgcolor
+      teld-bgcolor
 
     //.kibanaLoader
       //.kibanaLoader__logo
@@ -278,9 +229,41 @@ block content
     }
 
   script.
+    function dynamicTeldBgClass(){
+
+      var colorMapping = {
+        blue: '#5DB2FF',
+        azure: '#2dc3e8',
+        teal: '#03B3B2',
+        teld: '#47a447',
+        orange: '#FF8F32',
+        pink: '#cc324b',
+        darkred: '#AC193D',
+        darkred: '#AC193D',
+        purple: '#8C0095',
+        darkblue: '#0072C6',
+        gray: '#585858',
+        black: '#474544',
+        deepblue: '#001940'
+      };
+
+      var defalut='teld';
+      var skinName = getCookie('current-skin') || "";
+      var arr,reg = new RegExp("http[s]?://.+/Content/css/skins/(.+[^\.min])(\.min)?\.css");
+      if(arr = skinName.match(reg))
+      {
+        defalut = arr[1];
+      }
+      var backgroundColor= colorMapping[defalut];
+      var sheet=document.styleSheets[0];      
+      //- vsr Rules =sheet.cssRules||sheet[0].rules;   //W3C用cssRules //微软rules
+      sheet.insertRule(".teld-bgcolor { background-color: "+backgroundColor+" !important }", 0);
+    }
+
+  script.
     window.onload = function () {
        
-      setLoadAnimationColor();
+      dynamicTeldBgClass();
       
       var hideLoadingMessage = /#.*[?&]embed(&|$|=true)/.test(window.location.href);
       if (hideLoadingMessage) {

@@ -10,9 +10,10 @@ module.service('advancedSearch', function (Promise, getAppState) {
   
   this.fieldTypes = ["string", "number", "date", "boolean"];
 
-  this.getFieldSource = function (indexPattern) {
+  this.getFieldSource = function (indexPattern) {    
     let appState = getAppState();
     let columns = appState && appState.columns ? appState.columns : [];
+    let aliasColumns = [];
 
     let that = this;
     let fields = indexPattern.fields;
@@ -20,7 +21,7 @@ module.service('advancedSearch', function (Promise, getAppState) {
     let timeFieldName = indexPattern.timeFieldName;
 
     let keywords = {};
-
+    
     let fieldSource = fields.filter(field => {
 
       //let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable && field.analyzed == false;
@@ -61,12 +62,18 @@ module.service('advancedSearch', function (Promise, getAppState) {
       if (keywords[field.name] && false === field.hasKeyword) {
         returnValue = false;
       }
+      if (field.alias) {
+        aliasColumns.push(field.name);
+      }
       return returnValue;
     });
     
+    /*设置了别名的字段靠前显示*/
+    //fieldSource = _.sortByOrder(fieldSource, ['alias'], ['asc']);
     /**
      * 排序，用户定义的字段排在前边
      */
+    columns = _.uniq(columns.concat(aliasColumns));
     let masterFieldNameMapping = {};
     let secondaryFields = fieldSource.filter(field => {
       let findKey = field.asFieldName || field.name;
