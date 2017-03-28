@@ -28,7 +28,7 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active">
       <div class="row">
-        <div class="col-md-2">
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
           <ul class="nav nav-pills nav-stacked kbn-timepicker-modes">
             <li ng-class="{active: mode === 'public' }">
               <a ng-click="mode='public'">公共方案</a>
@@ -39,7 +39,7 @@
           </ul>
         </div>
 
-        <div class="col-md-10" style="padding-left: 0px;">
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="padding-left: 0px;">
           <div ng-switch on="mode">
             <paginate ng-switch-when="public" list="finder.hits | filter:public" per-page="20">
               <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
