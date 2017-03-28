@@ -14,7 +14,7 @@ uiModules
       size: '=sampleSize'
     },
     controller: function ($scope) {
-      let def_Sizes = [500, 1000, 5000, 10000, 50000];
+      let def_Sizes = [500, 1000, 5000, 10000];
       //let yml_sampleSize =  config.get('discover:sampleSize');
       let yml_sampleSize = $scope.size;
       console.log(config.get('discover:sampleSize'));
