@@ -3,10 +3,11 @@ import $ from 'jquery';
 import template from './navigation.html';
 import uiModules from 'ui/modules';
 import 'plugins/kibana/advanced_search/state/teld_state';
+import 'plugins/kibana/navigation/services/navigation_conf_service';
 
 uiModules
 .get('apps/navigation')
-.directive('teldNavigation', function (Private, $compile, kbnUrl, TeldState) { 
+.directive('teldNavigation', function (Private, $compile, kbnUrl, TeldState, navigationConfService) { 
 
   return {
     restrict: 'E',
@@ -25,9 +26,47 @@ uiModules
 
       if ($scope.savedObject.uiConf) {
         let navigationArray = $scope.savedObject.uiConf.navigation || [];
-        $scope.navigation = navigationArray.filter(nav => {
-          return !nav.disabled;
+        let conf_ids_nav = [];
+        let conf_ids = [];
+        
+        navigationArray = navigationArray.filter(nav => {
+
+          let returnValue = !nav.disabled;
+
+          if (returnValue && nav.conf_id) {
+            conf_ids_nav.push(nav);
+            conf_ids.push(nav.conf_id);
+          }
+
+          return returnValue;
         });
+        
+        navigationConfService.get(conf_ids).then(
+          /** resolve */
+          navigationConf => {
+            conf_ids_nav.forEach(item => {
+              let startIndex = navigationArray.indexOf(item);
+              let confArray = navigationConf[item.conf_id];
+
+              if (confArray) {
+                for (let index = 0; index < confArray.length; index++) {
+                  let confItem = confArray[index];
+                  if (!confItem.disabled) {
+                    navigationArray.splice(startIndex++, 0, confItem);
+                  }
+                }
+              }
+
+              navigationArray.splice(startIndex, 1);
+            });
+
+            $scope.navigation = navigationArray;
+          },
+          /** reject */
+          function () {
+            $scope.navigation = navigationArray;
+          }
+        );
       }
 
       self.makeUrl = function (hit) {

@@ -136,6 +136,7 @@ uiModules.get('apps/management')
         let timefilter_Schema = { disabled: true, timeFrom: '', timeTo: '' };
         //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
         let navigation_Schema = {
+          "conf_id": "navigationConf的id，配置了conf_id将忽略url，但disabled依然有效",
           "display": "显示的名称",
           "url": "#/visualize/edit/{visualize name} 或 #/discover/{discover name}",
           "disabled": true
