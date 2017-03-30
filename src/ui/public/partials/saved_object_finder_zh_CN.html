@@ -4,6 +4,10 @@
   .teld-saved-object-finder ul{margin-bottom: 0px;}
   .teld-saved-object-finder ul.list-group-menu li{padding: 5px;}
   .teld-saved-object-finder ul.nav a {padding: 5px}
+  .teld-saved-object-finder .saved-item { padding-top: 8px; padding-right: 0px; padding-left: 0px; }
+  /*.teld-saved-object-finder .saved-item:nth-child(odd) { background-color: #F6F6F6; }
+  .teld-saved-object-finder .saved-item:nth-child(even) { background-color: #ffffff; }*/
+  .teld-saved-object-finder .saved-item:hover { border-radius: 5px; background-color: #E4E4E4; }
 </style>
 <div class="teld-saved-object-finder" ng-init="mode = 'public'" >
   <div class="container-fluid">
@@ -41,78 +45,48 @@
 
         <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="padding-left: 0px;">
           <div ng-switch on="mode">
-            <paginate ng-switch-when="public" list="finder.hits | filter:public" per-page="20">
-              <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
-                <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
-                  <span class="paginate-heading">
-                    名称
-                    <i
-                      class="fa"
-                      ng-class="finder.isAscending ? 'fa-caret-up' : 'fa-caret-down'">
-                    </i>
-                  </span>
-                </li>
-                <li
-                  class="list-group-item list-group-menu-item"
-                  ng-class="{'active': finder.selector.index === $index && finder.selector.enabled}"
-                  ng-repeat="hit in page"
-                  ng-keydown="finder.hitKeyDown($event, page, paginate)"
-                  ng-click="finder.onChoose(hit, $event)">            
-                  <a ng-href="{{finder.makeUrl(hit)}}"
-                      ng-blur="finder.hitBlur($event)"
-                      ng-click="finder.preventClick($event)">
-                      <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
-                      <span>{{hit.title}}</span>
-                      <p ng-if="hit.description" ng-bind="hit.description"></p>
-                  </a>
-                </li>
-                <li
-                  class="list-group-item list-group-no-results"
-                  ng-if="!page.length || page.length === 0">
-                  <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
-                  <p ng-bind="'没有匹配到' + finder.properties.nouns"></p>
-                </li>
-              </ul>
+            <paginate ng-switch-when="public" list="finder.hits | filter:public" per-page="1000">
+              <div class="container-fluid table-hover">
+                <div class="row" style="display: block;">
+                  <div class="saved-item col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="hit in page" ng-click="finder.onChoose(hit, $event)">
+                    <div class="actions pull-left" style="margin-top: -6px; visibility: hidden;">
+                      <button style='background-color:transparent;' aria-label="Delete">
+                        <span class="sr-only">Delete</span>
+                        <i aria-hidden="true" class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                    <a ng-href="{{finder.makeUrl(hit)}}"
+                        ng-blur="finder.hitBlur($event)"
+                        ng-click="finder.preventClick($event)">
+                        <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
+                        <span>{{hit.title}}</span>
+                        <p ng-if="hit.description" ng-bind="hit.description"></p>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </paginate>
 
-            <paginate ng-switch-when="private" ng-show="owner" list="finder.hits | filter:private" per-page="20">
-              <ul class="li-striped list-group list-group-menu" ng-class="{'select-mode': finder.selector.enabled}">
-                <li class="list-group-item" ng-click="finder.sortHits(finder.hits)">
-                  <span class="paginate-heading">
-                    名称
-                    <i
-                      class="fa"
-                      ng-class="finder.isAscending ? 'fa-caret-up' : 'fa-caret-down'">
-                    </i>
-                  </span>
-                </li>
-                <li
-                  class="list-group-item list-group-menu-item"
-                  ng-class="{'active': finder.selector.index === $index && finder.selector.enabled}"
-                  ng-repeat="hit in page"
-                  ng-keydown="finder.hitKeyDown($event, page, paginate)"
-                  ng-click="finder.onChoose(hit, $event)">
-                  <div class="actions pull-right" style="margin-top: -6px;">
-                    <button ng-click="finder.delete(hit, $event)" style='background-color:transparent;' aria-label="Delete">
-                      <span class="sr-only">Delete</span>
-                      <i aria-hidden="true" class="fa fa-trash"></i>
-                    </button>
+            <paginate ng-switch-when="private" ng-show="owner" list="finder.hits | filter:private" per-page="1000">
+              <div class="container-fluid table-hover">
+                <div class="row" style="display: block;">
+                  <div class="saved-item col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="hit in page" ng-click="finder.onChoose(hit, $event)">
+                    <div class="actions pull-left" style="margin-top: -6px;">
+                      <button ng-click="finder.delete(hit, $event)" style='background-color:transparent;' aria-label="Delete">
+                        <span class="sr-only">Delete</span>
+                        <i aria-hidden="true" class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                    <a ng-href="{{finder.makeUrl(hit)}}"
+                        ng-blur="finder.hitBlur($event)"
+                        ng-click="finder.preventClick($event)">
+                        <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
+                        <span>{{hit.title}}</span>
+                        <p ng-if="hit.description" ng-bind="hit.description"></p>
+                    </a>
                   </div>
-                  <a ng-href="{{finder.makeUrl(hit)}}"
-                      ng-blur="finder.hitBlur($event)"
-                      ng-click="finder.preventClick($event)">
-                      <i aria-hidden="true" class="finder-type fa" ng-if="hit.icon" ng-class="hit.icon"></i>
-                      <span>{{hit.title}}</span>
-                      <p ng-if="hit.description" ng-bind="hit.description"></p>
-                  </a>
-                </li>
-                <li
-                  class="list-group-item list-group-no-results"
-                  ng-if="!page.length || page.length === 0">
-                  <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
-                  <p ng-bind="'没有匹配到' + finder.properties.nouns"></p>
-                </li>
-              </ul>
+                </div>
+              </div>
             </paginate>
           </div>
         </div>
