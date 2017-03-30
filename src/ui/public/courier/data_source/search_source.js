@@ -275,7 +275,6 @@ export default function SearchSourceFactory(Promise, Private, config) {
       if (_.isEmpty(val)) {
         return;
       }
-      debugger;
       state.body = state.body || {};
       // ignore if we already have a value
       if (state.body["query"] == null) {

@@ -10,10 +10,10 @@ const module = uiModules.get('discover/saved_searches', [
 module.factory('NavigationConf', function (courier,config,Private) {
   _.class(NavigationConf).inherits(courier.SavedObject);
   function NavigationConf(id) {
-    debugger;
     courier.SavedObject.call(this, {
       type: NavigationConf.type,
       mapping: NavigationConf.mapping,
+      mappingProps: NavigationConf.mappingProps,
       id: id,
       defaults: {
         title: 'New Saved NavigationConf',
@@ -29,8 +29,24 @@ module.factory('NavigationConf', function (courier,config,Private) {
   NavigationConf.type = 'navigationConf';
 
   NavigationConf.mapping = {
-    navigation: 'string'
+    //navigation: 'string'
   };
+
+  NavigationConf.mappingProps = {
+    "navigation": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "display": {
+          "type": "keyword"
+        },
+        "url": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
 
   /**这个值会影响在编辑页面中生成 “kibanaSavedObjectMeta.searchSourceJSON”项 */
   //NavigationConf.searchSource = true;

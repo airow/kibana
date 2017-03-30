@@ -93,27 +93,33 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
           }
         };
 
-        /** 定义ui配置相关参数,不定义使用动态方式设置 */
-        mapping.uiConf = {
-          properties: {
-            // setup the uiConf mapping, even if it is not used but this type yet
-            showTimeDiagram: {
-              type: 'keyword'
-            },
-            menus: {
-              type: 'keyword'
-            },
-            pageSize: {
-              type: 'keyword'
-            },
-            advancedSearchBool: {
-              type: 'keyword'
-            },
-            navigation: {
-              type: 'keyword'
-            },
+        if (config.mappingProps) {
+          for (let key in config.mappingProps) {
+            mapping[key] = config.mappingProps[key];
           }
-        };        
+        }
+
+        /** 定义ui配置相关参数,不定义使用动态方式设置 */
+        // mapping.uiConf = {
+        //   properties: {
+        //     // setup the uiConf mapping, even if it is not used but this type yet
+        //     showTimeDiagram: {
+        //       type: 'keyword'
+        //     },
+        //     menus: {
+        //       type: 'keyword'
+        //     },
+        //     pageSize: {
+        //       type: 'keyword'
+        //     },
+        //     advancedSearchBool: {
+        //       type: 'keyword'
+        //     },
+        //     navigation: {
+        //       type: 'keyword'
+        //     },
+        //   }
+        // };        
 
         // tell mappingSetup to set type
         return mappingSetup.setup(type, mapping);
