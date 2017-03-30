@@ -61,6 +61,8 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
     self.id = config.id || void 0;
     self.defaults = config.defaults;
 
+    self.mappingProps = config.mappingProps;
+
     /**
      * Asynchronously initialize this object - will only run
      * once even if called multiple times.
@@ -266,6 +268,14 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
             : self[fieldName];
         }
       });
+
+      if (self.mappingProps) {
+        _.forOwn(self.mappingProps, function (fieldMapping, fieldName) {
+          if (self[fieldName] != null) {
+            body[fieldName] = self[fieldName];
+          }
+        });
+      }
 
       if (self.searchSource) {
         body.kibanaSavedObjectMeta = {
