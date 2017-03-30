@@ -189,7 +189,6 @@ app.service('savedVisualizations', function (Promise, es, kbnIndex, SavedVis, Pr
 
   this.find = function (searchString, size = 100) {
     let search = $location.search();//获取地址栏查询参数angular $location 组件
-    debugger;
     if (search["_a"]) {
       let searchAJson = rison.decode(search["_a"]); //使用rison解码地址栏参数
       if (searchAJson.index) {

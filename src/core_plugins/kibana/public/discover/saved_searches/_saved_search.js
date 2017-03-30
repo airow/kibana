@@ -34,6 +34,9 @@ module.factory('SavedSearch', function (courier,config,Private) {
     });
   }
 
+  /**是否在编辑界面显示扩展内容 */
+  SavedSearch.hasUiConf = true;
+
   SavedSearch.type = 'search';
 
   SavedSearch.mapping = {

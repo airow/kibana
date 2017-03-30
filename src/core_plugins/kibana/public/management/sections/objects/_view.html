@@ -1,8 +1,8 @@
 <kbn-management-app section="kibana">
   <kbn-management-objects-view class="container">
     <div class="pull-right" style="margin-top: 20px;">
-      <a href="{{ link }}" class="btn btn-primary">View {{ title }}</a>
-      <!--<a confirm-click="delete()" class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete {{ title }} Object</a>-->
+      <a ng-if="obj.url" href="{{ link }}" class="btn btn-primary">View {{ title }}</a>
+      <a ng-if='allowEdit()' confirm-click="delete()" class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete {{ title }} Object</a>
     </div>
     <h1>Edit {{ title }} Object</h1>
     <div class="bs-callout bs-callout-danger" ng-if="notFound">
@@ -22,7 +22,7 @@
     <form role="form" name="objectForm" ng-submit="submit()">
       <div class="form-group" ng-repeat="field in fields">
         <label>{{ field.name }}</label>
-       <div ng-switch="{{ field.name | startsWith : 'uiConf.' }}">
+       <div ng-switch="{{ checkFieldAllowEdit(field.name) }}">
         <div ng-switch-when="true">
           <textarea rows="1" msd-elastic=" " ng-if="field.type === 'text'" ng-model="field.value" class="form-control span12" />
           <input ng-if="field.type === 'number'" type="number" ng-model="field.value" class="form-control span12" />
@@ -31,7 +31,7 @@
         <input ng-if="field.type === 'boolean'" type="checkbox" ng-model="field.value" ng-checked="field.value"/>
         </div>
         <div ng-switch-default>
-          <textarea rows="1" msd-elastic=" " ng-if="field.type === 'text'" disabled='disabled' ng-bind="field.value" class="form-control span12" />
+          <textarea rows="1"  ng-if="field.type === 'text'" disabled='disabled' ng-bind="field.value" class="form-control span12" />
           <input ng-if="field.type === 'number'" type="number" disabled='disabled' ng-bind="field.value" class="form-control span12" />
           <div ng-if="field.type === 'json' || field.type === 'array'" readonly='true' ui-ace="{ onLoad: aceLoaded, mode: 'json' }" id="{{field.name}}"
             ng-model="field.value" class="form-control"></div>

@@ -11,3 +11,7 @@ import savedObjectRegistry from 'ui/saved_objects/saved_object_registry';
 // preload
 
 savedObjectRegistry.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
+
+/** 注册保存的数据 */
+import 'plugins/kibana/navigation/navigation_confs/navigation_confs';
+savedObjectRegistry.register(require('plugins/kibana/navigation/navigation_confs/navigation_conf_register'));

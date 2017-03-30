@@ -28,7 +28,7 @@ uiModules.get('apps/management')
 .directive('kbnManagementObjectsView', function (kbnIndex, Notifier) {
   return {
     restrict: 'E',
-    controller: function ($scope, $injector, $routeParams, $location, $window, $rootScope, es, Private) {
+    controller: function ($scope, $injector, $routeParams, $location, $window, $rootScope, es, Private, $filter) {
       const notify = new Notifier({ location: 'SavedObject view' });
       const castMappingType = Private(IndexPatternsCastMappingTypeProvider);
       const serviceObj = registry.get($routeParams.service);
@@ -116,6 +116,17 @@ uiModules.get('apps/management')
 
       $scope.title = service.type;
 
+      $scope.checkFieldAllowEdit = function (fieldName) {
+        let returnValue = service.Class && service.Class.allowEdit;
+        returnValue = returnValue || $filter('startsWith')(fieldName, 'uiConf.');
+        return returnValue;
+      }
+
+      $scope.allowEdit = function () {
+        let returnValue = service.Class && service.Class.allowEdit;
+        return returnValue;
+      };
+
       es.get({
         index: kbnIndex,
         type: service.type,
@@ -132,25 +143,27 @@ uiModules.get('apps/management')
         //   'visualization': Private(VisualizationUiConfProvider)
         // }
         // let uiConf_default = uiConfProvider[service.type].defaultConf;
-        
-        let timefilter_Schema = { disabled: true, timeFrom: '', timeTo: '' };
-        //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
-        let navigation_Schema = {
-          "conf_id": "navigationConf的id，配置了conf_id将忽略url，但disabled依然有效",
-          "display": "显示的名称",
-          "url": "#/visualize/edit/{visualize name} 或 #/discover/{discover name}",
-          "disabled": true
-        }
-        /** 默认显示配置项 */
-        let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
 
-        obj._source.uiConf = obj._source.uiConf || {};
-
-        for (let key in uiConf_default) {
-          if (false === (key in obj._source.uiConf)) {
-            obj._source.uiConf[key] = uiConf_default[key];
+        if (service.Class && service.Class.hasUiConf) {
+          let timefilter_Schema = { disabled: true, timeFrom: '', timeTo: '' };
+          //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
+          let navigation_Schema = {
+            "conf_id": "navigationConf的id，配置了conf_id将忽略url，但disabled依然有效",
+            "display": "显示的名称",
+            "url": "#/visualize/edit/{visualize name} 或 #/discover/{discover name}",
+            "disabled": true
           }
-        }      
+          /** 默认显示配置项 */
+          let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
+
+          obj._source.uiConf = obj._source.uiConf || {};
+
+          for (let key in uiConf_default) {
+            if (false === (key in obj._source.uiConf)) {
+              obj._source.uiConf[key] = uiConf_default[key];
+            }
+          }
+        }       
 
         $scope.obj = obj;
         $scope.link = service.urlFor(obj._id);

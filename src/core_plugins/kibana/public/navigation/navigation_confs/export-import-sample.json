@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "navConf-sample",
+    "_type": "navigationConf",
+    "_source": {
+      "navigation": [
+        {
+          "display": "显示名称-visualize",
+          "url": "#/visualize/edit/%E6%97%A5%E5%85%85%E7%94%B5%E9%87%8F%E7%BB%9F%E8%AE%A1",
+          "disabled": true
+        },
+        {
+          "display": "显示名称-discover",
+          "url": "#/discover/%E7%94%B5%E7%AB%99%E8%BF%90%E8%90%A5%E6%97%A5%E6%8A%A5-%E9%9D%92%E5%B2%9B%E5%B8%82-2%E5%B9%B4",
+          "disabled": false
+        }
+      ]
+    }
+  }
+]
