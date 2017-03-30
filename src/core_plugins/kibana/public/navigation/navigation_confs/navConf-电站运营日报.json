@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "navConf-电站运营日报",
+    "_type": "navigationConf",
+    "_source": {
+      "navigation": [
+        {
+          "display": "电站充电量趋势",
+          "url": "#/visualize/edit/10_%E5%85%85%E7%94%B5%E9%87%8F%E8%B6%8B%E5%8A%BF",
+          "disabled": false
+        },
+        {
+          "display": "电站类型充电量统计",
+          "url": "#/visualize/edit/14_%E7%94%B5%E7%AB%99%E7%B1%BB%E5%9E%8B%E5%85%85%E7%94%B5%E9%87%8F",
+          "disabled": false
+        },
+        {
+          "display": "按充电量排名统计",
+          "url": "#/visualize/edit/11_%E6%8C%89%E5%85%85%E7%94%B5%E9%87%8F%E6%8E%92%E5%90%8D",
+          "disabled": false
+        },
+        {
+          "display": "按服务费排名统计",
+          "url": "#/visualize/edit/12_%E6%8C%89%E6%9C%8D%E5%8A%A1%E8%B4%B9%E6%8E%92%E5%90%8D",
+          "disabled": false
+        },
+        {
+          "display": "按订单数排名统计",
+          "url": "#/visualize/edit/13_%E6%8C%89%E8%AE%A2%E5%8D%95%E6%95%B0%E6%8E%92%E5%90%8D",
+          "disabled": false
+        },
+        {
+          "display": "返回",
+          "url": "#/discover/10_%E7%94%B5%E7%AB%99%E8%BF%90%E8%90%A5%E6%97%A5%E6%8A%A5",
+          "disabled": false
+        }
+      ]
+    }
+  }
+]

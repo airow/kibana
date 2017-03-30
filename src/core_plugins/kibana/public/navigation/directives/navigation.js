@@ -14,6 +14,7 @@ uiModules
     template: template,/** 不能使用这种方式 */
     scope: {
       savedObject: '=',
+      urlPrefix: '@',
       // optional make-url attr, sets the userMakeUrl in our scope
       userMakeUrl: '=?makeUrl',
       // optional on-choose attr, sets the userOnChoose in our scope
@@ -29,6 +30,11 @@ uiModules
         let conf_ids_nav = [];
         let conf_ids = [];
         
+        function removeCurrent(item) {
+          let id = encodeURIComponent($scope.savedObject.id);
+          return item.url !== `#/${$scope.urlPrefix}/${id}`;
+        }
+
         navigationArray = navigationArray.filter(nav => {
 
           let returnValue = !nav.disabled;
@@ -60,11 +66,11 @@ uiModules
               navigationArray.splice(startIndex, 1);
             });
 
-            $scope.navigation = navigationArray;
+            $scope.navigation = navigationArray.filter(removeCurrent);
           },
           /** reject */
           function () {
-            $scope.navigation = navigationArray;
+            $scope.navigation = navigationArray.filter(removeCurrent);
           }
         );
       }
