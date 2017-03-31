@@ -47,7 +47,7 @@ module.factory('SavedDashboard', function (courier, config, Private) {
   }
 
   /**是否在编辑界面显示扩展内容 */
-  SavedDashboard.hasUiConf = true;
+  SavedDashboard.hasUiConf = false;
 
   // save these objects with the 'dashboard' type
   SavedDashboard.type = 'dashboard';

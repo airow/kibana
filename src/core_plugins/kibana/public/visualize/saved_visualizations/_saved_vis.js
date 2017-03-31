@@ -54,7 +54,7 @@ uiModules
   }
 
 /**是否在编辑界面显示扩展内容 */
-  SavedVis.hasUiConf = false;
+  SavedVis.hasUiConf = true;
 
   SavedVis.type = 'visualization';
 
