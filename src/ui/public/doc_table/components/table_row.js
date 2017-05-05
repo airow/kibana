@@ -106,7 +106,7 @@ module.directive('kbnTableRow', function ($compile) {
             formatted: _displayField(row, column, true)
           }));
         });
-
+debugger;
         let $cells = $el.children();
         newHtmls.forEach(function (html, i) {
           let $cell = $cells.eq(i);

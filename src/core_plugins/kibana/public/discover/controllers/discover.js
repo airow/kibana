@@ -151,7 +151,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     // console.log(teldConf);
 
     console.log($route.current.locals.savedSearch);
-    
+
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
@@ -160,7 +160,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   const filterManager = Private(FilterManagerProvider);
 
 
-  const discoverExportExcel = Private(DiscoverExportExcelProvider);  
+  const discoverExportExcel = Private(DiscoverExportExcelProvider);
 
   const notify = new Notifier({
     location: 'Discover'
@@ -181,11 +181,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
-  $scope.$on('$destroy', savedSearch.destroy);  
+  $scope.$on('$destroy', savedSearch.destroy);
 
   console.log(savedSearch.uiConf);
   //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
-  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);  
+  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);
 
   function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
@@ -343,7 +343,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   // $scope.$watchCollection('advancedSearch', function () {
   //   alert(1);
   // });
-  
+
   $scope.opts = {
     // number of records to fetch, then paginate through
     //sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
@@ -682,7 +682,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.save();
-    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);    
+    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
 
     //debugger;
     $scope.searchSource
@@ -801,7 +801,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       notify.warning(err + ' Using the default index pattern: "' + loaded.id + '"');
     }
     return loaded;
-  } 
+  }
 
   $scope.test=function () {
     /** debugger; */
@@ -844,7 +844,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     // alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
 
     const requests = requestQueue.getStartable($scope.searchSource._fetchStrategy);
-    
+
     function startRequests(requests) {
       return Promise.map(requests, function (req) {
         //return req;
@@ -897,7 +897,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       });
 
     // let url = "/elasticsearch/export/_msearch";
-    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
+    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';
     // $http.post(url, data)
     //   .then(function successCallback(response) {
     //     console.log(response);
