@@ -169,6 +169,19 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
   $scope.showInterval = false;
 
+  //接收PostMessage发送过来的消息，通过Angular-Post-Message组件
+  let messageIncomingHandler = $scope.$root.$on('$messageIncoming', messageIncoming.bind(this));
+  function messageIncoming(event, data){
+    console.group("kibana");
+    console.log(angular.fromJson(event));
+    console.log(angular.fromJson(data));
+    console.groupEnd();
+  }
+  $scope.$on('$destroy',function() {
+    messageIncomingHandler();
+    messageIncomingHandler = null;
+  });
+
   $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
   };
@@ -442,7 +455,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           $scope.intervalName = 'by ' + buckets[0].buckets.getInterval().description;
         } else {
           $scope.intervalName = 'auto';
-        }        
+        }
       });
 
       $scope.$watchMulti([

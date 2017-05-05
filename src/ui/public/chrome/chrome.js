@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import angular from 'angular';
+import 'angular-post-message';
 
 import metadata from 'ui/metadata';
 import 'babel/polyfill';
@@ -38,7 +39,7 @@ require('./api/theme')(chrome, internals);
 
 chrome.bootstrap = function () {
   chrome.setupAngular();
-  angular.bootstrap(document, ['kibana']);
+  angular.bootstrap(document, ['kibana','ngPostMessage']);
 };
 
 module.exports = chrome;
