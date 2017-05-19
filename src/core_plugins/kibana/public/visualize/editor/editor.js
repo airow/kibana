@@ -127,50 +127,6 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   $scope.$emit('$messageOutgoing', angular.toJson(postData));
 
   this.$scope = $scope;
-  //this.$rootScope=$rootScope;
-  //接收PostMessage发送过来的消息，通过Angular-Post-Message组件
-  let messageIncomingHandler = $scope.$root.$on('$messageIncoming', messageIncoming.bind(this));
-  function messageIncoming(event, data) {
-    console.group("kibana");
-    console.log(angular.fromJson(event));
-    console.log(angular.fromJson(data));
-
-    let eventData = angular.fromJson(data);
-
-    console.group("messageIncoming.data");
-    console.log(eventData)
-
-    let that = this;
-
-    let messageIncomingHandlerConfin = {
-      "timeRangeChanged": function (eventData) {
-        let time = eventData.eventArgs;
-        console.log(time);
-        //debugger;
-        that.$scope.timefilter.time.from = eventData.eventArgs.from;
-        that.$scope.timefilter.time.to = eventData.eventArgs.to;
-
-
-        $("#kibana-body div.application").addClass("tab-dashboard").addClass("theme-dark");
-
-      }
-    };
-
-    let messageIncomingHandler = messageIncomingHandlerConfin[eventData.eventType] || function (eventData) {
-      console.log(`无${eventData.eventType}对应消息的处理方法`);
-    }
-
-    messageIncomingHandler(eventData);
-
-
-    console.groupEnd();
-
-    console.groupEnd();
-  }
-  $scope.$on('$destroy', function () {
-    messageIncomingHandler();
-    messageIncomingHandler = null;
-  });
 
   const $TeldState = $scope.TeldState = new TeldState();
   let teldUser = $scope.teldUser = teldSession.getUser();
