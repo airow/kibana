@@ -169,14 +169,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
   $scope.showInterval = false;
 
-  let postData = {
-    "eventType": "hello",
-    "eventArgs": "I'm from kibana discoverController"
-  };
-  $scope.$emit('$messageOutgoing', angular.toJson(postData));
-
-  postData.eventType = "syncTimeRange";
-  $scope.$emit('$messageOutgoing', angular.toJson(postData));
+  //syncGrafanaTimeRange();
+  tellGrafanaMyLoaded();
 
   this.$scope = $scope;
   //this.$rootScope=$rootScope;
@@ -195,16 +189,20 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     let that = this;
 
     let messageIncomingHandlerConfin = {
+      "grafanaLink": function(eventData){
+        let grafanaTheme = eventData.eventArgs.dashTheme;
+        if (grafanaTheme === "dark") {
+          let kibanaBody = $("#kibana-body").addClass("darkScrollbar").find("div.application").addClass("tab-dashboard");
+          kibanaBody.addClass("theme-dark");
+        }
+        $(".sidebar-collapser").hide();
+        $scope.fetch();
+      },
       "timeRangeChanged": function (eventData) {
         let time = eventData.eventArgs;
         console.log(time);
-        //debugger;
         that.$scope.timefilter.time.from = eventData.eventArgs.from;
         that.$scope.timefilter.time.to = eventData.eventArgs.to;
-
-
-        $("#kibana-body div.application").addClass("tab-dashboard").addClass("theme-dark");
-
       }
     };
 
@@ -228,6 +226,25 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     messageIncomingHandler();
     messageIncomingHandler = null;
   });
+
+  /*通知grafanakibana已经加载完成*/
+  function tellGrafanaMyLoaded(){
+    sendPostMessage("kibanaLoaded", { "message": "Hello, my loaded" });
+  }
+
+  /*同步grafana的时间范围*/
+  function syncGrafanaTimeRange(){
+    sendPostMessage("syncTimeRange",{});
+  }
+
+  function sendPostMessage(eventType, eventArgs) {
+    let postMessage = {
+      "eventType": eventType,
+      "eventArgs": eventArgs
+    };
+    console.log(postMessage);
+    $scope.$emit('$messageOutgoing', angular.toJson(postMessage));
+  }
 
   $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
