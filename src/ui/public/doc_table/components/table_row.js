@@ -7,6 +7,7 @@ import 'ui/filters/trust_as_html';
 import 'ui/filters/short_dots';
 import noWhiteSpace from 'ui/utils/no_white_space';
 import openRowHtml from 'ui/doc_table/components/table_row/open.html';
+import sendPostMessageRowHtml from 'ui/doc_table/components/table_row/sendPostMessage.html';
 import detailsHtml from 'ui/doc_table/components/table_row/details.html';
 import uiModules from 'ui/modules';
 let module = uiModules.get('app/discover');
@@ -24,9 +25,10 @@ let MIN_LINE_LENGTH = 20;
  * <tr ng-repeat="row in rows" kbn-table-row="row"></tr>
  * ```
  */
-module.directive('kbnTableRow', function ($compile) {
+module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
   let cellTemplate = _.template(noWhiteSpace(require('ui/doc_table/components/table_row/cell.html')));
   let truncateByHeightTemplate = _.template(noWhiteSpace(require('ui/partials/truncate_by_height.html')));
+
 
   return {
     restrict: 'A',
@@ -35,6 +37,39 @@ module.directive('kbnTableRow', function ($compile) {
       filter: '=',
       indexPattern: '=',
       row: '=kbnTableRow'
+    },
+    controller: function ($scope, advancedSearch, TeldState, globalState, teldSession, timefilter) {
+
+      $scope.$TeldState = new TeldState();
+      $scope.advancedSearch=advancedSearch;
+      $scope.sendPostMessage = function () {
+        debugger;
+        let postData = {
+          "response": "I'm kibana", "row": this.row,
+          TeldState: $scope.$TeldState, advancedSearch: $scope.advancedSearch
+        };
+        this.$emit('$messageOutgoing', angular.toJson(postData));
+      }
+
+      $scope.rowSelected = function () {
+        let postMessage = {
+          "eventType" : "kibana.RowSelected",
+          "eventArgs" : {
+            "row": this.row,
+            "timeRange": timefilter.getActiveBounds(),
+            "advancedSearch": $scope.advancedSearch,
+            "TeldState": $scope.$TeldState
+          }
+        };
+
+        if (this.$root.embedded.selectRowId != this.row._id) {
+          this.$root.embedded.selectRowId = this.row._id;
+        } else {
+          this.$root.embedded.selectRowId = null
+        }
+        console.log(postMessage);
+        this.$emit('$messageOutgoing', angular.toJson(postMessage));
+      }
     },
     link: function ($scope, $el) {
       $el.after('<tr>');
@@ -75,6 +110,11 @@ module.directive('kbnTableRow', function ($compile) {
         $compile($detailsTr)($detailsScope);
       };
 
+      // $scope.sendPostMessage = function(){
+      //     debugger;
+      //     this.$emit('$messageOutgoing', angular.toJson({"response" : "I'm kibana","row":this.row}));
+      // }
+
       $scope.$watchMulti([
         'indexPattern.timeFieldName',
         'row.highlight',
@@ -89,7 +129,8 @@ module.directive('kbnTableRow', function ($compile) {
 
         // We just create a string here because its faster.
         let newHtmls = [
-          openRowHtml
+          openRowHtml,
+          sendPostMessageRowHtml
         ];
 
         if (indexPattern.timeFieldName) {
@@ -106,7 +147,7 @@ module.directive('kbnTableRow', function ($compile) {
             formatted: _displayField(row, column, true)
           }));
         });
-debugger;
+
         let $cells = $el.children();
         newHtmls.forEach(function (html, i) {
           let $cell = $cells.eq(i);
@@ -129,6 +170,10 @@ debugger;
           $cells = $el.children();
 
           if (i === 0 && !reuse) {
+            $toggleScope = $scope.$new();
+            $compile($target)($toggleScope);
+          }
+          if (i === 1 && !reuse) {
             $toggleScope = $scope.$new();
             $compile($target)($toggleScope);
           }

@@ -17,7 +17,7 @@ uiModules.get('kibana')
     template: html,
     scope: {
       sorting: '=',
-      columns: '=',      
+      columns: '=',
       hits: '=?', // You really want either hits & indexPattern, OR searchSource
       indexPattern: '=?',
       searchSource: '=?',
@@ -55,6 +55,14 @@ uiModules.get('kibana')
       $scope.addRows = function () {
         $scope.limit += 50;
       };
+
+      $scope.selectRowStyle = function (row) {
+        var style = {};
+        if (this.$root.embedded && row._id === this.$root.embedded.selectRowId) {
+          style = { color: 'chartreuse' };
+        }
+        return style;
+      }
 
       // This exists to fix the problem of an empty initial column list not playing nice with watchCollection.
       $scope.$watch('columns', function (columns) {
@@ -114,7 +122,7 @@ uiModules.get('kibana')
           };
 
           //2017-02-17 00:32:09 父子通信
-          $scope.$emit('doc_table.hits.onResults', results);  
+          $scope.$emit('doc_table.hits.onResults', results);
 
           return $scope.searchSource.onResults().then(onResults);
         }).catch(notify.fatal);
