@@ -59,7 +59,7 @@ uiModules.get('kibana')
       $scope.selectRowStyle = function (row) {
         var style = {};
         if (this.$root.embedded && row._id === this.$root.embedded.selectRowId) {
-          style = { color: 'chartreuse' };
+          style = { color: 'rgba(50, 172, 45, 0.97)' };
         }
         return style;
       }
