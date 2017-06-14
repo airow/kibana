@@ -7,10 +7,10 @@ const module = uiModules.get('apps/advanced_search');
 
 // This is the only thing that gets injected into controllers
 module.service('advancedSearch', function (Promise, getAppState) {
-  
+
   this.fieldTypes = ["string", "number", "date", "boolean"];
 
-  this.getFieldSource = function (indexPattern) {    
+  this.getFieldSource = function (indexPattern) {
     let appState = getAppState();
     let columns = appState && appState.columns ? appState.columns : [];
     let aliasColumns = [];
@@ -21,7 +21,7 @@ module.service('advancedSearch', function (Promise, getAppState) {
     let timeFieldName = indexPattern.timeFieldName;
 
     let keywords = {};
-    
+
     let fieldSource = fields.filter(field => {
 
       //let returnValue = metaFields.indexOf(field.name) < 0 && field.searchable && field.analyzed == false;
@@ -67,7 +67,7 @@ module.service('advancedSearch', function (Promise, getAppState) {
       }
       return returnValue;
     });
-    
+
     /*设置了别名的字段靠前显示*/
     //fieldSource = _.sortByOrder(fieldSource, ['alias'], ['asc']);
     /**
@@ -127,9 +127,13 @@ module.service('advancedSearch', function (Promise, getAppState) {
             returnValue = [field.typeOperators.find(operator => {
               return operator.operatorKey === operatorKey;
             })];
+
+            returnValue.push(field.typeOperators.find(operator => {
+              return operator.operatorKey === 'string_wildcard';
+            }))
           }
           break;
-      }      
+      }
     }
     return returnValue;
   }
@@ -166,7 +170,7 @@ module.service('advancedSearch', function (Promise, getAppState) {
 
             let operatorExt = _.clone(operator.ext);
 
-            //处理字符类型 =,like 
+            //处理字符类型 =,like
             if (operator.strategy) {
               switch (operator.strategy) {
                 case ".keyword":
@@ -207,6 +211,19 @@ module.service('advancedSearch', function (Promise, getAppState) {
                 }
                 newLink[operator.link] = fieldVaue;
                 break;
+              case "wildcard":
+                newCondition[operator.keyword] = newOperator;
+                //fieldVaue = (fieldVaue || "").toLowerCase();
+                //newOperator[fieldName] = `*${fieldVaue}*`;
+                newOperator[fieldName] = fieldVaue;
+                if (false == isEsQueryDSL) {
+                  newOperator.conf = {
+                    "disabled": selected.disabled,
+                    "operatorKey": operator.operatorKey
+                  };
+                }
+                //newLink[operator.link] = fieldVaue;
+                break;
             }
 
             if (operatorExt) {
@@ -237,6 +254,24 @@ module.service('advancedSearch', function (Promise, getAppState) {
       if (fieldName) {
         let link = _.keys(condition[keyword][fieldName])[0];
         let selectValue = condition[keyword][fieldName][link];
+
+        let selectField = fieldSource.find(field => { return field.asFieldName === fieldName || field.name === fieldName });
+
+        let conf = condition[keyword]["conf"] || {};
+
+        let selectOperator = selectField.typeOperators.find(operator => {
+          return operator.operatorKey === conf.operatorKey;
+        });
+        selected = { value: selectValue, field: selectField, operator: selectOperator, disabled: conf.disabled };
+      }
+    });
+
+    ['wildcard'].forEach(keyword => {
+      let keys = _.keys(condition[keyword]);
+      let fieldName = keys.find(key => { return key !== "conf" });
+      if (fieldName) {
+        //let link = _.keys(condition[keyword][fieldName])[0];
+        let selectValue = condition[keyword][fieldName];
 
         let selectField = fieldSource.find(field => { return field.asFieldName === fieldName || field.name === fieldName });
 

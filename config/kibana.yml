@@ -26,6 +26,8 @@ server.port: 443
 #elasticsearch.url: "http://hdpjntest.es.localhost:9202"
 #elasticsearch.url: "http://hdpjntest.es.localhost:9202" #开发环境
 #elasticsearch.url: "http://hdpjntest.es.localhost:12200" #济南测试es
+elasticsearch.url: "http://hdpjntest.chinacloudapp.cn:12200" #济南测试es
+
 
 # When this setting’s value is true Kibana uses the hostname specified in the server.host
 # setting. When the value of this setting is false, Kibana uses the hostname of the host
