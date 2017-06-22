@@ -52,21 +52,22 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       }
 
       $scope.rowSelected = function () {
-        let postMessage = {
-          "eventType" : "kibana.RowSelected",
-          "eventArgs" : {
-            "row": this.row,
-            "timeRange": timefilter.getActiveBounds(),
-            "advancedSearch": $scope.advancedSearch,
-            "TeldState": $scope.$TeldState
-          }
-        };
-
         if (this.$root.embedded.selectRowId != this.row._id) {
           this.$root.embedded.selectRowId = this.row._id;
         } else {
           this.$root.embedded.selectRowId = null
         }
+
+        let postMessage = {
+          "eventType": "kibana.RowSelected",
+          "eventArgs": {
+            "row": this.row,
+            "timeRange": timefilter.getActiveBounds(),
+            "advancedSearch": $scope.advancedSearch,
+            "TeldState": $scope.$TeldState,
+            "isSelected": this.$root.embedded.selectRowId !== null
+          }
+        };
         console.log(postMessage);
         this.$emit('$messageOutgoing', angular.toJson(postMessage));
       }
