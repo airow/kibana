@@ -4,6 +4,9 @@
 
   .advancedSearch .filter-bar{padding: 0px;}
 
+  .embedGrafana .localNav * {font-size: 12px}
+  .embedGrafana .advancedSearch .filter-bar{font-size: 12px}
+
   table.advancedSearch {
     margin: 0px;
   }
@@ -37,7 +40,7 @@
 }
 
 .teld-modal .modal-header{
-  background-color: #f5f5f5; 
+  background-color: #f5f5f5;
   padding: 10px 15px 10px 20px;
 }
 
@@ -46,8 +49,8 @@
 }
 
 .teld-modal .modal-footer{
-  padding-top: 12px; 
-  padding-bottom: 14px; 
-  border-top: 0; 
+  padding-top: 12px;
+  padding-bottom: 14px;
+  border-top: 0;
   background-color: #f5f5f5;
 }

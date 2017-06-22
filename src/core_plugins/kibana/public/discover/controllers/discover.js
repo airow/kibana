@@ -192,7 +192,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       "grafanaLink": function(eventData){
         let grafanaTheme = eventData.eventArgs.dashTheme;
         if (grafanaTheme === "dark") {
-          let kibanaBody = $("#kibana-body").addClass("darkScrollbar").find("div.application").addClass("tab-dashboard");
+          let kibanaBody = $("#kibana-body").addClass('embedGrafana').addClass("darkScrollbar").find("div.application").addClass("tab-dashboard");
           kibanaBody.addClass("theme-dark");
         }
         $(".sidebar-collapser").hide();
