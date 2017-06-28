@@ -26,11 +26,15 @@ export default function IndexPatternFieldType() {
             { display: "精确", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { display: "模糊", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
             { display: "分词", keyword: "match", link: "query", strategy: '.keyword' },
-            */
+
             { operatorKey:'string_equal', display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { operatorKey:'string_contain', display: "包含", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
             //{ operatorKey:'string_contain', display: "包含", keyword: "wildcard", link: "value" },
             { operatorKey:'string_wildcard', display: "通配符", keyword: "wildcard", link: "value" },
+            */
+            // { operatorKey:'string_equal', display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { operatorKey: 'string_equal', display: "等于", keyword: "term", link: "value" },
+            { operatorKey:'string_contain', display: "包含", keyword: "teld_contain", link: "query", ext:{"type": "phrase"} },
           ]
       },
       { name: 'number',     operators: [

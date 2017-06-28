@@ -117,21 +117,26 @@ module.service('advancedSearch', function (Promise, getAppState) {
 
       switch (field.type) {
         case "string":
-          if (false == field.hasKeyword) {
-
-            let operatorKey = "string_equal";
-            if (field.analyzed) {
-              operatorKey = "string_contain";
-            }
-
+          if (false == field.hasKeyword && field.analyzed) {
             returnValue = [field.typeOperators.find(operator => {
-              return operator.operatorKey === operatorKey;
+              return operator.operatorKey === "string_contain";
             })];
-
-            returnValue.push(field.typeOperators.find(operator => {
-              return operator.operatorKey === 'string_wildcard';
-            }))
           }
+          // if (false == field.hasKeyword) {
+
+          //   let operatorKey = "string_equal";
+          //   if (field.analyzed) {
+          //     operatorKey = "string_contain";
+          //   }
+
+          //   // returnValue = [field.typeOperators.find(operator => {
+          //   //   return operator.operatorKey === operatorKey;
+          //   // })];
+
+          //   // returnValue = [field.typeOperators.find(operator => {
+          //   //   return operator.operatorKey === 'string_equal' || operator.operatorKey === 'string_contain';
+          //   // })];
+          // }
           break;
       }
     }
@@ -198,7 +203,31 @@ module.service('advancedSearch', function (Promise, getAppState) {
             let newLink = {};
 
             switch (operator.keyword) {
+              case "teld_contain":  //包含
+                if (selected.field.analyzed) {
+                  newCondition["match"] = newOperator;
+                  newOperator[fieldName] = newLink;
+                  if (false == isEsQueryDSL) {
+                    newOperator.conf = {
+                      "disabled": selected.disabled,
+                      "operatorKey": operator.operatorKey
+                    };
+                  }
+                  newLink["query"] = fieldVaue;
+                } else {
+                  newCondition["wildcard"] = newOperator;
+                  newOperator[fieldName] = `*${fieldVaue}*`;
+                  if (false == isEsQueryDSL) {
+                    newOperator.conf = {
+                      "disabled": selected.disabled,
+                      "operatorKey": operator.operatorKey
+                    };
+                  }
+                }
+                break;
+
               case "match":
+              case "match_phrase":
               case "range":
               case "term":
                 newCondition[operator.keyword] = newOperator;
@@ -211,7 +240,7 @@ module.service('advancedSearch', function (Promise, getAppState) {
                 }
                 newLink[operator.link] = fieldVaue;
                 break;
-              case "wildcard":
+              case "wildcard_bak":
                 newCondition[operator.keyword] = newOperator;
                 //fieldVaue = (fieldVaue || "").toLowerCase();
                 //newOperator[fieldName] = `*${fieldVaue}*`;
@@ -272,6 +301,10 @@ module.service('advancedSearch', function (Promise, getAppState) {
       if (fieldName) {
         //let link = _.keys(condition[keyword][fieldName])[0];
         let selectValue = condition[keyword][fieldName];
+        let r = /\*(.*)\*/.exec(selectValue);
+        if (r) {
+          selectValue = r[1];
+        }
 
         let selectField = fieldSource.find(field => { return field.asFieldName === fieldName || field.name === fieldName });
 

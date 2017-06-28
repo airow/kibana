@@ -196,6 +196,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           kibanaBody.addClass("theme-dark");
         }
         $(".sidebar-collapser").hide();
+        $scope.topNavMenuSwitch = eventData.eventArgs.topNavMenu;
         $scope.fetch();
       },
       "timeRangeChanged": function (eventData) {
@@ -467,7 +468,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     });
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
-    $scope.updateDataSource()
+    $scope.updateDataSource().then(dddd)
       .then(function () {
         $scope.$listen(timefilter, 'fetch', function () {
           $scope.fetch();
@@ -485,9 +486,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
         // update data source when filters update
         $scope.$listen(queryFilter, 'update', function () {
-          return $scope.updateDataSource().then(function () {
+          return $scope.updateDataSource().then(dddd)
+          .then(function () {
             $state.save();
-          });
+          })
         });
 
         // update data source when hitting forward/back and the query changes
@@ -580,11 +582,14 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
             $state.replace();
             $scope.$emit('application.load');
           });
+      })
+      .then(function () {
+        $state.query = $scope.dddquery;
       });
   });
 
   $scope.opts.saveDataSource = function () {
-    return $scope.updateDataSource()
+    return $scope.updateDataSource().then(dddd)
       .then(function () {
         savedSearch.id = savedSearch.title;
         savedSearch.columns = $scope.state.columns;
@@ -625,7 +630,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     $scope.updateTime();
 
-    $scope.updateDataSource()
+    $scope.updateDataSource().then(dddd)
       .then(setupVisualization)
       .then(function () {
         $state.save();
@@ -754,7 +759,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.newQuery = function () {
     kbnUrl.change('/discover');
   };
-
+  $scope.dddquery = {};
+  function dddd() {
+    $state.query = $scope.dddquery;
+  };
   $scope.updateDataSource = Promise.method(function () {
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
@@ -768,10 +776,34 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       "eventArgs": {"esQueryDSL":esQueryDSL}
     };
     $scope.$emit('$messageOutgoing', angular.toJson(postData));
+    $scope.dddquery = $state.query;
+    let query = $state.query;
+    if (query.query_string && query.query_string.query != "*") {
+      query = _.cloneDeep($state.query);
+
+      let dun = query.query_string.query.split(/\s+(and|or)\s+/gi);
+      let itemReg = /(.*):["']?.*["']?/gi;
+      let dum2 = dun.map(item => {
+
+        let r = itemReg.exec(item);
+        if (r) {
+          let name = r[1];
+          let field = _.find($scope.indexPattern.fields, { 'alias': name });
+          if (field) {
+            item = item.replace(new RegExp(field.alias + ":"), field.name + ":");
+          }
+        }
+        return item;
+      });
+
+      query.query_string.query = dum2.join(" ");
+    }
 
     $scope.searchSource
       .size($scope.opts.sampleSize)
-      .sort(getSort($state.sort, $scope.indexPattern)).query(!$state.query ? null : $state.query)
+      .sort(getSort($state.sort, $scope.indexPattern))
+      //.query(!$state.query ? null : $state.query)
+      .query(query)
       .set('filter', queryFilter.getFilters())
       .set('advancedSearch', esQueryDSL);
 
