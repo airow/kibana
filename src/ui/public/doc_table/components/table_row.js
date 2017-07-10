@@ -36,7 +36,8 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       columns: '=',
       filter: '=',
       indexPattern: '=',
-      row: '=kbnTableRow'
+      row: '=kbnTableRow',
+      rowIndex: '=?'
     },
     controller: function ($scope, advancedSearch, TeldState, globalState, teldSession, timefilter) {
 
@@ -52,24 +53,26 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       }
 
       $scope.rowSelected = function () {
-        if (this.$root.embedded.selectRowId != this.row._id) {
-          this.$root.embedded.selectRowId = this.row._id;
-        } else {
-          this.$root.embedded.selectRowId = null
-        }
-
-        let postMessage = {
-          "eventType": "kibana.RowSelected",
-          "eventArgs": {
-            "row": this.row,
-            "timeRange": timefilter.getActiveBounds(),
-            "advancedSearch": $scope.advancedSearch,
-            "TeldState": $scope.$TeldState,
-            "isSelected": this.$root.embedded.selectRowId !== null
+        if (this.$root.embedded) {
+          if (this.$root.embedded.selectRowId != this.row._id) {
+            this.$root.embedded.selectRowId = this.row._id;
+          } else {
+            this.$root.embedded.selectRowId = null
           }
-        };
-        console.log(postMessage);
-        this.$emit('$messageOutgoing', angular.toJson(postMessage));
+
+          let postMessage = {
+            "eventType": "kibana.RowSelected",
+            "eventArgs": {
+              "row": this.row,
+              "timeRange": timefilter.getActiveBounds(),
+              "advancedSearch": $scope.advancedSearch,
+              "TeldState": $scope.$TeldState,
+              "isSelected": this.$root.embedded.selectRowId !== null
+            }
+          };
+          console.log(postMessage);
+          this.$emit('$messageOutgoing', angular.toJson(postMessage));
+        }
       }
     },
     link: function ($scope, $el) {
@@ -115,6 +118,11 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       //     debugger;
       //     this.$emit('$messageOutgoing', angular.toJson({"response" : "I'm kibana","row":this.row}));
       // }
+      //嵌入模式，默认选择
+      if ($scope.$root.embedded && $scope.rowIndex === $scope.$root.initRowSelectIndex) {
+        $scope.rowSelected();
+      }
+
 
       $scope.$watchMulti([
         'indexPattern.timeFieldName',

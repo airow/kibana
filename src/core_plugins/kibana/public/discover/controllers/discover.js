@@ -197,6 +197,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         }
         $(".sidebar-collapser").hide();
         $scope.topNavMenuSwitch = eventData.eventArgs.topNavMenu;
+        $rootScope.initRowSelectIndex = eventData.eventArgs.initRowSelectIndex;
         $scope.fetch();
       },
       "timeRangeChanged": function (eventData) {

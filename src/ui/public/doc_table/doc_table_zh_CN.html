@@ -31,6 +31,7 @@
     <tbody>
       <tr ng-repeat="row in hits|limitTo:limit track by row._index+row._type+row._id+row._score"
         kbn-table-row="row"
+        row-index="$index"
         columns="columns"
         sorting="sorting"
         index-pattern="indexPattern"
