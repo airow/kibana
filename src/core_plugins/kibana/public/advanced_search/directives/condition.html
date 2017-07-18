@@ -64,18 +64,18 @@
               </div>
             </div>
             <div class="row" ng-switch-default>
-              <div class="col-xs-4">
+              <div class="col-sm-4 col-xs-12">
                 <select class="form-control" ng-disabled="condition.selected.disabled" ng-change='fieldChange()' ng-model="condition.selected.field" ng-options="field.alias||field.asFieldName for field in fieldSource">
                   <!--<option></option>-->
                 </select>
               </div>
-              <div class="col-xs-2">
+              <div class="col-sm-2 col-xs-12">
                 <!--<select class="form-control" ng-disabled="condition.selected.disabled" ng-model="condition.selected.operator" required ng-options="operator.display for operator in condition.selected.field.typeOperators">-->
                 <select class="form-control" ng-disabled="condition.selected.disabled"  ng-model="condition.selected.operator" ng-options="operator.display for operator in filterOperator()">
                   <!--<option></option>-->
                 </select>
               </div>
-              <div class="col-xs-4" ng-switch="condition.selected.field.type">
+              <div class="col-sm-4 col-xs-12" ng-switch="condition.selected.field.type">
                 <div ng-switch-when='number'>
                   <input ng-disabled="condition.selected.disabled" type="number" class="form-control" ng-model="condition.selected.value"/>
                 </div>

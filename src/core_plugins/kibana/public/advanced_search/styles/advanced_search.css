@@ -15,10 +15,11 @@
   .embedGrafana .localNav * {font-size: 12px}
   .embedGrafana .advancedSearch .filter-bar{font-size: 12px}
 
+  .embedGrafana .localMenu {margin-right: 10px;}
 
   .embedGrafana .embedGrafanaHide
   {
-    display: none !important;
+     display: none !important;
   }
 
   table.advancedSearch {
