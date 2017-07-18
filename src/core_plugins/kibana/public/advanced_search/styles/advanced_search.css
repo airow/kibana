@@ -1,3 +1,11 @@
+
+  .displayCount{
+    display: -webkit-flex;
+    display:flex;
+    flex: 0 0 auto;
+  }
+
+
   .advancedSearch button[data-bool='must'] { cursor: default; background-color: cornflowerblue; }
   .advancedSearch button[data-bool='should'] { cursor: default; background-color: yellowgreen; }
   .advancedSearch button[data-bool='must_not'] { cursor: default; background-color: red; }
@@ -6,6 +14,12 @@
 
   .embedGrafana .localNav * {font-size: 12px}
   .embedGrafana .advancedSearch .filter-bar{font-size: 12px}
+
+
+  .embedGrafana .embedGrafanaHide
+  {
+    display: none !important;
+  }
 
   table.advancedSearch {
     margin: 0px;

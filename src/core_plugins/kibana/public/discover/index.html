@@ -7,7 +7,7 @@
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="localBreadcrumbs">
         <div class="localBreadcrumb">
-          <span ng-show="opts.savedSearch.id" class="localBreadcrumb__emphasis">
+          <span ng-show="opts.savedSearch.id" class="embedGrafanaHide localBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="::opts.savedSearch.title"></span>
             <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
           </span>
@@ -32,7 +32,7 @@
             </select>-->
             <ui-conf-top sample-size="opts.sampleSize"></ui-conf-top>
             <!--<input class="localSearchInput" style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" step="50" value="{{opts.sampleSize}}" type="number" placeholder="PageSize">            -->
-            <label style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
+            <label class="embedGrafanaHide" style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
             <input
               parse-query
               input-focus
