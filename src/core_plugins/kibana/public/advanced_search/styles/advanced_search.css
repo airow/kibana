@@ -17,9 +17,9 @@
 
   .embedGrafana .localMenu {margin-right: 10px;}
 
-  .embedGrafana .embedGrafanaHide
-  {
-     display: none !important;
+  .embedGrafana .vis-editor-content .vis-editor-content,
+  .embedGrafana .vis-editor-content .sidebar-collapser{
+    display: none !important;
   }
 
   table.advancedSearch {

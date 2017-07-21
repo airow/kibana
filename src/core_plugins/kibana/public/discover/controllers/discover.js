@@ -191,14 +191,21 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     let messageIncomingHandlerConfin = {
       "grafanaLink": function(eventData){
         let grafanaTheme = eventData.eventArgs.dashTheme;
+
+        $rootScope.embedGrafana = $rootScope.embedGrafana || {};
+        $rootScope.embedGrafana.kibanaConf = eventData.eventArgs.kibanaConf;
+
         let kibanaBody = $("#kibana-body").addClass('embedGrafana');
         if (grafanaTheme === "dark") {
-          let kibanaApp = kibanaBody.addClass("darkScrollbar").find("div.application").addClass("tab-dashboard");
-          kibanaApp.addClass("theme-dark");
+          let kibanaApp = kibanaBody.addClass("darkScrollbar").find("div.application");
+          //kibanaApp.addClass("tab-dashboard").addClass("theme-dark");
+          $rootScope.embedGrafana.kibanaConf.themeClass = "tab-dashboard theme-dark";
         }
         $(".sidebar-collapser").hide();
         $scope.topNavMenuSwitch = eventData.eventArgs.topNavMenu;
         $rootScope.initRowSelectIndex = eventData.eventArgs.initRowSelectIndex;
+
+
         $scope.fetch();
       },
       "timeRangeChanged": function (eventData) {
