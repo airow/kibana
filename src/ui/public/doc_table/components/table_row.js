@@ -202,6 +202,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
        */
       function _displayField(row, fieldName, truncate) {
         let indexPattern = $scope.indexPattern;
+        urlFormat(indexPattern, fieldName, row); /** 对rul格式化特殊处理，支持row数据 */
         let text = indexPattern.formatField(row, fieldName);
 
         if (truncate && text.length > MIN_LINE_LENGTH) {
@@ -211,6 +212,25 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
         }
 
         return text;
+      }
+
+      function urlFormat(indexPattern, fieldName, row) {
+        let field = indexPattern.fields.byName[fieldName];
+        //let field = _.find(indexPattern.fields, { name: fieldName });
+        if (field && field.format && field.format.type) {
+          switch (field.format.type.id) {
+            case 'url':
+
+              //let confUrlTemplate = field.format._params.confUrlTemplate = field.format._params.confUrlTemplate || field.format._params.urlTemplate;
+              if (field.format._params.confUrlTemplate === undefined) {
+                field.format._params.confUrlTemplate = field.format._params.urlTemplate;
+              }
+              let confUrlTemplate = field.format._params.confUrlTemplate;
+
+              field.format._params.urlTemplate = _.template(confUrlTemplate)(row);
+              break;
+          }
+        }
       }
     }
   };

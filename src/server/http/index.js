@@ -162,6 +162,8 @@ module.exports = async function (kbnServer, server, config) {
   server.exposeStaticDir('/doc/{path*}', resolve(__dirname, '../../ui/public/assets/doc'));
   // 模板文件
   server.exposeStaticDir('/tmpl/{path*}', resolve(__dirname, '../../ui/public/assets/tmpl'));
+  // 静态html
+  server.exposeStaticDir('/httpd/{path*}', resolve(__dirname, '../../ui/public/assets/httpd'));
 
   kbnServer.mixin(versionCheckMixin);
 
