@@ -23,7 +23,7 @@ $(function () {
 
   function c(state, value) {
     var coord = value.coord.split(',');
-    return { state: state, name: value.name, x: coord[1], y: coord[0] };
+    return { state: state, name: value.name, x: coord[1], y: coord[0], distance: parseFloat(value.distance) };
   }
 
   console.log(rison.encode(gis));
@@ -44,7 +44,7 @@ $(function () {
   map.centerAndZoom(new BMap.Point(PointArr[0].x, PointArr[0].y), 14);  // 初始化地图,设置中心点坐标和地图级别
   //在地图上标记这三个点,不同状态添加不同图标
   for (var i = 0; i < PointArr.length; i++) {
-    addMarker(new BMap.Point(PointArr[i].x, PointArr[i].y), PointArr[i].name, PointArr[i].state);
+    addMarker(new BMap.Point(PointArr[i].x, PointArr[i].y), PointArr[i].name, PointArr[i].state, PointArr);
   }
   //第一个第二个点画线
   var polyline = new BMap.Polyline([
@@ -64,7 +64,7 @@ $(function () {
  * 标记
  * @param {Object} point
  */
-function addMarker(point, name, state) {
+function addMarker(point, name, state, pointArr) {
 
   if (state == '1') {
     var myIcon = new BMap.Icon('css/img/icon_teld_charger.svg', new BMap.Size(45, 45), {
@@ -76,27 +76,34 @@ function addMarker(point, name, state) {
     //                var marker = new BMap.Marker(new_point);  // 创建标注
     map.addOverlay(marker);               // 将标注添加到地图中
     // marker2.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
-    setInfoBox(name, marker);
+
+    var html = [name,
+      "",
+      "距运维公司：" + pointArr[1].name + pointArr[1].distance + "千米",
+      "距最近运维公司：" + pointArr[2].name + pointArr[2].distance + "千米",
+    ];
+
+    setInfoBox(html.join("<br>"), marker, new BMap.Size(-10, -70));
   } else if (state == '2') {
-    var myIcon = new BMap.Icon('css/img/icon_teld_car06.svg', new BMap.Size(45, 45), {
-      anchor: new BMap.Size(20, 45)//这句表示图片相对于所加的点的位置mapStart
-      // offset: new BMap.Size(-10, 45), // 指定定位位置
-      // imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
+    var myIcon = new BMap.Icon('css/img/icon_teld_maintain.png', new BMap.Size(45, 45), {
+      anchor: new BMap.Size(20, 45),//这句表示图片相对于所加的点的位置mapStart
+       //offset: new BMap.Size(0, 0), // 指定定位位置
+       imageOffset: new BMap.Size(0, 10) // 设置图片偏移
     });
     var marker = new BMap.Marker(point, { icon: myIcon });  // 创建标注
     //                var marker = new BMap.Marker(new_point);  // 创建标注
     map.addOverlay(marker);               // 将标注添加到地图中
     // marker2.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
-    setInfoBox(name, marker);
+    setInfoBox(name, marker, new BMap.Size(-10, -15));
   }
 
 
 }
 //加信息提示的文字方法
-function setInfoBox(name, marker) {
+function setInfoBox(name, marker, offset) {
   // var marker = new BMap.Marker(point);
   var label = new BMap.Label(name, {
-    offset: new BMap.Size(-10, -20)
+    offset: offset || new BMap.Size(-10, -20)
   });
   marker.setLabel(label);
 
