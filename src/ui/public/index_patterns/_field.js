@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import ObjDefine from 'ui/utils/obj_define';
 import IndexPatternsFieldFormatFieldFormatProvider from 'ui/index_patterns/_field_format/field_format';
 import IndexPatternsFieldTypesProvider from 'ui/index_patterns/_field_types';
@@ -34,7 +35,7 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
     }
 
     if (!type) type = fieldTypes.byName.unknown;
-    
+
     let format = spec.format;
     if (!format || !(format instanceof FieldFormat)) {
       format = indexPattern.fieldFormatMap[spec.name] || fieldFormats.getDefaultInstance(spec.type);
@@ -58,11 +59,23 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       obj.fact('typeOperators');
 
 
-      let selectable = spec.selectConf && spec.selectConf.enable;
-      obj.fact('selectable', selectable);
-      obj.writ('selectConf', selectable ? spec.selectConf : null);
+      // let selectable = spec.selectConf && spec.selectConf.enable;
+      // obj.fact('selectable', selectable);
+      // obj.writ('selectConf', selectable ? spec.selectConf : null);
 
-      obj.writ('alias');
+      //obj.writ('alias');
+      let originalField = _.find(indexPattern.fields, { name: spec.name });
+      if (originalField && originalField.alias) {
+        obj.writ('alias', originalField.alias);
+      } else {
+        obj.writ('alias');
+      }
+
+      if (originalField) {
+        let selectable = originalField.selectConf && originalField.selectConf.enable;
+        obj.fact('selectable', selectable);
+        obj.writ('selectConf', originalField.selectConf);
+      }
     }
     obj.writ('count', spec.count || 0);
 
