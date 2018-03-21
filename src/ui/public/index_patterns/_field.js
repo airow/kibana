@@ -66,7 +66,11 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       //obj.writ('alias');
       let originalField = _.find(indexPattern.fields, { name: spec.name });
       if (originalField && originalField.alias) {
-        obj.writ('alias', originalField.alias);
+        var alias = originalField.alias;
+        if (spec.alias && alias !== spec.alias) {
+          alias = spec.alias;
+        }
+        obj.writ('alias', alias);
       } else {
         obj.writ('alias');
       }
