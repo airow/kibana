@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import moment from 'moment';
 import 'ui/highlight';
 import 'ui/highlight/highlight_tags';
 import 'ui/doc_viewer';
@@ -28,6 +29,7 @@ let MIN_LINE_LENGTH = 20;
 module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
   let cellTemplate = _.template(noWhiteSpace(require('ui/doc_table/components/table_row/cell.html')));
   let truncateByHeightTemplate = _.template(noWhiteSpace(require('ui/partials/truncate_by_height.html')));
+  //let moment = require('moment');
 
 
   return {
@@ -214,6 +216,21 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
         return text;
       }
 
+      var urlFormatHelper = {
+        data: {
+          now: function () { return moment(); },
+          addHours: function (val, set) {
+            return moment(val).add(set, 'h');
+          },
+          addMinutes: function (val, set) {
+            return moment(val).add(set, 'm');
+          },
+          addDays: function (val, set) {
+            return moment(val).add(set, 'd');
+          }
+        }
+      };
+
       function urlFormat(indexPattern, fieldName, row) {
         let field = indexPattern.fields.byName[fieldName];
         //let field = _.find(indexPattern.fields, { name: fieldName });
@@ -227,7 +244,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
               }
               let confUrlTemplate = field.format._params.confUrlTemplate;
 
-              field.format._params.urlTemplate = _.template(confUrlTemplate)(row);
+              field.format._params.urlTemplate = _.template(confUrlTemplate, { imports: { moment: moment, helper: urlFormatHelper } })(row);
               break;
           }
         }
