@@ -217,7 +217,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       }
 
       var urlFormatHelper = {
-        data: {
+        date: {
           now: function () { return moment(); },
           addHours: function (val, set) {
             return moment(val).add(set, 'h');
