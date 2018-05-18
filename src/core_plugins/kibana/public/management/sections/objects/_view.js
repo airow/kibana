@@ -135,7 +135,7 @@ uiModules.get('apps/management')
       .then(function (obj) {
 
         // /** 处理功能菜单 */
-        // obj._source.menus = obj._source.menus || [];        
+        // obj._source.menus = obj._source.menus || [];
 
         // let uiConfProvider = {
         //   'search': Private(DiscoverUiConfProvider),
@@ -154,7 +154,7 @@ uiModules.get('apps/management')
             "disabled": true
           }
           /** 默认显示配置项 */
-          let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
+          let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
 
           obj._source.uiConf = obj._source.uiConf || {};
 
@@ -163,7 +163,7 @@ uiModules.get('apps/management')
               obj._source.uiConf[key] = uiConf_default[key];
             }
           }
-        }       
+        }
 
         $scope.obj = obj;
         $scope.link = service.urlFor(obj._id);

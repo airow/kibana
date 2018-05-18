@@ -435,6 +435,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     // number of records to fetch, then paginate through
     //sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
     sampleSize: parseInt(savedSearch.uiConf.pageSize || config.get('discover:sampleSize')),
+    sizeRange: savedSearch.uiConf.sizeRange || [],
     //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,

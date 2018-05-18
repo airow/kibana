@@ -11,13 +11,19 @@ uiModules
     replace: true,
     template: uiConfTopTemplate,
     scope : {
-      size: '=sampleSize'
+      size: '=sampleSize',
+      sizeRange: '=sizeRange'
     },
     controller: function ($scope) {
       let def_Sizes = [500, 1000, 5000, 10000];
       //let yml_sampleSize =  config.get('discover:sampleSize');
       let yml_sampleSize = $scope.size;
       console.log(config.get('discover:sampleSize'));
+
+      let sizeRange = $scope.sizeRange || [];
+      _.each(sizeRange, s => {
+        def_Sizes.push(s);
+      });
 
       let find = def_Sizes.find((n) => n == yml_sampleSize);
       if (typeof (find) === 'undefined') {

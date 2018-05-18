@@ -7,7 +7,7 @@ export default function UiConfProvider(Private, Promise, config) {
     /** 控制discover也中时序图是否显示，true：表示显示 */
     showTimeDiagram: true,
 
-    /** 界面中按钮的 name, 
+    /** 界面中按钮的 name,
      * []: 显示全部按钮
      * [""]: 不显示任何按钮
      * ["open","help","export","save"]
@@ -17,6 +17,7 @@ export default function UiConfProvider(Private, Promise, config) {
     advancedSearchBool: {},
 
     pageSize: config.get('discover:sampleSize'),/** */
+    sizeRange: [],/** */
 
     /** */
     navigation: []
