@@ -86,8 +86,37 @@ uiRoutes
             });
           });
       },
-      savedSearch: function (courier, savedSearches, $route) {
-        console.log("resolve.savedSearch");
+      savedSearch: function (courier, savedSearches, $route, $http) {
+        console.log('resolve.savedSearch');
+
+        function getDataP(savedSearch) {
+          return $http({
+            method: 'GET',
+            url: '/datap/营销系统报表负责公司权限'
+          }).then(function successCallback(response) {
+            if (response.status === 200) {
+              savedSearch.dataP = [];
+              savedSearch.dataP.push({ 'terms': { '运营公司': response.data.split(',') } });
+              savedSearch.dataP.push({ 'terms': { '运营公司': response.data.split(',') } });
+
+
+              // savedSearch.dataP = [{
+              //   'terms': {
+              //     //'运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
+              //     '运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e']
+              //   }
+              // }];
+              return savedSearch;
+            } else {
+              return savedSearch;
+            }
+          }, function errorCallback(response) {
+            return savedSearch;
+          }).catch((err) => {
+            return savedSearch;
+          });
+        }
+
         /*
         * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
         * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
@@ -97,6 +126,13 @@ uiRoutes
         *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
         * */
         return savedSearches.get($route.current.params.id)
+          .then(savedSearch => {
+            if (savedSearch.datap || true) {
+              return getDataP(savedSearch);
+            } else {
+              return savedSearch;
+            }
+          })
           .catch(courier.redirectWhenMissing({
             'search': '/discover',
             'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
@@ -355,6 +391,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
+  $scope.dataP = savedSearch.dataP;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
 
@@ -773,6 +810,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   function dddd() {
     $state.query = $scope.dddquery;
   };
+
+  function getDataPFilter() {
+    return $scope.dataP;
+  }
+
   $scope.updateDataSource = Promise.method(function () {
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
@@ -782,13 +824,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     //debugger;
 
     let postData = {
-      "eventType": "kibana.Query",
-      "eventArgs": {"esQueryDSL":esQueryDSL}
+      'eventType': 'kibana.Query',
+      'eventArgs': {'esQueryDSL':esQueryDSL}
     };
     $scope.$emit('$messageOutgoing', angular.toJson(postData));
     $scope.dddquery = $state.query;
     let query = $state.query;
-    if (query.query_string && query.query_string.query != "*") {
+    if (query.query_string && query.query_string.query != '*') {
       query = _.cloneDeep($state.query);
 
       let dun = query.query_string.query.split(/\s+(and|or)\s+/gi);
@@ -800,14 +842,34 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           let name = r[1];
           let field = _.find($scope.indexPattern.fields, { 'alias': name });
           if (field) {
-            item = item.replace(new RegExp(field.alias + ":"), field.name + ":");
+            item = item.replace(new RegExp(field.alias + ':'), field.name + ':');
           }
         }
         return item;
       });
 
-      query.query_string.query = dum2.join(" ");
+      query.query_string.query = dum2.join(' ');
     }
+
+    // $state.filters.push({
+    //   'terms': {
+    //     '运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
+    //   }
+    // });
+
+    let dataPFilter = [{
+      'terms': {
+        //'运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
+        '运营公司': ['E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
+      }
+    }];
+
+    // let filter = queryFilter.getFilters();
+    // dataPFilter.forEach(item => {
+    //   filter.push(item);
+    // })
+
+
 
     $scope.searchSource
       .size($scope.opts.sampleSize)
@@ -815,6 +877,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       //.query(!$state.query ? null : $state.query)
       .query(query)
       .set('filter', queryFilter.getFilters())
+      //.set('dpfilter', dataPFilter)
+      .set('dpfilter', getDataPFilter())
       .set('advancedSearch', esQueryDSL);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));
