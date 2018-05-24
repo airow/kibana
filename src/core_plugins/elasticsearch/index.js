@@ -3,7 +3,7 @@ import { methodNotAllowed } from 'boom';
 
 import healthCheck from './lib/health_check';
 import exposeClient from './lib/expose_client';
-import createProxy, { createPath } from './lib/create_proxy';
+import createProxy, { createPath, msearch } from './lib/create_proxy';
 import createProxyExport from './lib/create_proxy_export';
 
 const DEFAULT_REQUEST_HEADERS = [ 'authorization' ];
@@ -56,7 +56,11 @@ module.exports = function ({ Plugin }) {
       createProxy(server, 'POST', '/_mget');
       createProxy(server, 'POST', '/{index}/_search');
       createProxy(server, 'POST', '/{index}/_field_stats');
-      createProxy(server, 'POST', '/_msearch');
+      msearch(server, 'POST', '/_msearch', {
+        payload: {
+          output: 'data'
+        }
+      });
       createProxy(server, 'POST', '/_search/scroll');
 
       createProxyExport(server, 'POST', '/export/{index}/_search');
