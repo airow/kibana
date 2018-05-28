@@ -18,6 +18,7 @@ export default function UiConfProvider(Private, Promise, config) {
 
     pageSize: config.get('discover:sampleSize'),/** */
     sizeRange: [],/** */
+    authObj: [{ disable: true, '绑定字段': ['授权对象名称'] }],/** 授权对象 */
 
     /** */
     navigation: []

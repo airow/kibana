@@ -145,22 +145,23 @@ uiModules.get('apps/management')
         // let uiConf_default = uiConfProvider[service.type].defaultConf;
 
         if (service.Class && service.Class.hasUiConf) {
-          let timefilter_Schema = { disabled: true, timeFrom: '', timeTo: '' };
+          let timefilterSchema = { disabled: true, timeFrom: '', timeTo: '' };
           //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
-          let navigation_Schema = {
-            "conf_id": "navigationConf的id，配置了conf_id将忽略url，但disabled依然有效",
-            "display": "显示的名称",
-            "url": "#/visualize/edit/{visualize name} 或 #/discover/{discover name}",
-            "disabled": true
-          }
+          let navigationSchema = {
+            'conf_id': 'navigationConf的id，配置了conf_id将忽略url，但disabled依然有效',
+            'display': '显示的名称',
+            'url': '#/visualize/edit/{visualize name} 或 #/discover/{discover name}',
+            'disabled': true
+          };
+          let authObjSchema = { disable: true, '绑定字段': ['授权对象名称'] };
           /** 默认显示配置项 */
-          let uiConf_default = { showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], navigation: [navigation_Schema], timefilter: angular.toJson(timefilter_Schema) };
+          let uiConfDefault = { showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], authObj: [authObjSchema], navigation: [navigationSchema], timefilter: angular.toJson(timefilterSchema) };
 
           obj._source.uiConf = obj._source.uiConf || {};
 
-          for (let key in uiConf_default) {
+          for (let key in uiConfDefault) {
             if (false === (key in obj._source.uiConf)) {
-              obj._source.uiConf[key] = uiConf_default[key];
+              obj._source.uiConf[key] = uiConfDefault[key];
             }
           }
         }

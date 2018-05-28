@@ -42,6 +42,7 @@ import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -88,35 +89,6 @@ uiRoutes
       },
       savedSearch: function (courier, savedSearches, $route, $http) {
         console.log('resolve.savedSearch');
-
-        function getDataP(savedSearch) {
-          return $http({
-            method: 'GET',
-            url: '/datap/营销系统报表负责公司权限'
-          }).then(function successCallback(response) {
-            if (response.status === 200) {
-              savedSearch.dataP = [];
-              savedSearch.dataP.push({ 'terms': { '运营公司': response.data.split(',') } });
-              savedSearch.dataP.push({ 'terms': { '运营公司': response.data.split(',') } });
-
-
-              // savedSearch.dataP = [{
-              //   'terms': {
-              //     //'运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
-              //     '运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e']
-              //   }
-              // }];
-              return savedSearch;
-            } else {
-              return savedSearch;
-            }
-          }, function errorCallback(response) {
-            return savedSearch;
-          }).catch((err) => {
-            return savedSearch;
-          });
-        }
-
         /*
         * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
         * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
@@ -126,11 +98,32 @@ uiRoutes
         *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
         * */
         return savedSearches.get($route.current.params.id)
-          .then(savedSearch => {
-            if (savedSearch.datap || true) {
-              return getDataP(savedSearch);
+          .then(savedObjects => {
+            var authObj = _.get(savedObjects.uiConf, 'authObj', []);
+            var authObjConf = _.filter(authObj, item => { return !item.disable; });
+            if (_.size(authObjConf) > 0) {
+              return getAuthObjValue($http, authObjConf)
+                .then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
             } else {
-              return savedSearch;
+              var ip = savedObjects.searchSource.get('index');
+              var indexPatternsAuthObjConf = _.filter(ip.fields, item => { return _.isEmpty(item.authObjs) === false; });
+              indexPatternsAuthObjConf = _.map(indexPatternsAuthObjConf, field => {
+                var obj = {};
+                obj[field.name] = field.authObjs.split('|');
+                return obj;
+              });
+
+              if (_.size(indexPatternsAuthObjConf) > 0) {
+                return getAuthObjValue($http, indexPatternsAuthObjConf).then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
+              } else {
+                return savedObjects;
+              }
             }
           })
           .catch(courier.redirectWhenMissing({
@@ -391,7 +384,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
-  $scope.dataP = savedSearch.dataP;
+  $scope.authObjValue = savedSearch.authObjValue;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
 
@@ -652,6 +645,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
           savedSearch.uiConf.timefilter = angular.toJson(uiConf_timefilter);
         }
+        delete savedSearch.searchSource._state.dpfilter;
         return savedSearch.save()
           .then(function (id) {
             stateMonitor.setInitialState($state.toJSON());
@@ -811,8 +805,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     $state.query = $scope.dddquery;
   };
 
-  function getDataPFilter() {
-    return $scope.dataP;
+  function getDataPermFilter() {
+    return $scope.authObjValue || [];
   }
 
   $scope.updateDataSource = Promise.method(function () {
@@ -851,26 +845,6 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       query.query_string.query = dum2.join(' ');
     }
 
-    // $state.filters.push({
-    //   'terms': {
-    //     '运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
-    //   }
-    // });
-
-    let dataPFilter = [{
-      'terms': {
-        //'运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
-        '运营公司': ['E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
-      }
-    }];
-
-    // let filter = queryFilter.getFilters();
-    // dataPFilter.forEach(item => {
-    //   filter.push(item);
-    // })
-
-
-
     $scope.searchSource
       .size($scope.opts.sampleSize)
       .sort(getSort($state.sort, $scope.indexPattern))
@@ -878,7 +852,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       .query(query)
       .set('filter', queryFilter.getFilters())
       //.set('dpfilter', dataPFilter)
-      .set('dpfilter', getDataPFilter())
+      .set('dpfilter', getDataPermFilter())
       .set('advancedSearch', esQueryDSL);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));

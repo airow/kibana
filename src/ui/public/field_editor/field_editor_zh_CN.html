@@ -112,7 +112,7 @@
   <div class="form-group" ng-if="editor.field.type==='string'">
     <label>Selectable</label>
     <div class="form-inline">
-      <div class="form-group">        
+      <div class="form-group">
         <div class="input-group">
           <input type="checkbox" ng-disabled="editor.field.type!=='string'" ng-model="editor.field.selectConf.enable">
         </div>
@@ -144,13 +144,18 @@
           <input type="checkbox" ng-disabled="!editor.field.selectConf.enable" ng-model="editor.field.selectConf.isTree">
         </div>
       </div>
-    </div> 
+    </div>
   </div>
 
   <!--别名-->
   <div class="form-group">
     <label>Alias</label>
     <input type="text" class="form-control" placeholder="alias" ng-model="editor.field.alias">
+  </div>
+
+  <div class="form-group">
+    <label>AuthObjs</label>
+    <input type="text" class="form-control" placeholder="授权对象‘|’分割" ng-model="editor.field.authObjs">
   </div>
 
   <div ng-if="editor.field.scripted">
