@@ -42,6 +42,7 @@ import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -86,8 +87,8 @@ uiRoutes
             });
           });
       },
-      savedSearch: function (courier, savedSearches, $route) {
-        console.log("resolve.savedSearch");
+      savedSearch: function (courier, savedSearches, $route, $http) {
+        console.log('resolve.savedSearch');
         /*
         * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
         * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
@@ -97,6 +98,34 @@ uiRoutes
         *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
         * */
         return savedSearches.get($route.current.params.id)
+          .then(savedObjects => {
+            var authObj = _.get(savedObjects.uiConf, 'authObj', []);
+            var authObjConf = _.filter(authObj, item => { return !item.disable; });
+            if (_.size(authObjConf) > 0) {
+              return getAuthObjValue($http, authObjConf)
+                .then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
+            } else {
+              var ip = savedObjects.searchSource.get('index');
+              var indexPatternsAuthObjConf = _.filter(ip.fields, item => { return _.isEmpty(item.authObjs) === false; });
+              indexPatternsAuthObjConf = _.map(indexPatternsAuthObjConf, field => {
+                var obj = {};
+                obj[field.name] = field.authObjs.split('|');
+                return obj;
+              });
+
+              if (_.size(indexPatternsAuthObjConf) > 0) {
+                return getAuthObjValue($http, indexPatternsAuthObjConf).then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
+              } else {
+                return savedObjects;
+              }
+            }
+          })
           .catch(courier.redirectWhenMissing({
             'search': '/discover',
             'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
@@ -355,6 +384,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
+  $scope.authObjValue = savedSearch.authObjValue;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
 
@@ -615,6 +645,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
           savedSearch.uiConf.timefilter = angular.toJson(uiConf_timefilter);
         }
+        delete savedSearch.searchSource._state.dpfilter;
         return savedSearch.save()
           .then(function (id) {
             stateMonitor.setInitialState($state.toJSON());
@@ -773,6 +804,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   function dddd() {
     $state.query = $scope.dddquery;
   };
+
+  function getDataPermFilter() {
+    return $scope.authObjValue || [];
+  }
+
   $scope.updateDataSource = Promise.method(function () {
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
@@ -782,13 +818,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     //debugger;
 
     let postData = {
-      "eventType": "kibana.Query",
-      "eventArgs": {"esQueryDSL":esQueryDSL}
+      'eventType': 'kibana.Query',
+      'eventArgs': {'esQueryDSL':esQueryDSL}
     };
     $scope.$emit('$messageOutgoing', angular.toJson(postData));
     $scope.dddquery = $state.query;
     let query = $state.query;
-    if (query.query_string && query.query_string.query != "*") {
+    if (query.query_string && query.query_string.query != '*') {
       query = _.cloneDeep($state.query);
 
       let dun = query.query_string.query.split(/\s+(and|or)\s+/gi);
@@ -800,13 +836,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           let name = r[1];
           let field = _.find($scope.indexPattern.fields, { 'alias': name });
           if (field) {
-            item = item.replace(new RegExp(field.alias + ":"), field.name + ":");
+            item = item.replace(new RegExp(field.alias + ':'), field.name + ':');
           }
         }
         return item;
       });
 
-      query.query_string.query = dum2.join(" ");
+      query.query_string.query = dum2.join(' ');
     }
 
     $scope.searchSource
@@ -815,6 +851,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       //.query(!$state.query ? null : $state.query)
       .query(query)
       .set('filter', queryFilter.getFilters())
+      //.set('dpfilter', dataPFilter)
+      .set('dpfilter', getDataPermFilter())
       .set('advancedSearch', esQueryDSL);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));

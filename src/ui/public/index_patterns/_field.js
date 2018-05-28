@@ -67,7 +67,7 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       let originalField = _.find(indexPattern.fields, { name: spec.name });
       if (originalField && originalField.alias) {
         var alias = originalField.alias;
-        if (spec.alias && alias !== spec.alias) {
+        if (spec.alias !== undefined && alias !== spec.alias) {
           alias = spec.alias;
         }
         obj.writ('alias', alias);
@@ -79,6 +79,16 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
         let selectable = originalField.selectConf && originalField.selectConf.enable;
         obj.fact('selectable', selectable);
         obj.writ('selectConf', originalField.selectConf);
+      }
+
+      if (originalField && originalField.authObjs) {
+        var authObjs = originalField.authObjs;
+        if (spec.authObjs !== undefined && authObjs !== spec.authObjs) {
+          authObjs = spec.authObjs;
+        }
+        obj.writ('authObjs', authObjs);
+      } else {
+        obj.writ('authObjs');
       }
     }
     obj.writ('count', spec.count || 0);
