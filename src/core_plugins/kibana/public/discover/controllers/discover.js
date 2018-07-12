@@ -42,6 +42,7 @@ import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import 'plugins/kibana/backend_export/directives/backend_export';
 import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 const app = uiModules.get('apps/discover', [
@@ -344,6 +345,16 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           $scope.export();
         },
         testId: 'discoverExportButton',
+      },
+      'export': {
+        key: '后端导出',
+        description: '后端导出',
+        template: require('plugins/kibana/discover/partials/backend_export.html'),
+        run: function (menuItem, kbnTopNav) {
+          //$scope.export();
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'exportButton',
       },
       'navigation': {
         key: '统计分析',
