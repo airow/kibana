@@ -1,0 +1,30 @@
+<ul class="li-striped list-group list-group-menu" style="margin-bottom: 0px;">
+  <!--<li class="list-group-item">
+    <span class="paginate-heading">
+      名称
+    </span>
+  </li>-->
+  <li
+    class="list-group-item list-group-menu-item"
+    ng-repeat="task in exportList"
+    ng-click="finder.onChoose(task, $event)">
+
+    <a target="_black" ng-href="{{finder.makeUrl(task)}}">
+        <span>{{task.StartTime}}</span>
+
+        <span>{{task.Status}}</span>
+
+        <span>{{task.DonePercent}}</span>
+
+        <span>{{task.ErrorMsg}}</span>
+    </a>
+  </li>
+  <li
+    class="list-group-item list-group-no-results"
+    ng-if="exportList.length === 0">
+    <!--<p ng-bind="'No matching ' + finder.properties.nouns + ' found.'"></p>-->
+    <p ng-bind="'没有匹配到数据'"></p>
+  </li>
+  <li><button ng-click="finder.query()" >query</button></li>
+  <li><button ng-click="finder.export()" >export</button></li>
+</ul>
