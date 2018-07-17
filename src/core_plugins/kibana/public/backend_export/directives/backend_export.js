@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import $ from 'jquery';
 import template from './backend_export.html';
 import uiModules from 'ui/modules';
@@ -7,7 +8,7 @@ import 'plugins/kibana/backend_export/services/backend_export_service';
 
 uiModules
   .get('apps/backendexport')
-  .directive('teldBackendExport', function (Private, $compile, kbnUrl, $interval, backendExportService) {
+  .directive('teldBackendExport', function (Private, $compile, kbnUrl, $interval, backendExportService, Notifier) {
 
     return {
       restrict: 'E',
@@ -15,6 +16,7 @@ uiModules
       scope: {
         savedObject: '=',
         urlPrefix: '@',
+        export: '&',
         // optional make-url attr, sets the userMakeUrl in our scope
         userMakeUrl: '=?makeUrl',
         // optional on-choose attr, sets the userOnChoose in our scope
@@ -24,28 +26,62 @@ uiModules
       controller: function ($scope) {
         let self = this;
 
+        const notify = new Notifier();
+
+        self.pageIndex = 0;
+
         self.export = function ($event) {
-          backendExportService.export().then(
-            /** resolve */
-            res => {
-              if (_.isEmpty(res.data.error)) {
-                self.query();
-              } else {
-                alert(res.data.error);
+          $scope.export();
+        };
+
+        self.backendexport = function ($event) {
+          $scope.savedObject.searchSource.source()._flatten().then(function (flatSource) {
+            backendExportService.export(flatSource).then(
+              /** resolve */
+              res => {
+                if (_.isEmpty(res.data.error)) {
+                  notify.info('导入任务创建成功 TaskID:' + res.data.TaskId);
+                  self.query();
+                } else {
+                  notify.warning(res.data.error);
+                  //alert(res.data.error);
+                }
+              },
+              /** reject */
+              function () {
+                $scope.exportList = [];
               }
-            },
-            /** reject */
-            function () {
-              $scope.exportList = [];
-            }
-          );
+            );
+          });
+        };
+
+        self.fomartDate = function (task) {
+          return moment(task.StartTime).format('YYYY-MM-DD HH:mm:ss');
+        };
+
+        self.previous = function () {
+          if (self.pageIndex <= 0) {
+            return;
+          }
+          self.pageIndex = self.pageIndex - 1;
+          self.query();
+        };
+
+        self.next = function () {
+          if (self.pageIndex + 1 >= $scope.totalPageNum) {
+            return;
+          }
+          self.pageIndex = self.pageIndex + 1;
+          self.query();
         };
 
         self.query = function ($event) {
-          backendExportService.tasklist().then(
+          backendExportService.tasklist(self.pageIndex, 5).then(
             /** resolve */
             res => {
               if (_.isEmpty(res.data.error)) {
+                $scope.dataTotls = res.data.dataTotls;
+                $scope.totalPageNum = res.data.totalPageNum;
                 $scope.exportList = res.data.data;
               } else {
                 alert(res.data.error);
@@ -68,15 +104,15 @@ uiModules
           $event.preventDefault();
         };
 
-        // let timer = $interval(() => {
-        //   console.log('.');
-        //   self.query();
-        // }, 5000);
+        let timer = $interval(() => {
+          console.log('.');
+          self.query();
+        }, 15000);
 
-        // $scope.$on('$destroy', () => {
-        //   console.log('+');
-        //   $interval.cancel(timer);
-        // });
+        $scope.$on('$destroy', () => {
+          console.log('+');
+          $interval.cancel(timer);
+        });
 
         /**
          * Called when a hit object is clicked, can override the

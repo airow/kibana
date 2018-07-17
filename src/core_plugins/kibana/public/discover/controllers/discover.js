@@ -346,9 +346,9 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverExportButton',
       },
-      'export': {
-        key: '后端导出',
-        description: '后端导出',
+      'backendexport': {
+        key: '导出',
+        description: '导出',
         template: require('plugins/kibana/discover/partials/backend_export.html'),
         run: function (menuItem, kbnTopNav) {
           //$scope.export();
@@ -374,12 +374,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         menuKeys.push(key);
       }
     }
+
     menuKeys.forEach(function (value) {
       let confMenu = confTopNavMenu[value];
       if (confMenu) {
         menus.push(confMenu);
       }
     });
+
+    if (_.includes(menuKeys, 'backendexport') && _.includes(menuKeys, 'export')) {
+      _.remove(menus, { testId: 'discoverExportButton' });
+    }
 
     // menus.push({
     //   key: 'callNodejs',

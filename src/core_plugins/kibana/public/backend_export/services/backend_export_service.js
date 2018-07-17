@@ -7,44 +7,13 @@ const module = uiModules.get('apps/advanced_search');
 module.service('backendExportService', function ($http, kbnIndex) {
   this.url = '/ESExportSrv';
 
-  this.export = function (index, queryJson) {
-
-    //{'index':['etlentercustday'],'ignore_unavailable':true,'preference':1531379860780}
-    //{'query':{'bool':{'must':[{'query_string':{'query':'*','analyze_wildcard':true,'allow_leading_wildcard':false}},{'bool':{}},{'range':{'充电日期':{'gte':1499844068846,'lte':1531380068846,'format':'epoch_millis'}}}],'must_not':[]}},'highlight':{'pre_tags':['@kibana-highlighted-field@'],'post_tags':['@/kibana-highlighted-field@'],'fields':{'*':{}},'require_field_match':false,'fragment_size':2147483647},'size':100,'sort':[{'充电日期':{'order':'desc','unmapped_type':'boolean'}}],'_source':{'excludes':[]},'aggs':{'2':{'date_histogram':{'field':'充电日期','interval':'1w','time_zone':'Asia/Shanghai','min_doc_count':1}}},'stored_fields':['*'],'script_fields':{},'docvalue_fields':['充电日期']}
-
-    let query = {
-      'query': {
-        'bool': {
-          'must': [{
-            'query_string': {
-              'query': '*', 'analyze_wildcard': true,
-              'allow_leading_wildcard': false
-            }
-          }, { 'bool': {} },
-          { 'range': { '充电日期': { 'gte': 1499844068846, 'lte': 1531380068846, 'format': 'epoch_millis' } } }],
-          'must_not': []
-        }
-      }, 'highlight': {
-        'pre_tags': ['@kibana-highlighted-field@'],
-        'post_tags': ['@/kibana-highlighted-field@'], 'fields': { '*': {} }, 'require_field_match': false,
-        'fragment_size': 2147483647
-      }, 'size': 100, 'sort': [{ '充电日期': { 'order': 'desc', 'unmapped_type': 'boolean' } }],
-      '_source': { 'excludes': [] },
-      'aggs': {
-        '2': {
-          'date_histogram': {
-            'field': '充电日期', 'interval': '1w', 'time_zone': 'Asia/Shanghai',
-            'min_doc_count': 1
-          }
-        }
-      }, 'stored_fields': ['*'], 'script_fields': {}, 'docvalue_fields': ['充电日期']
-    };
+  this.export = function (flatSource) {
 
     return $http.post(this.url + '/export',
       {
         userId: 'userId',
         index: 'etlentercustday',
-        queryJson: JSON.stringify(query)
+        queryJson: JSON.stringify(flatSource.body)
       },
       {
         transformRequest: function (obj) {
@@ -64,10 +33,18 @@ module.service('backendExportService', function ($http, kbnIndex) {
       });
   };
 
-  this.tasklist = function (index, queryJson) {
+  this.tasklist = function (pageIndex, pageSize) {
     return $http.get(this.url + '/tasklist').success(function (data, header, config, status) {
       //响应成功
       debugger;
+      //data.data = _.take(data.data, pageSize);
+
+      data.dataTotls = _.size(data.data);
+      data.totalPageNum = Math.ceil(data.dataTotls / pageSize);
+      data.data = _.filter(data.data, (value, index) => {
+        return index >= pageIndex * pageSize && index <= pageIndex * pageSize + pageSize - 1;
+      });
+
       return data;
     }).error(function (data, header, config, status) {
       //处理响应失败
