@@ -36,7 +36,7 @@ uiModules
 
         self.backendexport = function ($event) {
           $scope.savedObject.searchSource.source()._flatten().then(function (flatSource) {
-            backendExportService.export(flatSource).then(
+            backendExportService.export($scope.savedObject, flatSource).then(
               /** resolve */
               res => {
                 if (_.isEmpty(res.data.error)) {
@@ -76,7 +76,9 @@ uiModules
         };
 
         self.query = function ($event) {
-          backendExportService.tasklist(self.pageIndex, 5).then(
+          debugger;
+          var indexPattern = $scope.savedObject.searchSource.get('index');
+          backendExportService.tasklist(indexPattern.id, self.pageIndex, 5).then(
             /** resolve */
             res => {
               if (_.isEmpty(res.data.error)) {
@@ -88,8 +90,9 @@ uiModules
               }
             },
             /** reject */
-            function () {
+            function (err) {
               $scope.exportList = [];
+              notify.warning('导出服务异常:' + err.statusText);
             }
           );
         };

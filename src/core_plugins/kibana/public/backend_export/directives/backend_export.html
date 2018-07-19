@@ -1,10 +1,11 @@
 <div class="row">
   <div class="col-md-11">
     <div class="table-responsive">
-      <table class="table table-hover">
+      <table class="table table-hover" style="margin-bottom:0px;">
         <thead>
           <tr>
             <th>#</th>
+            <th class="hidden-xs hidden-sm">索引</th>
             <th>任务Id</th>
             <th>开始时间</th>
             <th>状态</th>
@@ -15,6 +16,7 @@
         <tbody>
           <tr ng-repeat="task in exportList">
             <th scope="row">{{finder.pageIndex*5+($index+1)}}</th>
+            <td class="hidden-xs hidden-sm">{{task.TargetIndex}}</td>
             <td>{{task.ID}}
               <a ng-if='task.Status===2' target="_black" ng-href="{{finder.makeUrl(task)}}">
                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
@@ -59,7 +61,7 @@
           </tr>
         </tbody>
       </table>
-      <nav aria-label="Page navigation">
+      <nav aria-label="Page navigation" ng-if='totalPageNum>0'>
         <ul class="pagination" style="margin:0px;">
           <li ng-class="{'disabled' : finder.pageIndex<=0}" ng-if2="finder.pageIndex>0">
             <a aria-label="Previous">

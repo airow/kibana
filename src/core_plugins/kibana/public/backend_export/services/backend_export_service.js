@@ -7,12 +7,23 @@ const module = uiModules.get('apps/advanced_search');
 module.service('backendExportService', function ($http, kbnIndex) {
   this.url = '/ESExportSrv';
 
-  this.export = function (flatSource) {
+  this.export = function (savedObject, flatSource) {
+
+
+    // var columns = _.filter(flatSource.index.fields, function (f) { return _.includes(savedObject.columns, f.displayName); });
+    // columns = _.map(columns, function (f) { return { field: f.name, display: f.displayName }; });
+
+    // var columnMap = [_.size(savedObject.columns)];
+    // _.forEach(columns, function (col) {
+    //   columnMap[_.indexOf(savedObject.columns, col.display)] = col;
+    // });
+
+    flatSource.body._source = savedObject.columns;
 
     return $http.post(this.url + '/export',
       {
         userId: 'userId',
-        index: 'etlentercustday',
+        index: flatSource.index.id,
         queryJson: JSON.stringify(flatSource.body)
       },
       {
@@ -33,8 +44,8 @@ module.service('backendExportService', function ($http, kbnIndex) {
       });
   };
 
-  this.tasklist = function (pageIndex, pageSize) {
-    return $http.get(this.url + '/tasklist').success(function (data, header, config, status) {
+  this.tasklist = function (esIndex, pageIndex, pageSize) {
+    return $http.get(this.url + '/tasklist?index=' + esIndex).success(function (data, header, config, status) {
       //响应成功
       debugger;
       //data.data = _.take(data.data, pageSize);
