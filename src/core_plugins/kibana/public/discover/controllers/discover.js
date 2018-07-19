@@ -42,6 +42,7 @@ import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import 'plugins/kibana/backend_export/directives/backend_export';
 import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 const app = uiModules.get('apps/discover', [
@@ -345,6 +346,16 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverExportButton',
       },
+      'backendexport': {
+        key: '导出',
+        description: '导出',
+        template: require('plugins/kibana/discover/partials/backend_export.html'),
+        run: function (menuItem, kbnTopNav) {
+          //$scope.export();
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'exportButton',
+      },
       'navigation': {
         key: '统计分析',
         description: '统计分析',
@@ -363,12 +374,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         menuKeys.push(key);
       }
     }
+
     menuKeys.forEach(function (value) {
       let confMenu = confTopNavMenu[value];
       if (confMenu) {
         menus.push(confMenu);
       }
     });
+
+    if (_.includes(menuKeys, 'backendexport') && _.includes(menuKeys, 'export')) {
+      _.remove(menus, { testId: 'discoverExportButton' });
+    }
 
     // menus.push({
     //   key: 'callNodejs',
