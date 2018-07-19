@@ -8,6 +8,7 @@
             <th class="hidden-xs hidden-sm">索引</th>
             <th>任务Id</th>
             <th>开始时间</th>
+            <th>记录数</th>
             <th>状态</th>
             <th>百分比</th>
             <th></th>
@@ -23,6 +24,7 @@
               </a>
             </td>
             <td>{{finder.fomartDate(task)}}</td>
+            <td>{{task.TotalCount}}</td>
             <td>
               <div ng-switch="task.Status">
                 <div ng-switch-when="0">
