@@ -40,7 +40,7 @@ uiModules
               /** resolve */
               res => {
                 if (_.isEmpty(res.data.error)) {
-                  notify.info('导入任务创建成功 TaskID:' + res.data.TaskId);
+                  notify.info('导出任务创建成功 TaskID:' + res.data.TaskId);
                   self.query();
                 } else {
                   notify.warning(res.data.error);
@@ -76,7 +76,7 @@ uiModules
         };
 
         self.query = function ($event) {
-          debugger;
+          //debugger;
           var indexPattern = $scope.savedObject.searchSource.get('index');
           backendExportService.tasklist(indexPattern.id, self.pageIndex, 5).then(
             /** resolve */
