@@ -18,7 +18,15 @@ module.service('backendExportService', function ($http, kbnIndex) {
     //   columnMap[_.indexOf(savedObject.columns, col.display)] = col;
     // });
 
-    flatSource.body._source = savedObject.columns;
+    //flatSource.body._source = savedObject.columns;
+    var ip = savedObject.searchSource.get('index');
+    var timeFieldName = ip.timeFieldName;
+    var docvalue = [];
+    if (false === _.isUndefined(timeFieldName)) {
+      docvalue.push(timeFieldName);
+    }
+    flatSource.body._source = [].concat(docvalue, savedObject.columns);
+    flatSource.body._source = _.uniq(flatSource.body._source);
 
     return $http.post(this.url + '/export',
       {
