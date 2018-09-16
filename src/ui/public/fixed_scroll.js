@@ -220,7 +220,8 @@ uiModules
       ], setup);
 
       $scope.$watchMulti([
-        function () { return $el.offset().top; },
+        //*该行会影响dashboard页面的显示*/function () { return $el.offset().top; },
+        function () { return _.startsWith(window.location.hash, '#/discover/') ? $el.offset().top : $(window).height(); },
         function () { return $(window).height(); },
         function () { return $el.find('.kbn-table').height(); }
       ], function (newValue, oldValue) {
