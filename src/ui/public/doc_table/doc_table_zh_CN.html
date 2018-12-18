@@ -1,5 +1,6 @@
 <div
   ng-if="hits.length"
+  teld-fill-height more="addRows"
   ng-class="{ loading: searchSource.activeFetchCount > 0 }">
   <paginate ng-if="!infiniteScroll" list="hits" per-page="50" top-controls="true" class="paginate">
     <table class="kbn-table table" ng-if="indexPattern">
