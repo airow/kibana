@@ -100,6 +100,10 @@ uiRoutes
         * */
         return savedSearches.get($route.current.params.id)
           .then(savedObjects => {
+
+            //TODO:用于在新建查询是默认索引配置了数据权限后造成查询不出数据的问题
+            var isNewSearch = savedObjects.title === 'New Saved Search';
+
             var authObj = _.get(savedObjects.uiConf, 'authObj', []);
             var authObjConf = _.filter(authObj, item => { return !item.disable; });
             if (_.size(authObjConf) > 0) {
