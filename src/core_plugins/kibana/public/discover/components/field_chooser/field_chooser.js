@@ -83,6 +83,13 @@ app.directive('discFieldChooser', function ($location, globalState, config, $rou
             && matchName
           ;
         },
+        isFieldFilteredWithDispaly: function (field) {
+          const matchName = (!filter.vals.name || field.name.indexOf(filter.vals.name) !== -1);
+
+          return field.display
+            && matchName
+          ;
+        },
         popularity: function (field) {
           return field.count > 0;
         },
