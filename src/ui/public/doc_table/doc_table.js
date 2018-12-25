@@ -33,6 +33,22 @@ uiModules.get('kibana')
         columns: $scope.columns
       };
 
+      $scope.din = false;
+
+      $scope.changePin = function () {
+        $scope.din = !$scope.din;
+        $scope.$emit('ppin', $scope.din);
+      };
+      $scope.$emit('ppin', $scope.din);
+
+
+      $scope.$emit('FromSelf', { divName: 'Self', description: '向父传播数据' });
+      $scope.$on('FromSelf', function (event, data) {
+        debugger;
+        alert(1);
+        //$window.alert("当前节点" + event.currentScope.name + ",截获到了来自" + data.divName + "的事件：" + event.name + "，它的作用是" + data.description);
+      });
+
       let prereq = (function () {
         let fns = [];
 

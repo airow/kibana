@@ -8,39 +8,41 @@ export default function discoverExportExcelService(Private, Promise) {
 
     function createSummaryRow(row) {
 
-    // We just create a string here because its faster.
-    let exportRow = {};
+      // We just create a string here because its faster.
+      let exportRow = {};
 
-    if (indexPattern.timeFieldName) {
-      //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
-      exportRow["time"] = getFiled(row, indexPattern.timeFieldName);
+      if (indexPattern.timeFieldName) {
+        //exportRow.push({ text: _displayField(row, indexPattern.timeFieldName) });
+        exportRow["time"] = getFiled(row, indexPattern.timeFieldName);
+      }
+
+      columns.forEach(function (column) {
+        //exportRow.push({ text: _displayField(row, column, true) });
+        exportRow[column] = getFiled(row, column, true);
+      });
+
+      return exportRow;
     }
 
-    columns.forEach(function (column) {
-      //exportRow.push({ text: _displayField(row, column, true) });
-      exportRow[column] = getFiled(row, column, true);
-    });
-
-    return exportRow;
-  }
-
-  function getFiled(hit, fieldName) {
-    let text;
-    if (indexPattern.timeFieldName === fieldName) {
-      text = indexPattern.formatField(hit, fieldName);
-    } else {
-      text = getFieldValue(hit, fieldName)
+    function getFiled(hit, fieldName) {
+      let text;
+      if (indexPattern.timeFieldName === fieldName) {
+        text = indexPattern.formatField(hit, fieldName);
+      } else {
+        text = getFieldValue(hit, fieldName)
+      }
+      return text;
     }
-    return text;
-  }
 
-  function getFieldValue(hit, fieldName) {
-    let value = hit[fieldName];
-    if (!value) {
-      value = hit._source[fieldName];
-    }
-    return value;
-  };
+    var numberFields = _.map(indexPattern.fields.byType.number, 'asFieldName');
+
+    function getFieldValue(hit, fieldName) {
+      let value = hit[fieldName];
+      if (!value) {
+        value = hit._source[fieldName];
+      }
+      return value;
+    };
 
 
     let exportRows = [];
@@ -53,16 +55,18 @@ export default function discoverExportExcelService(Private, Promise) {
       columns: [],
       data: exportRows
     };
-
-    _.forEach(sheet.data[0], function (n, key) {
-      sheet.columns.push(key);
+    _.forEach(sheet.data[0], function (value, key) {
+      var intVal = +value;
+      var type = _.isNumber(intVal) && _.includes(numberFields, key) && !_.isNaN(intVal) ? 'Number' : 'String';
+      var col = { title: key, ss: { type: type } };
+      sheet.columns.push(col);
     });
 
     let dataSource = [sheet];
-    saveExecl(dataSource,sheet.name);
+    saveExecl(dataSource, sheet.name);
   }
 
-  function saveExecl(dataSource, fileName) {    
+  function saveExecl(dataSource, fileName) {
 
     let execlTemplate = _.template(require('./tmpl.excel.html'));
 
@@ -72,9 +76,9 @@ export default function discoverExportExcelService(Private, Promise) {
     // saveAs(xls, (fileName||'Export_Execl') + ".xls");
 
     let xls = new Blob([out], { type: 'application/vnd.ms-excel;charset=utf-8' });
-    saveAs(xls, (fileName||'Export_Execl') + ".xls");
+    saveAs(xls, (fileName || 'Export_Execl') + ".xls");
   }
 
-  
+
   return exportExcel;
 };

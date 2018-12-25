@@ -15,6 +15,7 @@
           <!--<ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>-->
           <ng-pluralize count="hits" when="{'1':'个已找到', 'other':'个已找到'}"></ng-pluralize>
         </div>
+        <go-to-config target='searches'>
       </div>
 
       <!-- Search. -->
@@ -105,6 +106,7 @@
           <!-- result -->
           <div class="results" ng-show="resultState === 'ready'">
             <div class="discover-timechart" ng-if="opts.timefield && opts.savedSearch.uiConf.showTimeDiagram">
+              <i title="打开关闭时间图表" ng-click='visualizeSwitch=!visualizeSwitch' class="legend-icon fa" ng-class="{true:'fa-eye-slash',false:'fa-eye'}[visualizeSwitch]" style="position: absolute;top: 0px;right: 10px; color:cornflowerblue;"></i>
               <header>
                 <center class="small">
                   <span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>
@@ -131,7 +133,7 @@
               </header>
 
               <visualize
-                 ng-if="vis && rows.length != 0"
+                 ng-if="vis && rows.length != 0 && visualizeSwitch"
                  vis="vis"
                  ui-state="uiState"
                  es-resp="mergedEsResp"
@@ -139,7 +141,7 @@
                </visualize>
             </div>
 
-            <div class="discover-table" del-fixed-scroll>
+            <div class="discover-table" fixed-scroll>
               <doc-table
                 hits="rows"
                 index-pattern="indexPattern"

@@ -1,60 +1,148 @@
 import _ from 'lodash';
+import $ from 'jquery';
 import uiModules from 'ui/modules';
+import 'fixed-header-table/jquery.fixedheadertable';
 const app = uiModules.get('apps/discover');
 
-app.directive('teldFillHeight', function () {
+app.directive('teldSidebarListFillHeight', function () {
   return {
     restrict: 'A',
     scope: {
       more: '='
     },
     link: function ($scope, $element) {
-      $element.closest('#kibana-body').css('overflow-y', 'hidden');
       $scope.$watch(function () { return $element.offset().top; }, function (top) {
-        //var offset = $element.offset();
         $element.css({ 'overflow-y': 'scroll', 'height': `calc(100vh - ${top}px)` });
       });
+    }
+  };
+});
 
-      let checkTimer;
-
-      function onScroll() {
-        if (!$scope.more) return;
-        let height = $element.height();
-        let scrollTop = $element.scrollTop();
-        let scrollHeight = $element.prop('scrollHeight');
-        if (scrollHeight <= (height + scrollTop)) {
-          $scope[$scope.$$phase ? '$eval' : '$apply'](function () {
-            let more = $scope.more();
-          });
+app.directive('teldFillHeight', function () {
+  return {
+    restrict: 'A',
+    scope: {
+      more: '=',
+      din: '='
+    },
+    link: function ($scope, $element) {
+      $scope.$watch('din', function (n, o) {
+        if (n) {
+          $element.closest('#kibana-body').css('overflow-y', 'hidden');
+          $element.css({ 'height': `calc(100vh - ${top + 25}px)` });
+        } else {
+          $element.closest('#kibana-body').css('overflow-y', '');
+          $element.css('height','');
         }
-
-        // let winHeight = $window.height();
-        // let winBottom = winHeight + $window.scrollTop();
-        // let elTop = $element.offset().top;
-        // let remaining = elTop - winBottom;
-        // if (remaining <= winHeight * 0.50) {
-        //   $scope[$scope.$$phase ? '$eval' : '$apply'](function () {
-        //     let more = $scope.more();
-        //   });
-        // }
+      });
+      if (false === $scope.din) {
+        return;
       }
 
-      function scheduleCheck() {
-        if (checkTimer) return;
-        checkTimer = setTimeout(function () {
-          checkTimer = null;
-          onScroll();
-        }, 50);
+      $scope.$watch(function () { return $element.offset().top; }, function (top) {
+        $element.css({ 'height': `calc(100vh - ${top + 25}px)` });
+      });
+
+      $scope.$on('$destroy', function () {
+        $element.closest('#kibana-body').css('overflow-y','');
+      });
+    }
+  };
+});
+
+app.directive('teldFixedHeaderTable', function () {
+  return {
+    restrict: 'A',
+    scope: {
+      more: '=',
+      list: '=',
+      din: '='
+    },
+    link: function ($scope, $element) {
+      let checkTimer;
+      let scheduleCheck;
+      $scope.fillHeight = $element.closest('[teld-fill-height]');
+      $scope.$watch('din', function (n, o) {
+        if (n) {
+          setTimeout(setup, 0);
+        } else {
+          clearTimeout(checkTimer);
+          $element.off('scroll', scheduleCheck);
+          $element.fixedHeaderTable('destroy');
+        }
+      });
+      $scope.$watch(function () { return $scope.fillHeight.offset().top; }, function (n, o) {
+        if ($scope.din) setup();
+      });
+      if (false === $scope.din) {
+        return;
+      }
+      $scope.$watch(function () { return $scope.list; }, function (n, o) {
+        setTimeout(setup, 0);
+      });
+
+      function setup() {
+        var pHeight = $scope.fillHeight.height();
+        $element.fixedHeaderTable('destroy');
+        if ($element.height() >= pHeight) {
+          fixedHeaderTable();
+        }
       }
 
-      $element.on('scroll', scheduleCheck);
-      scheduleCheck();
+      function fixedHeaderTable() {
+        $element.fixedHeaderTable({ footer: false, cloneHeadToFoot: false, fixedColumn: false });
+
+        var $tbody = $element.closest('.fht-tbody');
+        $tbody.css('overflow', 'scroll')
+        .css('height', $(window).height() - $tbody.offset().top);
+
+        var onScroll = function () {
+          //alert(1);
+          if (!$scope.more) return;
+          let height = $tbody.height();
+          let scrollTop = $tbody.scrollTop();
+          let scrollHeight = $tbody.prop('scrollHeight');
+          if (scrollHeight <= (height + scrollTop)) {
+            $scope[$scope.$$phase ? '$eval' : '$apply'](function () {
+              let more = $scope.more();
+            });
+          }
+        };
+
+        scheduleCheck = function () {
+          if (checkTimer) return;
+          checkTimer = setTimeout(function () {
+            checkTimer = null;
+            onScroll();
+          }, 50);
+        };
+
+        $tbody.on('scroll', scheduleCheck);
+        scheduleCheck();
+      }
 
       $scope.$on('$destroy', function () {
         clearTimeout(checkTimer);
         $element.off('scroll', scheduleCheck);
-        $element.closest('#kibana-body').css('overflow-y','');
+        $element.fixedHeaderTable('destroy');
       });
+    }
+  };
+});
+
+app.directive('goToConfig', function () {
+  return {
+    restrict: 'E',
+    scope:{
+      target:'@'
+    },
+    template: '<a style="margin-left:6px;" ng-href="{{href}}"><i class="fa fa-reply" aria-hidden="true"></i></a>',
+    link: function ($scope, $element) {
+      $scope.referrer = document.referrer;
+      $scope.href = `/app/kibana#/management/kibana/objects?_a=(tab:${$scope.target})`;
+      if (window !== window.top || false === _.isEmpty(document.referrer)) {
+        $element.find('i').hide();
+      }
     }
   };
 });

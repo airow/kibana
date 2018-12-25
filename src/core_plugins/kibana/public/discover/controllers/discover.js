@@ -202,6 +202,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
   $scope.showInterval = false;
+  $scope.visualizeSwitch = true;
 
   //syncGrafanaTimeRange();
   tellGrafanaMyLoaded();

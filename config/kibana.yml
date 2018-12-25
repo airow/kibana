@@ -22,10 +22,10 @@ server.host: "0.0.0.0"
 #server.name: "your-hostname"
 
 # The URL of the Elasticsearch instance to use for all your queries.
-#elasticsearch.url: "http://localhost:9200"
+# elasticsearch.url: "http://localhost:9200"
 #elasticsearch.url: "http://hdpjntest.es.localhost:9202"
-#elasticsearch.url: "http://hdpjntest.es.localhost:9202" #开发环境
-#elasticsearch.url: "http://hdpjntest.es.localhost:12200" #济南测试es
+# elasticsearch.url: "http://hdpjntest.es.localhost:9202" #开发环境
+# elasticsearch.url: "http://hdpjntest.es.localhost:12200" #济南测试es
 elasticsearch.url: "http://hdpjntest.chinacloudapp.cn:12200" #济南测试es
 
 

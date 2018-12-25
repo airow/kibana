@@ -185,7 +185,7 @@ uiModules
        */
       function setup() {
         cleanUp();
-
+        if ($scope.pin) { return; }
         const containerWidth = $el.width();
         const contentWidth = $el.prop('scrollWidth');
         const containerHorizOverflow = contentWidth - containerWidth;
@@ -219,6 +219,14 @@ uiModules
         function () { return $el.width(); }
       ], setup);
 
+      $scope.$on('ppin', function (event,pin) {
+        $scope.pin = pin;
+        setup();
+        $el.scrollLeft(0);
+        // if (pin) {
+        //   $el.css('height','');
+        // }
+      });
 
       var browser = {
         versions: function () {
@@ -246,6 +254,10 @@ uiModules
           function () { return $(window).height(); },
           function () { return $el.find('.kbn-table').height(); }
         ], function (newValue, oldValue) {
+          if ($scope.pin) {
+            $el.height('auto');
+            return;
+          }
           var h = $(window).height() - newValue[0];
           var th = $el.find('.kbn-table').height();
           if (h > th) {
