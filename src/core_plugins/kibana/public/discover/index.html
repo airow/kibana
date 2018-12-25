@@ -1,13 +1,13 @@
 <discover-app class="app-container">
   <!--<button ng-click="test()">asdfasdf</button>-->
   <!-- Local nav. -->
-  <kbn-top-nav name="discover" config="topNavMenu">
+  <kbn-top-nav ng-show="!$root.embedded || topNavMenuSwitch" name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="localBreadcrumbs">
         <div class="localBreadcrumb">
-          <span ng-show="opts.savedSearch.id" class="localBreadcrumb__emphasis">
+          <span ng-show="opts.savedSearch.id" ng-hide="embedGrafana.kibanaConf.localBreadcrumb.hide"  class="localBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="::opts.savedSearch.title"></span>
             <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
           </span>
@@ -15,6 +15,7 @@
           <!--<ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>-->
           <ng-pluralize count="hits" when="{'1':'个已找到', 'other':'个已找到'}"></ng-pluralize>
         </div>
+        <go-to-config target='searches'>
       </div>
 
       <!-- Search. -->
@@ -30,9 +31,9 @@
             <!--<label style="flex: 0 0 auto; margin: auto 10px auto auto;">TOP：</label>
             <select style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" ng-options="x for x in [100,500,1000,5000,10000,50000]">
             </select>-->
-            <ui-conf-top sample-size="opts.sampleSize"></ui-conf-top>
+            <ui-conf-top size-range="opts.sizeRange" sample-size="opts.sampleSize"></ui-conf-top>
             <!--<input class="localSearchInput" style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" step="50" value="{{opts.sampleSize}}" type="number" placeholder="PageSize">            -->
-            <label style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
+            <label ng-hide="embedGrafana.kibanaConf.localSearchInput.label.hide" style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
             <input
               parse-query
               input-focus
@@ -60,6 +61,10 @@
       </form>
     </div>
   </kbn-top-nav>
+  <span ng-show="$root.embedded" ng-click="topNavMenuSwitch=!topNavMenuSwitch" style="position: absolute;z-index: 999;right: 5px; top:-3px;" >
+    <i title="显示条件" class="fa fa-chevron-circle-down" ng-hide="topNavMenuSwitch" aria-hidden="true"></i>
+    <i title="隐藏条件" class="fa fa-chevron-circle-up" ng-show="topNavMenuSwitch" aria-hidden="true"></i>
+  </span>
   <div class="container-fluid" role="main">
     <div class="row">
       <filter-bar state="state" index-pattern="indexPattern"></filter-bar>
@@ -101,6 +106,7 @@
           <!-- result -->
           <div class="results" ng-show="resultState === 'ready'">
             <div class="discover-timechart" ng-if="opts.timefield && opts.savedSearch.uiConf.showTimeDiagram">
+              <i title="打开关闭时间图表" ng-click='visualizeSwitch=!visualizeSwitch' class="legend-icon fa" ng-class="{true:'fa-eye-slash',false:'fa-eye'}[visualizeSwitch]" style="position: absolute;top: 0px;right: 10px; color:cornflowerblue;"></i>
               <header>
                 <center class="small">
                   <span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>
@@ -127,7 +133,7 @@
               </header>
 
               <visualize
-                 ng-if="vis && rows.length != 0"
+                 ng-if="vis && rows.length != 0 && visualizeSwitch"
                  vis="vis"
                  ui-state="uiState"
                  es-resp="mergedEsResp"

@@ -24,6 +24,7 @@ uiModules.get('apps/management')
       $scope.columns = [
         { title: 'name' },
         { title: 'alias' },
+        { title: 'authObjs' },
         { title: 'type' },
         { title: 'format' },
         { title: 'searchable', info: 'These fields can be used in the filter bar' },
@@ -59,6 +60,10 @@ uiModules.get('apps/management')
             {
               markup: `<span>${field.alias || ''}</span>`,
               value: field.alias
+            },
+            {
+              markup: `<span>${field.authObjs || ''}</span>`,
+              value: field.authObjs
             },
             {
               markup: typeHtml,

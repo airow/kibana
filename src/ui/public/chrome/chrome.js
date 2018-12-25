@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import angular from 'angular';
+//import 'angular-post-message';
+import './angular-post-message-teld.js';
 
 import metadata from 'ui/metadata';
 import 'babel/polyfill';
@@ -38,7 +40,7 @@ require('./api/theme')(chrome, internals);
 
 chrome.bootstrap = function () {
   chrome.setupAngular();
-  angular.bootstrap(document, ['kibana']);
+  angular.bootstrap(document, ['kibana', /*'ngPostMessage',*/ 'ngPostMessageTeld']);
 };
 
 module.exports = chrome;

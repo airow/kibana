@@ -17,7 +17,7 @@ uiModules.get('kibana')
     template: html,
     scope: {
       sorting: '=',
-      columns: '=',      
+      columns: '=',
       hits: '=?', // You really want either hits & indexPattern, OR searchSource
       indexPattern: '=?',
       searchSource: '=?',
@@ -32,6 +32,22 @@ uiModules.get('kibana')
         sorting: $scope.sorting,
         columns: $scope.columns
       };
+
+      $scope.din = false;
+
+      $scope.changePin = function () {
+        $scope.din = !$scope.din;
+        $scope.$emit('ppin', $scope.din);
+      };
+      $scope.$emit('ppin', $scope.din);
+
+
+      $scope.$emit('FromSelf', { divName: 'Self', description: '向父传播数据' });
+      $scope.$on('FromSelf', function (event, data) {
+        debugger;
+        alert(1);
+        //$window.alert("当前节点" + event.currentScope.name + ",截获到了来自" + data.divName + "的事件：" + event.name + "，它的作用是" + data.description);
+      });
 
       let prereq = (function () {
         let fns = [];
@@ -55,6 +71,14 @@ uiModules.get('kibana')
       $scope.addRows = function () {
         $scope.limit += 50;
       };
+
+      $scope.selectRowStyle = function (row) {
+        var style = {};
+        if (this.$root.embedded && row._id === this.$root.embedded.selectRowId) {
+          style = { color: 'rgba(50, 172, 45, 0.97)' };
+        }
+        return style;
+      }
 
       // This exists to fix the problem of an empty initial column list not playing nice with watchCollection.
       $scope.$watch('columns', function (columns) {
@@ -114,7 +138,7 @@ uiModules.get('kibana')
           };
 
           //2017-02-17 00:32:09 父子通信
-          $scope.$emit('doc_table.hits.onResults', results);  
+          $scope.$emit('doc_table.hits.onResults', results);
 
           return $scope.searchSource.onResults().then(onResults);
         }).catch(notify.fatal);

@@ -23,7 +23,7 @@ import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 import FilterManagerProvider from 'ui/filter_manager';
 import AggTypesBucketsIntervalOptionsProvider from 'ui/agg_types/buckets/_interval_options';
-import stateMonitorFactory  from 'ui/state_management/state_monitor_factory';
+import stateMonitorFactory from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/kibana/discover/index.html';
@@ -42,6 +42,8 @@ import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import 'plugins/kibana/backend_export/directives/backend_export';
+import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -50,89 +52,121 @@ const app = uiModules.get('apps/discover', [
 ]);
 
 uiRoutes
-.defaults(/discover/, {
-  requireDefaultIndex: true
-})
-.when('/discover/:id?', {
-  template: indexTemplate,
-  reloadOnSearch: false,
-  resolve: {
-    ip: function (Promise, courier, config, $location, Private) {
-      console.log("resolve.ip");
-      const State = Private(StateProvider);
-      return courier.indexPatterns.getIds()
-      .then(function (list) {
-        /**
-         *  In making the indexPattern modifiable it was placed in appState. Unfortunately,
-         *  the load order of AppState conflicts with the load order of many other things
-         *  so in order to get the name of the index we should use, and to switch to the
-         *  default if necessary, we parse the appState with a temporary State object and
-         *  then destroy it immediatly after we're done
-         *
-         *  @type {State}
-         */
-        const state = new State('_a', {});
+  .defaults(/discover/, {
+    requireDefaultIndex: true
+  })
+  .when('/discover/:id?', {
+    template: indexTemplate,
+    reloadOnSearch: false,
+    resolve: {
+      ip: function (Promise, courier, config, $location, Private) {
+        console.log("resolve.ip");
+        const State = Private(StateProvider);
+        return courier.indexPatterns.getIds()
+          .then(function (list) {
+            /**
+             *  In making the indexPattern modifiable it was placed in appState. Unfortunately,
+             *  the load order of AppState conflicts with the load order of many other things
+             *  so in order to get the name of the index we should use, and to switch to the
+             *  default if necessary, we parse the appState with a temporary State object and
+             *  then destroy it immediatly after we're done
+             *
+             *  @type {State}
+             */
+            const state = new State('_a', {});
 
-        const specified = !!state.index;
-        const exists = _.contains(list, state.index);
-        const id = exists ? state.index : config.get('defaultIndex');
-        state.destroy();
+            const specified = !!state.index;
+            const exists = _.contains(list, state.index);
+            const id = exists ? state.index : config.get('defaultIndex');
+            state.destroy();
 
-        return Promise.props({
-          list: list,
-          loaded: courier.indexPatterns.get(id),
-          stateVal: state.index,
-          stateValFound: specified && exists
-        });
-      });
-    },
-    savedSearch: function (courier, savedSearches, $route) {
-      console.log("resolve.savedSearch");
-      /*
-      * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
-      * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
-      *    _saved_search.js为src/ui/public/courier/saved_object/saved_object.js的子类
-      *   _.class(SavedSearch).inherits(courier.SavedObject);
-      *   【注意】在这里无法获取当前index的id，需要在“function discoverController”控制器中进行赋值
-      *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
-      * */
-      return savedSearches.get($route.current.params.id)
-      .catch(courier.redirectWhenMissing({
-        'search': '/discover',
-        'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
-      }));
+            return Promise.props({
+              list: list,
+              loaded: courier.indexPatterns.get(id),
+              stateVal: state.index,
+              stateValFound: specified && exists
+            });
+          });
+      },
+      savedSearch: function (courier, savedSearches, $route, $http) {
+        console.log('resolve.savedSearch');
+        /*
+        * savedSearches负责注册和初始化src/core_plugins/kibana/public/discover/saved_searches/_saved_search.js
+        * 在 _saved_search.js 文件中对type对mapping进行了扩展，添加了‘tagetIndex’用于保存对应的index关系
+        *    _saved_search.js为src/ui/public/courier/saved_object/saved_object.js的子类
+        *   _.class(SavedSearch).inherits(courier.SavedObject);
+        *   【注意】在这里无法获取当前index的id，需要在“function discoverController”控制器中进行赋值
+        *   savedSearch.tagetIndex=savedSearch.searchSource.get("index").id 【ref:@#设置索引id@2017-02-06 22:11:23】      *
+        * */
+        return savedSearches.get($route.current.params.id)
+          .then(savedObjects => {
+
+            //TODO:用于在新建查询是默认索引配置了数据权限后造成查询不出数据的问题
+            var isNewSearch = savedObjects.title === 'New Saved Search';
+
+            var authObj = _.get(savedObjects.uiConf, 'authObj', []);
+            var authObjConf = _.filter(authObj, item => { return !item.disable; });
+            if (_.size(authObjConf) > 0) {
+              return getAuthObjValue($http, authObjConf)
+                .then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
+            } else {
+              var ip = savedObjects.searchSource.get('index');
+              var indexPatternsAuthObjConf = _.filter(ip.fields, item => { return _.isEmpty(item.authObjs) === false; });
+              indexPatternsAuthObjConf = _.map(indexPatternsAuthObjConf, field => {
+                var obj = {};
+                obj[field.name] = field.authObjs.split('|');
+                return obj;
+              });
+
+              if (_.size(indexPatternsAuthObjConf) > 0) {
+                return getAuthObjValue($http, indexPatternsAuthObjConf).then(authObjValue => {
+                  savedObjects.authObjValue = authObjValue;
+                  return savedObjects;
+                });
+              } else {
+                return savedObjects;
+              }
+            }
+          })
+          .catch(courier.redirectWhenMissing({
+            'search': '/discover',
+            'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
+          }));
+      }
+      // ,teldConf: function (Promise, courier, savedSearches, $route, es) {
+      //   console.log(es);
+      //   console.log("es"+$route.current.params.id);
+
+      //   // let conf = Promise.props({});
+      //   // if ($route.current.params.id) {
+      //   //   conf = es.get({
+      //   //     index: ".teld.conf",
+      //   //     type: 'search',
+      //   //     id: $route.current.params.id
+      //   //   })
+      //   //     .then(function (resp) {
+      //   //       console.log("es get");
+      //   //       console.log(resp);
+      //   //     });
+      //   // }
+
+      //   // return conf;
+
+      //   return es.get({
+      //       index: ".teld.conf",
+      //       type: 'search',
+      //       id: $route.current.params.id
+      //     })
+      //       .then(function (resp) {
+      //         console.log("es get");
+      //         console.log(resp);
+      //       });
+      // }
     }
-    // ,teldConf: function (Promise, courier, savedSearches, $route, es) {
-    //   console.log(es);
-    //   console.log("es"+$route.current.params.id);
-
-    //   // let conf = Promise.props({});
-    //   // if ($route.current.params.id) {
-    //   //   conf = es.get({
-    //   //     index: ".teld.conf",
-    //   //     type: 'search',
-    //   //     id: $route.current.params.id
-    //   //   })
-    //   //     .then(function (resp) {
-    //   //       console.log("es get");
-    //   //       console.log(resp);
-    //   //     });
-    //   // }
-
-    //   // return conf;
-
-    //   return es.get({
-    //       index: ".teld.conf",
-    //       type: 'search',
-    //       id: $route.current.params.id
-    //     })
-    //       .then(function (resp) {
-    //         console.log("es get");
-    //         console.log(resp);
-    //       });
-    // }
-  }
-});
+  });
 
 app.directive('discoverApp', function () {
   return {
@@ -145,13 +179,13 @@ app.directive('discoverApp', function () {
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, globalState, teldSession) {
 
-    $rootScope.showNotify = true;
+  $rootScope.showNotify = true;
 
-    // const teldConf = $route.current.locals.teldConf;
-    // console.log(teldConf);
+  // const teldConf = $route.current.locals.teldConf;
+  // console.log(teldConf);
 
-    console.log($route.current.locals.savedSearch);
-    
+  console.log($route.current.locals.savedSearch);
+
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const brushEvent = Private(UtilsBrushEventProvider);
@@ -160,7 +194,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   const filterManager = Private(FilterManagerProvider);
 
 
-  const discoverExportExcel = Private(DiscoverExportExcelProvider);  
+  const discoverExportExcel = Private(DiscoverExportExcelProvider);
 
   const notify = new Notifier({
     location: 'Discover'
@@ -168,6 +202,94 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
   $scope.showInterval = false;
+  $scope.visualizeSwitch = true;
+
+  //syncGrafanaTimeRange();
+  tellGrafanaMyLoaded();
+
+  this.$scope = $scope;
+  //this.$rootScope=$rootScope;
+  //接收PostMessage发送过来的消息，通过Angular-Post-Message组件
+  let messageIncomingHandler = $scope.$root.$on('$messageIncoming', messageIncoming.bind(this));
+  function messageIncoming(event, data) {
+    console.group("kibana");
+    console.log(angular.fromJson(event));
+    console.log(angular.fromJson(data));
+
+    let eventData = angular.fromJson(data);
+
+    console.group("messageIncoming.data");
+    console.log(eventData)
+
+    let that = this;
+
+    let messageIncomingHandlerConfin = {
+      "grafanaLink": function(eventData){
+        let grafanaTheme = eventData.eventArgs.dashTheme;
+
+        $rootScope.embedGrafana = $rootScope.embedGrafana || {};
+        $rootScope.embedGrafana.kibanaConf = eventData.eventArgs.kibanaConf;
+
+        let kibanaBody = $("#kibana-body").addClass('embedGrafana');
+        if (grafanaTheme === "dark") {
+          let kibanaApp = kibanaBody.addClass("darkScrollbar").find("div.application");
+          //kibanaApp.addClass("tab-dashboard").addClass("theme-dark");
+          $rootScope.embedGrafana.kibanaConf.themeClass = "tab-dashboard theme-dark";
+        }
+        $(".sidebar-collapser").hide();
+        $scope.topNavMenuSwitch = eventData.eventArgs.topNavMenu;
+        $rootScope.initRowSelectIndex = eventData.eventArgs.initRowSelectIndex;
+
+
+        $scope.fetch();
+      },
+      "timeRangeChanged": function (eventData) {
+        let time = eventData.eventArgs;
+        console.log(time);
+        that.$scope.timefilter.time.from = eventData.eventArgs.from;
+        that.$scope.timefilter.time.to = eventData.eventArgs.to;
+      }
+    };
+
+    if(data.origin!==window.location.origin){
+      $rootScope.embedded = {origin:data.origin};
+    }
+
+
+    let messageIncomingHandler = messageIncomingHandlerConfin[eventData.eventType] || function (eventData) {
+      console.log(`无${eventData.eventType}对应消息的处理方法`);
+    }
+
+    messageIncomingHandler(eventData);
+
+
+    console.groupEnd();
+
+    console.groupEnd();
+  }
+  $scope.$on('$destroy', function () {
+    messageIncomingHandler();
+    messageIncomingHandler = null;
+  });
+
+  /*通知grafanakibana已经加载完成*/
+  function tellGrafanaMyLoaded(){
+    sendPostMessage("kibanaLoaded", { "message": "Hello, my loaded" });
+  }
+
+  /*同步grafana的时间范围*/
+  function syncGrafanaTimeRange(){
+    sendPostMessage("syncTimeRange",{});
+  }
+
+  function sendPostMessage(eventType, eventArgs) {
+    let postMessage = {
+      "eventType": eventType,
+      "eventArgs": eventArgs
+    };
+    console.log(postMessage);
+    $scope.$emit('$messageOutgoing', angular.toJson(postMessage));
+  }
 
   $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
@@ -181,11 +303,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
-  $scope.$on('$destroy', savedSearch.destroy);  
+  $scope.$on('$destroy', savedSearch.destroy);
 
   console.log(savedSearch.uiConf);
   //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
-  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);  
+  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);
 
   function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
@@ -229,6 +351,16 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverExportButton',
       },
+      'backendexport': {
+        key: '导出',
+        description: '导出',
+        template: require('plugins/kibana/discover/partials/backend_export.html'),
+        run: function (menuItem, kbnTopNav) {
+          //$scope.export();
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'exportButton',
+      },
       'navigation': {
         key: '统计分析',
         description: '统计分析',
@@ -247,12 +379,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         menuKeys.push(key);
       }
     }
+
     menuKeys.forEach(function (value) {
       let confMenu = confTopNavMenu[value];
       if (confMenu) {
         menus.push(confMenu);
       }
     });
+
+    if (_.includes(menuKeys, 'backendexport') && _.includes(menuKeys, 'export')) {
+      _.remove(menus, { testId: 'discoverExportButton' });
+    }
 
     // menus.push({
     //   key: 'callNodejs',
@@ -268,6 +405,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
+  $scope.authObjValue = savedSearch.authObjValue;
   $scope.indexPattern = resolveIndexPatternLoading();
   $scope.searchSource.set('index', $scope.indexPattern);
 
@@ -343,11 +481,12 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   // $scope.$watchCollection('advancedSearch', function () {
   //   alert(1);
   // });
-  
+
   $scope.opts = {
     // number of records to fetch, then paginate through
     //sampleSize: parseInt(savedSearch.pageSize || config.get('discover:sampleSize')),
     sampleSize: parseInt(savedSearch.uiConf.pageSize || config.get('discover:sampleSize')),
+    sizeRange: savedSearch.uiConf.sizeRange || [],
     //sampleSize: 10000 ,
     // Index to match
     index: $scope.indexPattern.id,
@@ -390,156 +529,161 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     });
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
-    $scope.updateDataSource()
-    .then(function () {
-      $scope.$listen(timefilter, 'fetch', function () {
-        $scope.fetch();
-      });
-
-      $scope.$watchCollection('state.sort', function (sort) {
-        if (!sort) return;
-
-        // get the current sort from {key: val} to ["key", "val"];
-        const currentSort = _.pairs($scope.searchSource.get('sort')).pop();
-
-        // if the searchSource doesn't know, tell it so
-        if (!angular.equals(sort, currentSort)) $scope.fetch();
-      });
-
-      // update data source when filters update
-      $scope.$listen(queryFilter, 'update', function () {
-        return $scope.updateDataSource().then(function () {
-          $state.save();
+    $scope.updateDataSource().then(dddd)
+      .then(function () {
+        $scope.$listen(timefilter, 'fetch', function () {
+          $scope.fetch();
         });
-      });
 
-      // update data source when hitting forward/back and the query changes
-      $scope.$listen($state, 'fetch_with_changes', function (diff) {
-        if (diff.indexOf('query') >= 0) $scope.fetch();
-      });
+        $scope.$watchCollection('state.sort', function (sort) {
+          if (!sort) return;
 
-      // fetch data when filters fire fetch event
-      $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+          // get the current sort from {key: val} to ["key", "val"];
+          const currentSort = _.pairs($scope.searchSource.get('sort')).pop();
 
-      $scope.$watch('opts.timefield', function (timefield) {
-        timefilter.enabled = !!timefield;
-      });
+          // if the searchSource doesn't know, tell it so
+          if (!angular.equals(sort, currentSort)) $scope.fetch();
+        });
 
-      $scope.$watch('state.interval', function (interval, oldInterval) {
-        if (interval !== oldInterval && interval === 'auto') {
-          $scope.showInterval = false;
-        }
-        $scope.fetch();
-      });
+        // update data source when filters update
+        $scope.$listen(queryFilter, 'update', function () {
+          return $scope.updateDataSource().then(dddd)
+          .then(function () {
+            $state.save();
+          })
+        });
 
-      $scope.$watch('vis.aggs', function () {
-        // no timefield, no vis, nothing to update
-        if (!$scope.opts.timefield) return;
+        // update data source when hitting forward/back and the query changes
+        $scope.$listen($state, 'fetch_with_changes', function (diff) {
+          if (diff.indexOf('query') >= 0) $scope.fetch();
+        });
 
-        const buckets = $scope.vis.aggs.bySchemaGroup.buckets;
+        // fetch data when filters fire fetch event
+        $scope.$listen(queryFilter, 'fetch', $scope.fetch);
 
-        if (buckets && buckets.length === 1) {
-          $scope.intervalName = 'by ' + buckets[0].buckets.getInterval().description;
-        } else {
-          $scope.intervalName = 'auto';
-        }        
-      });
+        $scope.$watch('opts.timefield', function (timefield) {
+          timefilter.enabled = !!timefield;
+        });
 
-      $scope.$watchMulti([
-        'rows',
-        'fetchStatus'
-      ], (function updateResultState() {
-        let prev = {};
-        const status = {
-          LOADING: 'loading', // initial data load
-          READY: 'ready', // results came back
-          NO_RESULTS: 'none' // no results came back
-        };
+        $scope.$watch('state.interval', function (interval, oldInterval) {
+          if (interval !== oldInterval && interval === 'auto') {
+            $scope.showInterval = false;
+          }
+          $scope.fetch();
+        });
 
-        function pick(rows, oldRows, fetchStatus) {
-          // initial state, pretend we are loading
-          if (rows == null && oldRows == null) return status.LOADING;
+        $scope.$watch('vis.aggs', function () {
+          // no timefield, no vis, nothing to update
+          if (!$scope.opts.timefield) return;
 
-          const rowsEmpty = _.isEmpty(rows);
-          // An undefined fetchStatus means the requests are still being
-          // prepared to be sent. When all requests are completed,
-          // fetchStatus is set to null, so it's important that we
-          // specifically check for undefined to determine a loading status.
-          const preparingForFetch = _.isUndefined(fetchStatus);
-          if (preparingForFetch) return status.LOADING;
-          else if (rowsEmpty && fetchStatus) return status.LOADING;
-          else if (!rowsEmpty) return status.READY;
-          else return status.NO_RESULTS;
-        }
+          const buckets = $scope.vis.aggs.bySchemaGroup.buckets;
 
-        return function () {
-          const current = {
-            rows: $scope.rows,
-            fetchStatus: $scope.fetchStatus
+          if (buckets && buckets.length === 1) {
+            $scope.intervalName = 'by ' + buckets[0].buckets.getInterval().description;
+          } else {
+            $scope.intervalName = 'auto';
+          }
+        });
+
+        $scope.$watchMulti([
+          'rows',
+          'fetchStatus'
+        ], (function updateResultState() {
+          let prev = {};
+          const status = {
+            LOADING: 'loading', // initial data load
+            READY: 'ready', // results came back
+            NO_RESULTS: 'none' // no results came back
           };
 
-          $scope.resultState = pick(
-            current.rows,
-            prev.rows,
-            current.fetchStatus,
-            prev.fetchStatus
-          );
+          function pick(rows, oldRows, fetchStatus) {
+            // initial state, pretend we are loading
+            if (rows == null && oldRows == null) return status.LOADING;
 
-          prev = current;
-        };
-      }()));
+            const rowsEmpty = _.isEmpty(rows);
+            // An undefined fetchStatus means the requests are still being
+            // prepared to be sent. When all requests are completed,
+            // fetchStatus is set to null, so it's important that we
+            // specifically check for undefined to determine a loading status.
+            const preparingForFetch = _.isUndefined(fetchStatus);
+            if (preparingForFetch) return status.LOADING;
+            else if (rowsEmpty && fetchStatus) return status.LOADING;
+            else if (!rowsEmpty) return status.READY;
+            else return status.NO_RESULTS;
+          }
 
-      $scope.searchSource.onError(function (err) {
-        notify.error(err);
-      }).catch(notify.fatal);
+          return function () {
+            const current = {
+              rows: $scope.rows,
+              fetchStatus: $scope.fetchStatus
+            };
 
-      function initForTime() {
-        return setupVisualization().then($scope.updateTime);
-      }
+            $scope.resultState = pick(
+              current.rows,
+              prev.rows,
+              current.fetchStatus,
+              prev.fetchStatus
+            );
 
-      return Promise.resolve($scope.opts.timefield && initForTime())
+            prev = current;
+          };
+        }()));
+
+        $scope.searchSource.onError(function (err) {
+          notify.error(err);
+        }).catch(notify.fatal);
+
+        function initForTime() {
+          return setupVisualization().then($scope.updateTime);
+        }
+
+        return Promise.resolve($scope.opts.timefield && initForTime())
+          .then(function () {
+            init.complete = true;
+            $state.replace();
+            $scope.$emit('application.load');
+          });
+      })
       .then(function () {
-        init.complete = true;
-        $state.replace();
-        $scope.$emit('application.load');
+        $state.query = $scope.dddquery;
       });
-    });
   });
 
   $scope.opts.saveDataSource = function () {
-    return $scope.updateDataSource()
-    .then(function () {
-      savedSearch.id = savedSearch.title;
-      savedSearch.columns = $scope.state.columns;
-      savedSearch.sort = $scope.state.sort;
-      //savedSearch.pageSize = $scope.opts.sampleSize;
-      savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
-      savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
-      teldSession.setSavedObjOwner(savedSearch);
+    return $scope.updateDataSource().then(dddd)
+      .then(function () {
+        savedSearch.id = savedSearch.title;
+        savedSearch.columns = $scope.state.columns;
+        savedSearch.sort = $scope.state.sort;
+        //savedSearch.pageSize = $scope.opts.sampleSize;
+        savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
+        savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+        teldSession.setSavedObjOwner(savedSearch);
 
-      if ($scope.indexPattern.hasTimeField()) {
-        let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
-        //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
+        if ($scope.indexPattern.hasTimeField()) {
+          let uiConf_timefilter = { disabled: false, timeFrom: timefilter.time.from, timeTo: timefilter.time.to };
+          //uiConf_timefilter.refreshInterval = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
 
-        savedSearch.uiConf.timefilter = angular.toJson(uiConf_timefilter);
-      }
-      return savedSearch.save()
-      .then(function (id) {
-        stateMonitor.setInitialState($state.toJSON());
-        $scope.kbnTopNav.close('save');
-
-        if (id) {
-          notify.info('Saved Data Source "' + savedSearch.title + '"');
-          if (savedSearch.id !== $route.current.params.id) {
-            kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
-          } else {
-            // Update defaults so that "reload saved query" functions correctly
-            $state.setDefaults(getStateDefaults());
-          }
+          savedSearch.uiConf.timefilter = angular.toJson(uiConf_timefilter);
         }
-      });
-    })
-    .catch(notify.error);
+        delete savedSearch.searchSource._state.dpfilter;
+        return savedSearch.save()
+          .then(function (id) {
+            stateMonitor.setInitialState($state.toJSON());
+            $scope.kbnTopNav.close('save');
+
+            if (id) {
+              notify.info('Saved Data Source "' + savedSearch.title + '"');
+              if (savedSearch.id !== $route.current.params.id) {
+                kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
+              } else {
+                // Update defaults so that "reload saved query" functions correctly
+                $state.setDefaults(getStateDefaults());
+              }
+            }
+          });
+      })
+      .catch(notify.error);
   };
 
   $scope.opts.fetch = $scope.fetch = function () {
@@ -548,15 +692,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     $scope.updateTime();
 
-    $scope.updateDataSource()
-    .then(setupVisualization)
-    .then(function () {
-      $state.save();
-      $TeldState.save();
-      $scope.kbnTopNav.close();
-      return courier.fetch();
-    })
-    .catch(notify.error);
+    $scope.updateDataSource().then(dddd)
+      .then(setupVisualization)
+      .then(function () {
+        $state.save();
+        $TeldState.save();
+        $scope.kbnTopNav.close();
+        return courier.fetch();
+      })
+      .catch(notify.error);
   };
 
   $scope.searchSource.onBeginSegmentedFetch(function (segmented) {
@@ -677,18 +821,59 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.newQuery = function () {
     kbnUrl.change('/discover');
   };
+  $scope.dddquery = {};
+  function dddd() {
+    $state.query = $scope.dddquery;
+  };
+
+  function getDataPermFilter() {
+    return $scope.authObjValue || [];
+  }
 
   $scope.updateDataSource = Promise.method(function () {
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.save();
-    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);    
+    let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
 
     //debugger;
+
+    let postData = {
+      'eventType': 'kibana.Query',
+      'eventArgs': {'esQueryDSL':esQueryDSL}
+    };
+    $scope.$emit('$messageOutgoing', angular.toJson(postData));
+    $scope.dddquery = $state.query;
+    let query = $state.query;
+    if (query.query_string && query.query_string.query != '*') {
+      query = _.cloneDeep($state.query);
+
+      let dun = query.query_string.query.split(/\s+(and|or)\s+/gi);
+      let itemReg = /(.*):["']?.*["']?/gi;
+      let dum2 = dun.map(item => {
+
+        let r = itemReg.exec(item);
+        if (r) {
+          let name = r[1];
+          let field = _.find($scope.indexPattern.fields, { 'alias': name });
+          if (field) {
+            item = item.replace(new RegExp(field.alias + ':'), field.name + ':');
+          }
+        }
+        return item;
+      });
+
+      query.query_string.query = dum2.join(' ');
+    }
+
     $scope.searchSource
       .size($scope.opts.sampleSize)
-      .sort(getSort($state.sort, $scope.indexPattern)).query(!$state.query ? null : $state.query)
+      .sort(getSort($state.sort, $scope.indexPattern))
+      //.query(!$state.query ? null : $state.query)
+      .query(query)
       .set('filter', queryFilter.getFilters())
+      //.set('dpfilter', dataPFilter)
+      .set('dpfilter', getDataPermFilter())
       .set('advancedSearch', esQueryDSL);
 
     //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));
@@ -697,7 +882,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       $scope.searchSource.highlight({
         pre_tags: [highlightTags.pre],
         post_tags: [highlightTags.post],
-        fields: {'*': {}},
+        fields: { '*': {} },
         require_field_match: false,
         fragment_size: 2147483647 // Limit of an integer.
       });
@@ -774,10 +959,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         resolve($scope.vis);
       });
     })
-    .finally(function () {
-      // clear the loading flag
-      loadingVis = null;
-    });
+      .finally(function () {
+        // clear the loading flag
+        loadingVis = null;
+      });
 
     return loadingVis;
   }
@@ -801,9 +986,9 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       notify.warning(err + ' Using the default index pattern: "' + loaded.id + '"');
     }
     return loaded;
-  } 
+  }
 
-  $scope.test=function () {
+  $scope.test = function () {
     /** debugger; */
 
     /*在方法中 this===$scope 成立*/
@@ -823,10 +1008,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     //或$scope.fetch() 详细分析见http://www.cnblogs.com/xing901022/p/5158425.html
   }
 
-  $scope.export = function(){
+  $scope.export = function () {
     let indexPattern = $scope.indexPattern;
     let columns = $scope.state.columns;
-    discoverExportExcel(indexPattern,columns,savedSearch,$scope.rows);
+    discoverExportExcel(indexPattern, columns, savedSearch, $scope.rows);
   }
 
   const requestQueue = Private(RequestQueueProvider);
@@ -836,7 +1021,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   const forEachStrategy = Private(require("ui/courier/fetch/for_each_strategy"));
   const ABORTED = { CourierFetchRequestStatus: 'aborted' };
 
-  $scope.callNodejs=function () {
+  $scope.callNodejs = function () {
 
     /** debugger; */
     // $scope.searchSource 拼接查询条件的数据
@@ -844,7 +1029,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     // alert($scope.searchSource._fetchStrategy.reqsFetchParamsToBody);
 
     const requests = requestQueue.getStartable($scope.searchSource._fetchStrategy);
-    
+
     function startRequests(requests) {
       return Promise.map(requests, function (req) {
         //return req;
@@ -865,10 +1050,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
       replaceAbortedRequests();
       return startRequests(requests)
-      .then(function () {
-        replaceAbortedRequests();
-        return callClientExport(strategy, requests);
-      })
+        .then(function () {
+          replaceAbortedRequests();
+          return callClientExport(strategy, requests);
+        })
     }
 
     let ooo = forEachStrategy(requests, function (strategy, reqsForStrategy) {
@@ -897,7 +1082,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       });
 
     // let url = "/elasticsearch/export/_msearch";
-    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';    
+    // let data = '{"index":["系统运行日志"],"ignore_unavailable":true,"preference":1486962061082}\r\n{"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fields":{"*":{}},"require_field_match":false,"fragment_size":2147483647},"query":{"bool":{"must":[{"query_string":{"query":"*","analyze_wildcard":true}},{"range":{"CreateTime":{"gte":1486961615159,"lte":1486962515159,"format":"epoch_millis"}}}],"must_not":[]}},"size":500,"sort":[{"_score":{"order":"desc"}}],"_source":{"excludes":[]},"aggs":{"2":{"date_histogram":{"field":"CreateTime","interval":"30s","time_zone":"Asia/Shanghai","min_doc_count":1}}},"stored_fields":["*"],"script_fields":{},"docvalue_fields":["CreateTime"]}\r\n';
     // $http.post(url, data)
     //   .then(function successCallback(response) {
     //     console.log(response);

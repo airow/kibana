@@ -19,12 +19,13 @@ import editorTemplate from 'plugins/kibana/visualize/editor/editor.html';
 
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
 uiRoutes
 .when('/visualize/create', {
   template: editorTemplate,
   resolve: {
-    savedVis: function (savedVisualizations, courier, $route, Private) {
+    savedVis: function (savedVisualizations, courier, $route, Private, $http) {
       const visTypes = Private(RegistryVisTypesProvider);
       const visType = _.find(visTypes, {name: $route.current.params.type});
       if (visType.requiresSearch && !$route.current.params.indexPattern && !$route.current.params.savedSearchId) {
@@ -32,6 +33,24 @@ uiRoutes
       }
 
       return savedVisualizations.get($route.current.params)
+      .then(savedObjects => {
+        var ip = savedObjects.vis.indexPattern;
+        var authObjConf = _.filter(ip.fields, item => { return _.isEmpty(item.authObjs) === false; });
+        authObjConf = _.map(authObjConf, field => {
+          var obj = {};
+          obj[field.name] = field.authObjs.split('|');
+          return obj;
+        });
+
+        if (_.size(authObjConf) > 0) {
+          return getAuthObjValue($http, authObjConf).then(authObjValue => {
+            savedObjects.authObjValue = authObjValue;
+            return savedObjects;
+          });
+        } else {
+          return savedObjects;
+        }
+      })
       .catch(courier.redirectWhenMissing({
         '*': '/visualize'
       }));
@@ -41,8 +60,39 @@ uiRoutes
 .when('/visualize/edit/:id', {
   template: editorTemplate,
   resolve: {
-    savedVis: function (savedVisualizations, courier, $route) {
+    savedVis: function (savedVisualizations, courier, $route,$http) {
       return savedVisualizations.get($route.current.params.id)
+      .then(savedObjects => {
+        debugger;
+        var authObj = _.get(savedObjects.uiConf, 'authObj', []);
+        var authObjConf = _.filter(authObj, item => { return !item.disable; });
+        if (_.size(authObjConf) > 0) {
+          return getAuthObjValue($http, authObjConf)
+            .then(authObjValue => {
+              savedObjects.authObjValue = authObjValue;
+              return savedObjects;
+            });
+        } else {
+          var refIndex = angular.fromJson(savedObjects.kibanaSavedObjectMeta.searchSourceJSON).index;
+          return courier.indexPatterns.get(refIndex).then(ip => {
+            var authObjConf = _.filter(ip.fields, item => { return _.isEmpty(item.authObjs) === false; });
+            authObjConf = _.map(authObjConf, field => {
+              var obj = {};
+              obj[field.name] = field.authObjs.split('|');
+              return obj;
+            });
+
+            if (_.size(authObjConf) > 0) {
+              return getAuthObjValue($http, authObjConf).then(authObjValue => {
+                savedObjects.authObjValue = authObjValue;
+                return savedObjects;
+              });
+            } else {
+              return savedObjects;
+            }
+          });
+        }
+      })
       .catch(courier.redirectWhenMissing({
         'visualization': '/visualize',
         'search': '/management/kibana/objects/savedVisualizations/' + $route.current.params.id,
@@ -117,6 +167,17 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     }
   }
 
+  let postData = {
+    "eventType": "hello",
+    "eventArgs": "I'm from kibana visualizeController"
+  };
+  $scope.$emit('$messageOutgoing', angular.toJson(postData));
+
+  postData.eventType = "syncTimeRange";
+  $scope.$emit('$messageOutgoing', angular.toJson(postData));
+
+  this.$scope = $scope;
+
   const $TeldState = $scope.TeldState = new TeldState();
   let teldUser = $scope.teldUser = teldSession.getUser();
   $TeldState.advancedSearchBool = ($TeldState.advancedSearchBool || savedVis.uiConf.advancedSearchBool) || {};
@@ -177,7 +238,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
         testId: 'discoverNavigationButton',
       }
     };
-    
+
     let menus = [];
     if (menuKeys && menuKeys.length == 0) {
       for (let key in confTopNavMenu) {
@@ -215,7 +276,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
   //   description: 'Share Visualization',
   //   template: require('plugins/kibana/visualize/editor/panels/share.html'),
   //   testId: 'visualizeShareButton',
-  // }, 
+  // },
   // {
   //   key: '刷新',
   //   description: 'Refresh',
@@ -383,6 +444,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $scope.kbnTopNav.close();
     $state.save();
     searchSource.set('filter', queryFilter.getFilters());
+    searchSource.set('dpfilter', savedVis.authObjValue);
     searchSource.set('advancedSearch', esQueryDSL);
     if (!$state.linked) searchSource.set('query', $state.query);
     if ($scope.vis.type.requiresSearch) {
@@ -403,7 +465,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
     $state.vis.title = savedVis.title;
     savedVis.visState = $state.vis;
     savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
-    
+
     savedVis.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
     teldSession.setSavedObjOwner(savedVis);
 
@@ -413,7 +475,7 @@ function VisEditor($scope, $route, timefilter, AppState, $location, kbnUrl, $tim
 
       savedVis.uiConf.timefilter = angular.toJson(uiConf_timefilter);
     }
-
+    delete savedVis.searchSource._state.dpfilter;
     savedVis.save()
     .then(function (id) {
       stateMonitor.setInitialState($state.toJSON());

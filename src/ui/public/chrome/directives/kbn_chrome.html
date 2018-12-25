@@ -14,7 +14,7 @@
       <kbn-loading-indicator></kbn-loading-indicator>
       <div
         class="application"
-        ng-class="'tab-' + chrome.getFirstPathSegment() + ' ' + chrome.getApplicationClasses()"
+        ng-class="$root.embedGrafana.kibanaConf.themeClass+' '+'tab-' + chrome.getFirstPathSegment() + ' ' + chrome.getApplicationClasses() "
         ng-view
       ></div>
     </div>

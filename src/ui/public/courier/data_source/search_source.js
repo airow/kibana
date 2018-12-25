@@ -97,7 +97,8 @@ export default function SearchSourceFactory(Promise, Private, config) {
     'from',
     'size',
     'source',
-    'advancedSearch'
+    'advancedSearch',
+    'dpfilter'
   ];
 
   SearchSource.prototype.index = function (indexPattern) {
@@ -227,6 +228,7 @@ export default function SearchSourceFactory(Promise, Private, config) {
 
     switch (key) {
       case 'filter':
+      case 'dpfilter':
         let verifiedFilters = val;
         if (config.get('courier:ignoreFilterIfFieldNotInIndex')) {
           if (!_.isArray(val)) val = [val];
@@ -246,6 +248,11 @@ export default function SearchSourceFactory(Promise, Private, config) {
           return !filter || _.get(filter, 'meta.disabled');
         })
         .value();
+        // state.filters.push({
+        //   'terms': {
+        //     '运营公司': ['09639fa0-967d-4c15-a09e-5bb96dd4791e', '09639FA0-967D-4C15-A09E-5BB96DD4791E', 'e5cdfff3-d5b0-4e06-862d-67d3bafbd00e', 'E5CDFFF3-D5B0-4E06-862D-67D3BAFBD00E']
+        //   }
+        // });
         return;
       case 'index':
       case 'type':
@@ -267,6 +274,15 @@ export default function SearchSourceFactory(Promise, Private, config) {
         state.advancedSearchBool = { bool: val };
         console.log(val);
         break;
+      // case 'dpfilter':
+      //   state.filters = _([state.filters || [], val])
+      //     .flatten()
+      //     // Yo Dawg! I heard you needed to filter out your filters
+      //     .reject(function (filter) {
+      //       return !filter || _.get(filter, 'meta.disabled');
+      //     })
+      //     .value();
+      //   break;
       default:
         addToBody();
     }

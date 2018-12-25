@@ -1,0 +1,26 @@
+2017-03-29
+
+PUT /.kibana/_mapping/navigationConf
+{
+  "properties": {
+    "navigation": {
+        "properties": {
+          "disabled": {
+            "type": "boolean"
+          },
+          "display": {
+            "type": "keyword"
+          },
+          "url": {
+            "type": "keyword"
+          }
+        }
+      }
+  }
+}
+
+GET /.kibana/navigationConf/_search
+
+POST _bulk
+{ "index" : { "_index" : ".kibana", "_type" : "navigationConf", "_id" : "navConf-1" } }
+{ "navigation":[{"display":"日充电量统计","url":"#/visualize/edit/%E6%97%A5%E5%85%85%E7%94%B5%E9%87%8F%E7%BB%9F%E8%AE%A1","disabled":false},{"display":"电站运营日报-青岛市-2年","url":"#/discover/%E7%94%B5%E7%AB%99%E8%BF%90%E8%90%A5%E6%97%A5%E6%8A%A5-%E9%9D%92%E5%B2%9B%E5%B8%82-2%E5%B9%B4","disabled":false}] }

@@ -14,8 +14,9 @@ function fieldAliasFilterProvider() {
     let returnValue = str;
     if (fields) {
       let field = fields.find(field => field.name === str);
-
-      returnValue = field.alias || field.name;
+      if(field){
+        returnValue = field.alias || field.name;
+      }
     }
     return returnValue;
   }

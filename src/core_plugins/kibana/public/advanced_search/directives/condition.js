@@ -3,13 +3,16 @@ import $ from 'jquery';
 import moment from 'moment';
 import conditionTemplate from './condition.html';
 import conditionDisplayTemplate from './condition_display.html';
-import '../styles/advanced_search.css'
+import '../styles/advanced_search.css';
 import uiModules from 'ui/modules';
 import './value_selector';
 
+import '../styles/selectize.default.css';
+import 'ui-select';
+
 uiModules
-.get('apps/advanced_search')
-.directive('teldAdvancedSearch', function (Private, $compile, advancedSearch, courier) { 
+.get('apps/advanced_search', ['ui.select'])
+.directive('teldAdvancedSearch', function (Private, $compile, advancedSearch, courier) {
 
   return {
     restrict: 'E',
@@ -22,19 +25,19 @@ uiModules
       boolSourceParent: '='
     },
     controller: function ($scope) {
-      
+
 
       let fieldSource = $scope.fieldSource = advancedSearch.getFieldSource($scope.indexPattern);
-      
-      
+
+
       /**初始化选择值 */
       $scope.initSelectField = function () {
         advancedSearch.queryField2ViewModel(this.condition, fieldSource);
-      }      
-      
+      }
+
       $scope.disableChange = function(){
         this.condition.selected.disabled=!this.condition.selected.disabled
-        $scope.$emit('advancedSearch.condition.disable', {});  
+        $scope.$emit('advancedSearch.condition.disable', {});
       }
 
       $scope.dateToTime = function () {
@@ -47,7 +50,7 @@ uiModules
         if (this.condition.selected) {
           let copy = { field: this.condition.selected.field, operator: this.condition.selected.operator };
           copy.value = null;
-          this.conditions.push({ selected: copy });          
+          this.conditions.push({ selected: copy });
         }
       }
 
@@ -60,7 +63,7 @@ uiModules
 
         if (_.isEmpty($scope.boolSource[this.key])) {
           delete $scope.boolSource[this.key];
-        }        
+        }
 
         let size = 0;
         _.keys($scope.boolSource).forEach(key => {
@@ -71,7 +74,7 @@ uiModules
         if (size == 0 && $scope.boolSourceType) {
           _.pull($scope.boolSourceType, $scope.boolSourceParent);
         }
-      }      
+      }
 
       $scope.removeGroup = function () {
         _.pull($scope.boolSourceType, $scope.boolSourceParent);
@@ -79,7 +82,7 @@ uiModules
       }
 
       /**条件组 */
-      $scope.addConditionGroup = function (type) {     
+      $scope.addConditionGroup = function (type) {
         $scope.boolSource = $scope.boolSource || {};
         let conditions = $scope.boolSource[type] || ($scope.boolSource[type] = []);
         let bool = {};
@@ -145,13 +148,13 @@ uiModules
         // });
       }
       /**OR */
-      $scope.addShould = function () { 
+      $scope.addShould = function () {
         $scope.addCondition('should');
-      }  
+      }
 
       $scope.addMustNot = function () {
         $scope.addCondition('must_not');
-      }    
+      }
 
       $scope.filterOperator = function () {
         let returnValue = [];
@@ -178,7 +181,7 @@ uiModules
     }
   };
 })
-.directive('teldAdvancedSearchDisplay', function (Private, $compile, advancedSearch) { 
+.directive('teldAdvancedSearchDisplay', function (Private, $compile, advancedSearch) {
 
   return {
     restrict: 'E',
@@ -194,9 +197,9 @@ uiModules
       /**初始化选择值 */
       $scope.initSelectField = function () {
         advancedSearch.queryField2ViewModel(this.condition, fieldSource);
-      }      
+      }
 
-      $scope.keySort = {};  
+      $scope.keySort = {};
 
       $scope.disableChange = function () {
         this.condition.selected.disabled = !this.condition.selected.disabled
@@ -212,7 +215,7 @@ uiModules
 
         if (_.isEmpty($scope.boolSource[this.key])) {
           delete $scope.boolSource[this.key];
-        }        
+        }
 
         let size = 0;
         _.keys($scope.boolSource).forEach(key => {
@@ -223,7 +226,7 @@ uiModules
         if (size == 0 && $scope.boolSourceType) {
           _.pull($scope.boolSourceType, $scope.boolSourceParent);
         }
-      } 
+      }
     },
     link: function ($scope, element) {
       const init = function () {

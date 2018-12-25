@@ -1,4 +1,4 @@
-<div class="sidebar-list">
+<div class="sidebar-list" teld-sidebar-list-fill-height>
   <div class="teld-indexPatternList" ng-show="indexPatternList.length > 1">
     <div class="index-pattern" ng-click="showIndexPatternSelection = !showIndexPatternSelection"
     ng-class="{active: showIndexPatternSelection === true}">
@@ -20,13 +20,20 @@
       <div css-truncate>{{ indexPattern.id }}</div>
     </div>
   </div>
-
+  <div class="sidebar-item">
+    <div class="discover-field-details" style="display:flex;">
+      <input style="height: 30px;" placeholder="筛选字段" type="text" class="form-control" ng-model="filter.vals.name">
+      <button aria-label="Search" class="localSearchButton" ng-click="filter.vals.name=''">
+        <span class="fa fa-close" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
   <div class="sidebar-list-header">
     <!--<h5>Selected Fields</h5>-->
     <h5>已选字段</h5>
   </div>
-  <ul class="list-unstyled discover-selected-fields" >
-    <discover-field ng-repeat="field in fields.raw|filter:{display:true}">
+  <ul class="list-unstyled discover-selected-fields">
+    <discover-field ng-repeat="field in fields.raw|filter:filter.isFieldFilteredWithDispaly">
     </discover-field>
   </ul>
 

@@ -26,9 +26,15 @@ export default function IndexPatternFieldType() {
             { display: "精确", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { display: "模糊", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
             { display: "分词", keyword: "match", link: "query", strategy: '.keyword' },
-            */
+
             { operatorKey:'string_equal', display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
             { operatorKey:'string_contain', display: "包含", keyword: "match", link: "query", strategy: '.keyword', ext: { "type": "phrase" } },
+            //{ operatorKey:'string_contain', display: "包含", keyword: "wildcard", link: "value" },
+            { operatorKey:'string_wildcard', display: "通配符", keyword: "wildcard", link: "value" },
+            */
+            // { operatorKey:'string_equal', display: "等于", keyword: "match", link: "query", ext:{"type": "phrase"} },
+            { operatorKey: 'string_equal', display: "等于", keyword: "term", link: "value" },
+            { operatorKey:'string_contain', display: "包含", keyword: "teld_contain", link: "query", ext:{"type": "phrase"} },
           ]
       },
       { name: 'number',     operators: [
@@ -45,7 +51,7 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'conflict',   operators: [
-            { operatorKey:'conflict_equal', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'conflict_equal', display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'geo_point',  operators: [
@@ -54,23 +60,23 @@ export default function IndexPatternFieldType() {
           ]
       },
       { name: 'geo_shape',  operators: [
-            { operatorKey:'geo_shape', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'geo_shape', display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'attachment', operators: [
-            { operatorKey:'attachment_equal', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'attachment_equal', display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'murmur3',    operators: [
-            { operatorKey:'murmur3_equal', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'murmur3_equal', display: "=", keyword: "term", link: "value" }
           ]
       },
       { name: 'unknown',    operators: [
-            { operatorKey:'unknown_equal', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'unknown_equal', display: "=", keyword: "term", link: "value" }
           ]
      },
       { name: '_source',    operators: [
-            { operatorKey:'_source_equal', display: "=", keyword: "term", link: "value" }            
+            { operatorKey:'_source_equal', display: "=", keyword: "term", link: "value" }
           ]
      },
     ]

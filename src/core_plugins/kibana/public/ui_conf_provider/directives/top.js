@@ -11,21 +11,20 @@ uiModules
     replace: true,
     template: uiConfTopTemplate,
     scope : {
-      size: '=sampleSize'
+      size: '=sampleSize',
+      sizeRange: '=sizeRange'
     },
     controller: function ($scope) {
-      let def_Sizes = [500, 1000, 5000, 10000];
+      let defSizes = [500, 1000, 5000, 10000];
       //let yml_sampleSize =  config.get('discover:sampleSize');
-      let yml_sampleSize = $scope.size;
-      console.log(config.get('discover:sampleSize'));
+      let ymlSampleSize = $scope.size;
+      //console.log(config.get('discover:sampleSize'));
 
-      let find = def_Sizes.find((n) => n == yml_sampleSize);
-      if (typeof (find) === 'undefined') {
-        def_Sizes.push(yml_sampleSize);
-        def_Sizes.sort((a, b) => a - b);
-      }
+      let sizeRange = $scope.sizeRange || [];
+      //defSizes = _.concat(defSizes, sizeRange);
+      defSizes = _(defSizes).concat(sizeRange).push(ymlSampleSize).uniq().sortBy().value();
 
-      $scope.sizeArray = def_Sizes;
+      $scope.sizeArray = defSizes;
     }
   };
 });

@@ -1,5 +1,6 @@
 <tr>
   <th width="1%"></th>
+  <th ng-show="$root.embedded"></th>
   <th ng-if="indexPattern.timeFieldName">
     <span>Time <i ng-class="headerClass(indexPattern.timeFieldName)" ng-click="sort(indexPattern.timeFieldName)" tooltip="Sort by time"></i></span>
   </th>

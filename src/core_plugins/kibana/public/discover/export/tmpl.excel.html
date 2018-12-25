@@ -18,7 +18,7 @@
         let returnValue = col;
         if( typeof(col) === "object" ){
             returnValue = (col.title || col.field || "");
-        } 
+        }
         return returnValue;
     }
 
@@ -26,17 +26,17 @@
         let returnValue = col;
         if( typeof(col) === "object" ){
             returnValue = (col.field || col.title || "");
-        } 
+        }
         return returnValue;
     }
 
     function getValue(item , col){
         let val = item[getColField(col)];
-        let returnValue = val;  
+        let returnValue = val;
         if(val && typeof(val) === "object")
         {
             returnValue = val.value;
-        }        
+        }
         return returnValue ? returnValue : "";
     }
 %>
@@ -93,7 +93,7 @@
             <Cell><Data ss:Type="String">${ col }</Data></Cell>
         <% }else{ %>
             <Cell><Data ss:Type="String">${ getColTitle(col) }</Data></Cell>
-        <% } %>     
+        <% } %>
      <% }); %>
     </Row>
     <% _.forEach(sheet.data, function(row) { %>

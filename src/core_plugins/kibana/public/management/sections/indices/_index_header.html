@@ -3,7 +3,14 @@
     <i aria-hidden="true" ng-if="defaultIndex === indexPattern.id" class="fa fa-star"></i>
     {{indexPattern.id}}
   </h1>
-  <div class="controls" ng-hide="true">
+  <div class="controls">
+    <button
+      ng-click="newDiscover()"
+      tooltip="New Discover"
+      class="btn btn-success">
+      <span class="sr-only">New Discover</span>
+      <i aria-hidden="true" class="fa fa-list"></i>
+    </button>
     <button
       ng-if="setDefault"
       ng-click="setDefault()"
