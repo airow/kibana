@@ -66,6 +66,7 @@ app.directive('discoverField', function ($compile) {
       $scope.toggleDisplay = function (field) {
         // This is inherited from fieldChooser
         $scope.toggle(field.name);
+        $scope.$root.$broadcast('fixedHeaderTableRefresh');
         if (field.display) $scope.increaseFieldCounter(field);
 
         if (field.details) {

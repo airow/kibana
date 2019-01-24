@@ -5,34 +5,35 @@ import uiModules from 'ui/modules';
 
 
 uiModules
-.get('kibana')
-.directive('collapsibleSidebar', function () {
-  // simply a list of all of all of angulars .col-md-* classes except 12
-  let listOfWidthClasses = _.times(11, function (i) { return 'col-md-' + i; });
+  .get('kibana')
+  .directive('collapsibleSidebar', function () {
+    // simply a list of all of all of angulars .col-md-* classes except 12
+    let listOfWidthClasses = _.times(11, function (i) { return 'col-md-' + i; });
 
-  return {
-    restrict: 'C',
-    link: function ($scope, $elem) {
-      let $collapser = $('<div class="sidebar-collapser"><div class="chevron-cont"></div></div>');
-      let $siblings = $elem.siblings();
+    return {
+      restrict: 'C',
+      link: function ($scope, $elem) {
+        let $collapser = $('<div class="sidebar-collapser"><div class="chevron-cont"></div></div>');
+        let $siblings = $elem.siblings();
 
-      let siblingsClass = listOfWidthClasses.reduce(function (prev, className) {
-        if (prev) return prev;
-        return $siblings.hasClass(className) && className;
-      }, false);
+        let siblingsClass = listOfWidthClasses.reduce(function (prev, className) {
+          if (prev) return prev;
+          return $siblings.hasClass(className) && className;
+        }, false);
 
-      $collapser.on('click', function () {
-        $elem.toggleClass('closed');
-        //$("disc-field-chooser").toggle();
-        $elem.children().toggle();
-        $(this).show();
-        // if there is are only two elements we can assume the other one will take 100% of the width
-        if ($siblings.length === 1 && siblingsClass) {
-          $siblings.toggleClass(siblingsClass + ' col-md-12');
-        }
-      })
-      .click()/*默认收起字段选择区域*/
-      .appendTo($elem);
-    }
-  };
-});
+        $collapser.on('click', function () {
+          $elem.toggleClass('closed');
+          $scope.$root.$broadcast('fixedHeaderTableRefresh');
+          //$("disc-field-chooser").toggle();
+          $elem.children().toggle();
+          $(this).show();
+          // if there is are only two elements we can assume the other one will take 100% of the width
+          if ($siblings.length === 1 && siblingsClass) {
+            $siblings.toggleClass(siblingsClass + ' col-md-12');
+          }
+        })
+          .click()/*默认收起字段选择区域*/
+          .appendTo($elem);
+      }
+    };
+  });

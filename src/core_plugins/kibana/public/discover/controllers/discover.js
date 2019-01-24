@@ -224,7 +224,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     let that = this;
 
     let messageIncomingHandlerConfin = {
-      "grafanaLink": function(eventData){
+      "grafanaLink": function (eventData) {
         let grafanaTheme = eventData.eventArgs.dashTheme;
 
         $rootScope.embedGrafana = $rootScope.embedGrafana || {};
@@ -251,8 +251,8 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       }
     };
 
-    if(data.origin!==window.location.origin){
-      $rootScope.embedded = {origin:data.origin};
+    if (data.origin !== window.location.origin) {
+      $rootScope.embedded = { origin: data.origin };
     }
 
 
@@ -273,13 +273,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   });
 
   /*通知grafanakibana已经加载完成*/
-  function tellGrafanaMyLoaded(){
+  function tellGrafanaMyLoaded() {
     sendPostMessage("kibanaLoaded", { "message": "Hello, my loaded" });
   }
 
   /*同步grafana的时间范围*/
-  function syncGrafanaTimeRange(){
-    sendPostMessage("syncTimeRange",{});
+  function syncGrafanaTimeRange() {
+    sendPostMessage("syncTimeRange", {});
   }
 
   function sendPostMessage(eventType, eventArgs) {
@@ -548,9 +548,9 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         // update data source when filters update
         $scope.$listen(queryFilter, 'update', function () {
           return $scope.updateDataSource().then(dddd)
-          .then(function () {
-            $state.save();
-          })
+            .then(function () {
+              $state.save();
+            })
         });
 
         // update data source when hitting forward/back and the query changes
@@ -840,7 +840,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     let postData = {
       'eventType': 'kibana.Query',
-      'eventArgs': {'esQueryDSL':esQueryDSL}
+      'eventArgs': { 'esQueryDSL': esQueryDSL }
     };
     $scope.$emit('$messageOutgoing', angular.toJson(postData));
     $scope.dddquery = $state.query;

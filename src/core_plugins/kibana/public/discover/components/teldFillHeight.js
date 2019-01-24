@@ -2,6 +2,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import uiModules from 'ui/modules';
 import 'fixed-header-table/jquery.fixedheadertable';
+import { debug } from 'util';
 const app = uiModules.get('apps/discover');
 
 app.directive('teldSidebarListFillHeight', function () {
@@ -32,7 +33,7 @@ app.directive('teldFillHeight', function () {
           $element.css({ 'height': `calc(100vh - ${top + 25}px)` });
         } else {
           $element.closest('#kibana-body').css('overflow-y', '');
-          $element.css('height','');
+          $element.css('height', '');
         }
       });
       if (false === $scope.din) {
@@ -44,13 +45,13 @@ app.directive('teldFillHeight', function () {
       });
 
       $scope.$on('$destroy', function () {
-        $element.closest('#kibana-body').css('overflow-y','');
+        $element.closest('#kibana-body').css('overflow-y', '');
       });
     }
   };
 });
 
-app.directive('teldFixedHeaderTable', function () {
+app.directive('teldFixedHeaderTable', function ($compile) {
   return {
     restrict: 'A',
     scope: {
@@ -61,6 +62,14 @@ app.directive('teldFixedHeaderTable', function () {
     link: function ($scope, $element) {
       let checkTimer;
       let scheduleCheck;
+      let listener;
+      debugger;
+      listener = $scope.$on('fixedHeaderTableRefresh', function (event, data) {
+        //alert($scope.din);
+        if ($scope.din) {
+          setTimeout(setup, 0);
+        }
+      });
       $scope.fillHeight = $element.closest('[teld-fill-height]');
       $scope.$watch('din', function (n, o) {
         if (n) {
@@ -93,8 +102,64 @@ app.directive('teldFixedHeaderTable', function () {
         $element.fixedHeaderTable({ footer: false, cloneHeadToFoot: false, fixedColumn: false });
 
         var $tbody = $element.closest('.fht-tbody');
+        var $thead = $element.parents('.fht-table-wrapper').find('.fht-thead');
+        debugger;
+
+        var head = $thead.find('thead').html();
+        var h = head.replace('ng-if="indexPattern.timeFieldName"', '')
+          .replace(/ng-repeat/g, 'ngRepeat');
+        var $h = $(h);
+
+        var ngClikcFun = function () {
+          var tr = $(this).closest('tr');
+          var ths = tr.find('th');
+          var th = $(this).closest('th');
+          var index = ths.index($(this).closest('th'));
+
+          var tabWrapper = $(this).closest('.fht-table-wrapper');
+          var eventTH = tabWrapper.find('.fht-tbody thead th:eq(' + index + ')');
+          var ngClikc = $(this).attr('ng-click');
+          eventTH.find('[ng-click="' + ngClikc + '"]').click();
+
+          debugger;
+          // var tt = tabWrapper.find('.fht-tbody thead').html();
+          // tt.replace('ng-if="indexPattern.timeFieldName"', '')
+          //   .replace(/ng-repeat/g, 'ngRepeat');
+          // var $hh = $(tt);
+          // $hh.find('[ng-click]').click(ngClikcFun);
+          // tr.parent().html($hh);
+
+          setTimeout(function () { setup(); }, 0);
+
+          // var text = th.find('.table-header-name').text();
+          // var ele;
+          // switch (ngClikc) {
+          //   case 'moveLeft(name)':
+          //     ele = th.prev().find('.table-header-name');
+          //     break;
+          //   case 'moveRight(name)':
+          //     ele = th.next().find('.table-header-name');
+          //     break;
+          //   case 'toggleColumn(name)':
+          //     th.remove();
+          //     tr.find('.table-header-move:first [ng-click="moveLeft(name)"]').hide();
+          //     tr.find('.table-header-move:last [ng-click="moveRight(name)"]').hide();
+          //     break;
+          // }
+          // if (ele) {
+          //   var ctext = ele.text();
+          //   th.find('.table-header-name').text(ctext);
+          //   ele.text(text);
+          // }
+
+        };
+
+        $h.find('[ng-click]').click(ngClikcFun);
+        $thead.find('thead').html($h);
+
+
         $tbody.css('overflow', 'scroll')
-        .css('height', $(window).height() - $tbody.offset().top);
+          .css('height', $(window).height() - $tbody.offset().top);
 
         var onScroll = function () {
           //alert(1);
@@ -125,6 +190,10 @@ app.directive('teldFixedHeaderTable', function () {
         clearTimeout(checkTimer);
         $element.off('scroll', scheduleCheck);
         $element.fixedHeaderTable('destroy');
+        if (listener) {
+          listener();
+          listener = null;
+        }
       });
     }
   };
@@ -133,8 +202,8 @@ app.directive('teldFixedHeaderTable', function () {
 app.directive('goToConfig', function () {
   return {
     restrict: 'E',
-    scope:{
-      target:'@'
+    scope: {
+      target: '@'
     },
     template: '<a style="margin-left:6px;" ng-href="{{href}}"><i class="fa fa-reply" aria-hidden="true"></i></a>',
     link: function ($scope, $element) {
