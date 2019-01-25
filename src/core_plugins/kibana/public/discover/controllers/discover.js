@@ -308,6 +308,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   console.log(savedSearch.uiConf);
   //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
   $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);
+  $scope.uiConf = savedSearch.uiConf;
 
   function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
@@ -407,6 +408,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   $scope.searchSource = savedSearch.searchSource;
   $scope.authObjValue = savedSearch.authObjValue;
   $scope.indexPattern = resolveIndexPatternLoading();
+  $scope.savedSearch = savedSearch;
   $scope.searchSource.set('index', $scope.indexPattern);
 
   $scope.helpDialog = function () {
@@ -658,6 +660,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         //savedSearch.pageSize = $scope.opts.sampleSize;
         savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
         savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+        savedSearch.uiConf.fixedHeader = $scope.uiConf.fixedHeader;
         teldSession.setSavedObjOwner(savedSearch);
 
         if ($scope.indexPattern.hasTimeField()) {

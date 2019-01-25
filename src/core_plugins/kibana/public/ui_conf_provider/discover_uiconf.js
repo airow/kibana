@@ -21,7 +21,8 @@ export default function UiConfProvider(Private, Promise, config) {
     authObj: [{ disable: true, '绑定字段': ['授权对象名称'] }],/** 授权对象 */
 
     /** */
-    navigation: []
+    navigation: [],
+    fixedHeader: false
   };
 
 };

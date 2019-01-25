@@ -121,37 +121,7 @@ app.directive('teldFixedHeaderTable', function ($compile) {
           var ngClikc = $(this).attr('ng-click');
           eventTH.find('[ng-click="' + ngClikc + '"]').click();
 
-          debugger;
-          // var tt = tabWrapper.find('.fht-tbody thead').html();
-          // tt.replace('ng-if="indexPattern.timeFieldName"', '')
-          //   .replace(/ng-repeat/g, 'ngRepeat');
-          // var $hh = $(tt);
-          // $hh.find('[ng-click]').click(ngClikcFun);
-          // tr.parent().html($hh);
-
           setTimeout(function () { setup(); }, 0);
-
-          // var text = th.find('.table-header-name').text();
-          // var ele;
-          // switch (ngClikc) {
-          //   case 'moveLeft(name)':
-          //     ele = th.prev().find('.table-header-name');
-          //     break;
-          //   case 'moveRight(name)':
-          //     ele = th.next().find('.table-header-name');
-          //     break;
-          //   case 'toggleColumn(name)':
-          //     th.remove();
-          //     tr.find('.table-header-move:first [ng-click="moveLeft(name)"]').hide();
-          //     tr.find('.table-header-move:last [ng-click="moveRight(name)"]').hide();
-          //     break;
-          // }
-          // if (ele) {
-          //   var ctext = ele.text();
-          //   th.find('.table-header-name').text(ctext);
-          //   ele.text(text);
-          // }
-
         };
 
         $h.find('[ng-click]').click(ngClikcFun);
