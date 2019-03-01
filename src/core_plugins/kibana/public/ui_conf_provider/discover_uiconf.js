@@ -22,7 +22,35 @@ export default function UiConfProvider(Private, Promise, config) {
 
     /** */
     navigation: [],
-    fixedHeader: false
+    fixedHeader: false,
+    columnConf: [
+      {
+        fieldName: '绑定字段',
+        disable: true,
+        'coloring': {
+          'bgColor': false,
+          'strategy': 'ranges|thresholds|expression|enumeration',
+          'template': '<span>${value}</span>',
+          'ranges': [
+            { 'range': '[0 TO 10)', 'color': 'red' },
+            { 'range': '[10 TO 15]', 'color': 'green' },
+            { 'range': '(15 TO *]', 'color': 'yellow' }
+          ],
+          'thresholds': [
+            { 'value': 0, 'color': 'red' },
+            { 'value': 50, 'color': 'red' }
+          ],
+          'enumeration': [
+            { 'value': '1', 'text': '公交站', 'color': 'red' },
+            { 'value': '2', 'text': '非公交' }
+          ],
+          'expression': {
+            'body': 'return value; //方法签名 fun(value, row, fieldName)'
+          }
+        },
+        'style': 'width:100px'
+      }
+    ]
   };
 
 };

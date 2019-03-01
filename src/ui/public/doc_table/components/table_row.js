@@ -44,7 +44,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
     controller: function ($scope, advancedSearch, TeldState, globalState, teldSession, timefilter) {
 
       $scope.$TeldState = new TeldState();
-      $scope.advancedSearch=advancedSearch;
+      $scope.advancedSearch = advancedSearch;
       $scope.sendPostMessage = function () {
         debugger;
         let postData = {
@@ -199,6 +199,153 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
         $el.trigger('renderComplete');
       }
 
+      var columnConfCache = {};
+
+      function cac(column) {
+        let returnValue = {
+          disable: column.disable,
+          template: _.template('${value}'),
+          defStrategy: function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            return val;
+          },
+          exec: function (value, row, fieldName) {
+            value = value.replace('<mark>', '').replace('</mark>', '');
+            var color = this[this.strategy || 'defStrategy'](value, row, fieldName);
+            var style = [this.style || ''];
+            value = new String(this.template(color));
+            if (color.color !== '') {
+              if (this.bgColor) {
+                style.push('background-color:' + color.color);
+              } else {
+                style.push('color:' + color.color);
+              }
+            } else {
+              if (this.bgColor) { style.push('color: inherit !important'); }
+            }
+            value.style = style.join(';');
+            return value;
+          }
+
+        };
+        if (column.coloring) {
+          returnValue.disable = column.disable;
+          returnValue.strategy = column.coloring.strategy;
+          returnValue.bgColor = column.coloring.bgColor;
+          returnValue.style = column.style;
+          returnValue.config = _.pick(column.coloring, ['ranges', 'expression', 'thresholds', 'enumeration']);
+          returnValue.template = _.template(column.coloring.template || '${value}');
+          returnValue.enumeration = function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            if (!this.config.enumeration) {
+              return val;
+            }
+
+            var item = _.find(this.config.enumeration, { value: value });
+            if (item) {
+              val.value = item.text;
+              val.color = item.color || '';
+            }
+            return val;
+          };
+          returnValue.expression = function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            var fun = new Function('value', 'row', 'fieldName', this.config.expression.body);
+            val.color = fun(value, row, fieldName);
+            return val;
+          };
+          returnValue.thresholds = function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            if (!this.config.thresholds) {
+              return val;
+            }
+            _.each(this.config.thresholds, item => {
+              if (value >= item.value) {
+                val.color = item.color;
+              }
+            });
+            return val;
+          };
+          returnValue.ranges = function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            if (!this.config.ranges) {
+              return val;
+            }
+            _.each(this.config.ranges, item => {
+              var range = item.range;
+              var color = item.color;
+              range = _.toArray(range.replace(/\s/g, ''));
+              var head = range.shift();
+              var last = range.pop();
+              range = range.join('');
+              var values = range.split(/,|TO/);
+              var minStr = values[0];
+              var maxStr = values[1];
+              var min = +minStr;
+              var max = +maxStr;
+              value = +value;
+
+              if (minStr === maxStr === '*') {
+                val.color = color;
+                return false;
+              }
+
+              var minStatus = minStr === '*';
+              if (minStatus === false) {
+                switch (head) {
+                  case '[':
+                    minStatus = min <= value;
+                    break;
+                  case '(':
+                    minStatus = min < value;
+                    break;
+                }
+              }
+              var maxStatus = maxStr === '*';
+              if (maxStatus === false) {
+                switch (last) {
+                  case ']':
+                    maxStatus = max >= value;
+                    break;
+                  case ')':
+                    maxStatus = max > value;
+                    break;
+                }
+              }
+              if (minStatus && maxStatus) {
+                val.color = color;
+                return false;
+              }
+            });
+            return val;
+          };
+        }
+        return returnValue;
+      }
+
+
+      function columnConf(value, row, fieldName) {
+        let columnConf = _.get($scope, '$parent.savedObj.uiConf.columnConf');
+        if (!columnConf) {
+          return value;
+        }
+
+        let column = columnConfCache[fieldName];
+        if (!column) {
+          let colConf = _.find(columnConf, { fieldName: fieldName });
+          if (!colConf || colConf.disable) {
+            return value;
+          }
+          column = columnConfCache[fieldName] = cac(colConf);
+        }
+        if (column.disable) {
+          return value;
+        }
+
+        value = column.exec(value, row, fieldName);
+        return value;
+      }
+
       /**
        * Fill an element with the value of a field
        */
@@ -207,12 +354,21 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
         urlFormat(indexPattern, fieldName, row); /** 对rul格式化特殊处理，支持row数据 */
         let text = indexPattern.formatField(row, fieldName);
 
-        if (truncate && text.length > MIN_LINE_LENGTH) {
-          return truncateByHeightTemplate({
-            body: text
-          });
-        }
+        //字段着色、枚举转换、单元格样式
+        text = columnConf(text, row._source, fieldName);
 
+        if (truncate && text.length > MIN_LINE_LENGTH) {
+          if (text instanceof String) {
+            var truncateText = truncateByHeightTemplate({
+              body: text
+            });
+            return _.defaults(new String(truncateText), text);
+          } else {
+            return truncateByHeightTemplate({
+              body: text
+            });
+          }
+        }
         return text;
       }
 
