@@ -7,9 +7,11 @@
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="localBreadcrumbs">
         <div class="localBreadcrumb">
-          <span ng-show="opts.savedSearch.id" ng-hide="embedGrafana.kibanaConf.localBreadcrumb.hide" class="localBreadcrumb__emphasis">
+          <span ng-show="opts.savedSearch.id" ng-hide="embedGrafana.kibanaConf.localBreadcrumb.hide"
+            class="localBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="::opts.savedSearch.title"></span>
-            <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
+            <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();"
+              class="fa fa-undo small"></i>&nbsp;
           </span>
           <span data-test-subj="discoverQueryHits" class="localBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
           <!--<ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>-->
@@ -27,9 +29,11 @@
             </select>-->
             <ui-conf-top size-range="opts.sizeRange" sample-size="opts.sampleSize"></ui-conf-top>
             <!--<input class="localSearchInput" style="flex: 0 0 auto; width: 85px; border-radius: 4px;" ng-model="opts.sampleSize" step="50" value="{{opts.sampleSize}}" type="number" placeholder="PageSize">            -->
-            <label ng-hide="embedGrafana.kibanaConf.localSearchInput.label.hide" style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
-            <input parse-query input-focus kbn-typeahead-input ng-model="state.query" placeholder="搜索..." aria-label="Search input"
-              type="text" class="localSearchInput" ng-class="{'localSearchInput-isInvalid': discoverSearch.$invalid}">
+            <label ng-hide="embedGrafana.kibanaConf.localSearchInput.label.hide"
+              style="flex: 0 0 auto; margin: auto 10px auto 25px;">过滤：</label>
+            <input parse-query input-focus kbn-typeahead-input ng-model="state.query" placeholder="搜索..."
+              aria-label="Search input" type="text" class="localSearchInput" style="width:100%;"
+              ng-class="{'localSearchInput-isInvalid': discoverSearch.$invalid}">
             <button type="submit" aria-label="Search" class="localSearchButton" ng-disabled="discoverSearch.$invalid">
               <span class="fa fa-search" aria-hidden="true"></span>
             </button>
@@ -41,7 +45,8 @@
       </form>
     </div>
   </kbn-top-nav>
-  <span ng-show="$root.embedded" ng-click="topNavMenuSwitch=!topNavMenuSwitch" style="position: absolute;z-index: 999;right: 5px; top:-3px;">
+  <span ng-show="$root.embedded" ng-click="topNavMenuSwitch=!topNavMenuSwitch"
+    style="position: absolute;z-index: 999;right: 5px; top:-3px;">
     <i title="显示条件" class="fa fa-chevron-circle-down" ng-hide="topNavMenuSwitch" aria-hidden="true"></i>
     <i title="隐藏条件" class="fa fa-chevron-circle-up" ng-show="topNavMenuSwitch" aria-hidden="true"></i>
   </span>
@@ -49,9 +54,11 @@
     <div class="row">
       <filter-bar state="state" index-pattern="indexPattern"></filter-bar>
     </div>
-    <div class="row" ng-show="advancedSearch.must && advancedSearch.must.length>0 || advancedSearch.should && advancedSearch.should.length>0 || advancedSearch.must_not && advancedSearch.must_not.length>0">
+    <div class="row"
+      ng-show="advancedSearch.must && advancedSearch.must.length>0 || advancedSearch.should && advancedSearch.should.length>0 || advancedSearch.must_not && advancedSearch.must_not.length>0">
       <div class="filter-bar">
-        高级：<teld-advanced-search-display index-pattern='indexPattern' bool-source="advancedSearch"></teld-advanced-search-display>
+        高级：<teld-advanced-search-display index-pattern='indexPattern' bool-source="advancedSearch">
+        </teld-advanced-search-display>
       </div>
     </div>
     <div class="row">
@@ -80,7 +87,8 @@
           <!-- result -->
           <div class="results" ng-show="resultState === 'ready'">
             <div class="discover-timechart" ng-if="opts.timefield && opts.savedSearch.uiConf.showTimeDiagram">
-              <i title="打开关闭时间图表" ng-click='visualizeSwitch=!visualizeSwitch' class="legend-icon fa" ng-class="{true:'fa-eye-slash',false:'fa-eye'}[visualizeSwitch]"
+              <i title="打开关闭时间图表" ng-click='visualizeSwitch=!visualizeSwitch' class="legend-icon fa"
+                ng-class="{true:'fa-eye-slash',false:'fa-eye'}[visualizeSwitch]"
                 style="position: absolute;top: 0px;right: 10px; color:cornflowerblue;"></i>
               <header>
                 <center class="small">
@@ -96,21 +104,22 @@
                   </span>
 
                   <span ng-show="showInterval" class="results-interval form-inline">
-                    <select class="form-control" ng-model="state.interval" ng-options="interval.val as (interval.display_zh_CN || interval.display) for interval in intervalOptions | filter: intervalEnabled">
+                    <select class="form-control" ng-model="state.interval"
+                      ng-options="interval.val as (interval.display_zh_CN || interval.display) for interval in intervalOptions | filter: intervalEnabled">
                     </select>
                   </span>
                 </center>
 
               </header>
 
-              <visualize ng-if="vis && rows.length != 0 && visualizeSwitch" vis="vis" ui-state="uiState" es-resp="mergedEsResp"
-                search-source="searchSource">
+              <visualize ng-if="vis && rows.length != 0 && visualizeSwitch" vis="vis" ui-state="uiState"
+                es-resp="mergedEsResp" search-source="searchSource">
               </visualize>
             </div>
 
             <div class="discover-table" fixed-scroll>
-              <doc-table hits="rows" index-pattern="indexPattern" saved-obj="savedSearch" sorting="state.sort" columns="state.columns"
-                infinite-scroll="true" filter="filterQuery" render-counter>
+              <doc-table hits="rows" index-pattern="indexPattern" saved-obj="savedSearch" sorting="state.sort"
+                columns="state.columns" infinite-scroll="true" filter="filterQuery" render-counter>
               </doc-table>
 
               <div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">

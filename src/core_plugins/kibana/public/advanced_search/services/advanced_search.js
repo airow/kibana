@@ -199,6 +199,9 @@ module.service('advancedSearch', function (Promise, getAppState) {
             }
 
             let newCondition = {};
+            if (isEsQueryDSL === false) {
+              newCondition = _.pick(condition, ['embed']);
+            }
             let newOperator = {};
             let newLink = {};
 
