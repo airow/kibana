@@ -3,17 +3,13 @@
     <p>
       <i class="fa fa-danger text-danger"></i>
       <strong>Scripting disabled:</strong>
-      All inline scripting has been disabled in Elasticsearch. You must enable inline scripting for at least one language in order to use scripted fields in Kibana.
+      All inline scripting has been disabled in Elasticsearch. You must enable inline scripting for at least one
+      language in order to use scripted fields in Kibana.
     </p>
   </div>
   <div ng-if="editor.creating" class="form-group">
     <label>Name</label>
-    <input
-      ng-model="editor.field.name"
-      required
-      placeholder="New Scripted Field"
-      input-focus
-      class="form-control">
+    <input ng-model="editor.field.name" required placeholder="New Scripted Field" input-focus class="form-control">
   </div>
   <div ng-if="editor.creating && editor.indexPattern.fields.byName[editor.field.name]" class="hintbox">
     <p>
@@ -26,10 +22,7 @@
 
   <div ng-if="editor.field.scripted" class="form-group">
     <label>Language</label>
-    <select
-      ng-model="editor.field.lang"
-      ng-options="lang as lang for lang in editor.scriptingLangs"
-      required
+    <select ng-model="editor.field.lang" ng-options="lang as lang for lang in editor.scriptingLangs" required
       class="form-control">
       <option value="">-- Select Language --</option>
     </select>
@@ -37,17 +30,10 @@
 
   <div class="form-group">
     <label>Type</label>
-    <select
-      ng-if="editor.field.scripted"
-      ng-model="editor.field.type"
-      ng-options="type as type for type in editor.fieldTypes"
-      class="form-control">
+    <select ng-if="editor.field.scripted" ng-model="editor.field.type"
+      ng-options="type as type for type in editor.fieldTypes" class="form-control">
     </select>
-    <input
-      ng-if="!editor.field.scripted"
-      ng-model="editor.field.type"
-      readonly
-      class="form-control">
+    <input ng-if="!editor.field.scripted" ng-model="editor.field.type" readonly class="form-control">
   </div>
 
   <div class="form-group">
@@ -63,19 +49,15 @@
       </h4>
 
       <p>
-        Formatting allows you to control the way that specific values are displayed. It can also cause values to be completely changed and prevent highlighting in Discover from working.
+        Formatting allows you to control the way that specific values are displayed. It can also cause values to be
+        completely changed and prevent highlighting in Discover from working.
       </p>
     </div>
 
-    <select
-      ng-model="editor.selectedFormatId"
-      ng-options="format.id as format.title for format in editor.fieldFormatTypes"
-      class="form-control">
+    <select ng-model="editor.selectedFormatId"
+      ng-options="format.id as format.title for format in editor.fieldFormatTypes" class="form-control">
     </select>
-    <fieldset
-      field-format-editor
-      ng-if="editor.selectedFormatId"
-      field="editor.field"
+    <fieldset field-format-editor ng-if="editor.selectedFormatId" field="editor.field"
       format-params="editor.formatParams">
     </fieldset>
   </div>
@@ -84,23 +66,14 @@
     <label for="editor.field.count">Popularity</label>
     <div class="input-group">
 
-      <input
-        ng-model="editor.field.count"
-        type="number"
-        class="form-control">
+      <input ng-model="editor.field.count" type="number" class="form-control">
 
       <span class="input-group-btn">
-        <button
-          type="button"
-          ng-click="editor.field.count = editor.field.count + 1"
-          aria-label="Plus"
+        <button type="button" ng-click="editor.field.count = editor.field.count + 1" aria-label="Plus"
           class="btn btn-default">
           <i aria-hidden="true" class="fa fa-plus"></i>
         </button>
-        <button
-          type="button"
-          ng-click="editor.field.count = editor.field.count - 1"
-          aria-label="Minus"
+        <button type="button" ng-click="editor.field.count = editor.field.count - 1" aria-label="Minus"
           class="btn btn-default">
           <i aria-hidden="true" class="fa fa-minus"></i>
         </button>
@@ -120,18 +93,18 @@
       <div class="form-group">
         <label>groupKey:</label>
         <div class="input-group">
-          <input type="text" ng-required='editor.field.selectConf.enable && editor.field.selectConf.groupKey!==""' ng-disabled="!editor.field.selectConf.enable" class="form-control" placeholder="groupKey" ng-model="editor.field.selectConf.groupKey">
+          <input type="text" ng-required='editor.field.selectConf.enable && editor.field.selectConf.groupKey!==""'
+            ng-disabled="!editor.field.selectConf.enable" class="form-control" placeholder="groupKey"
+            ng-model="editor.field.selectConf.groupKey">
         </div>
       </div>
       <div class="form-group">
         <label>valueKey:</label>
         <div class="input-group">
           <!--<input type="text" ng-required='editor.field.selectConf.enable && editor.field.selectConf.valueKey!==""' ng-disabled="!editor.field.selectConf.enable" class="form-control" placeholder="valueKey" ng-model="editor.field.selectConf.valueKey">-->
-          <select
-            ng-disabled="!editor.field.selectConf.enable"
+          <select ng-disabled="!editor.field.selectConf.enable"
             ng-required='editor.field.selectConf.enable && editor.field.selectConf.valueKey!==""'
-            ng-model="editor.field.selectConf.valueKey"
-            class="form-control">
+            ng-model="editor.field.selectConf.valueKey" class="form-control">
             <option></option>
             <option>code</option>
             <option>value</option>
@@ -141,7 +114,8 @@
       <div class="form-group">
         <label>isTree:</label>
         <div class="input-group">
-          <input type="checkbox" ng-disabled="!editor.field.selectConf.enable" ng-model="editor.field.selectConf.isTree">
+          <input type="checkbox" ng-disabled="!editor.field.selectConf.enable"
+            ng-model="editor.field.selectConf.isTree">
         </div>
       </div>
     </div>
@@ -158,10 +132,18 @@
     <input type="text" class="form-control" placeholder="授权对象‘|’分割" ng-model="editor.field.authObjs">
   </div>
 
+  <div class="form-group">
+    <label>IsQueryStringField</label>
+    <div class="input-group">
+      <input type="checkbox" ng-model="editor.field.isQueryStringField"><label>启用</label>
+    </div>
+  </div>
+
   <div ng-if="editor.field.scripted">
     <div class="form-group">
       <label>Script</label>
-      <textarea required class="field-editor_script-input form-control text-monospace" ng-model="editor.field.script"></textarea>
+      <textarea required class="field-editor_script-input form-control text-monospace"
+        ng-model="editor.field.script"></textarea>
     </div>
 
     <div class="form-group">
@@ -171,11 +153,15 @@
         </h4>
 
         <p>
-          Please familiarize yourself with <a target="_window" ng-href="{{ editor.docLinks.scriptFields }}">script fields <i class="fa-link fa"></i></a> and with <a target="_window" ng-href="">scripts in aggregations <i class="fa-link fa"></i></a> before using scripted fields.
+          Please familiarize yourself with <a target="_window" ng-href="{{ editor.docLinks.scriptFields }}">script
+            fields <i class="fa-link fa"></i></a> and with <a target="_window" ng-href="">scripts in aggregations <i
+              class="fa-link fa"></i></a> before using scripted fields.
         </p>
 
         <p>
-          Scripted fields can be used to display and aggregate calculated values. As such, they can be very slow, and if done incorrectly, can cause Kibana to be unusable. There's no safety net here. If you make a typo, unexpected exceptions will be thrown all over the place!
+          Scripted fields can be used to display and aggregate calculated values. As such, they can be very slow, and if
+          done incorrectly, can cause Kibana to be unusable. There's no safety net here. If you make a typo, unexpected
+          exceptions will be thrown all over the place!
         </p>
       </div>
     </div>
@@ -187,21 +173,30 @@
         </h4>
 
         <p>
-          By default, Kibana scripted fields use <a target="_window" ng-href="{{editor.docLinks.painless}}">Painless <i class="fa-link fa"></i></a>, a simple and secure scripting language designed specifically for use with Elasticsearch.  To access values in the document use the following format:
+          By default, Kibana scripted fields use <a target="_window" ng-href="{{editor.docLinks.painless}}">Painless <i
+              class="fa-link fa"></i></a>, a simple and secure scripting language designed specifically for use with
+          Elasticsearch. To access values in the document use the following format:
         </p>
 
         <p><code>doc['some_field'].value</code></p>
 
         <p>
-          Painless is powerful but easy to use. It provides access to many <a target="_window" ng-href="{{editor.docLinks.painlessApi}}">native Java APIs <i class="fa-link fa"></i></a>. Read up on its <a target="_window" ng-href="{{editor.docLinks.painlessSyntax}}">syntax <i class="fa-link fa"></i></a> and you'll be up to speed in no time!
+          Painless is powerful but easy to use. It provides access to many <a target="_window"
+            ng-href="{{editor.docLinks.painlessApi}}">native Java APIs <i class="fa-link fa"></i></a>. Read up on its <a
+            target="_window" ng-href="{{editor.docLinks.painlessSyntax}}">syntax <i class="fa-link fa"></i></a> and
+          you'll be up to speed in no time!
         </p>
 
         <p>
-          Kibana currently imposes one special limitation on the painless scripts you write. They cannot contain named functions.
+          Kibana currently imposes one special limitation on the painless scripts you write. They cannot contain named
+          functions.
         </p>
 
         <p>
-          Coming from an older version of Kibana? The <a target="_window" ng-href="{{editor.docLinks.luceneExpressions}}">Lucene Expressions <i class="fa-link fa"></i></a> you know and love are still available. Lucene expressions are a lot like JavaScript, but limited to basic arithmetic, bitwise and comparison operations.
+          Coming from an older version of Kibana? The <a target="_window"
+            ng-href="{{editor.docLinks.luceneExpressions}}">Lucene Expressions <i class="fa-link fa"></i></a> you know
+          and love are still available. Lucene expressions are a lot like JavaScript, but limited to basic arithmetic,
+          bitwise and comparison operations.
         </p>
 
         <p>
@@ -210,7 +205,8 @@
         <ul>
           <li> Only numeric, boolean, date, and geo_point fields may be accessed </li>
           <li> Stored fields are not available </li>
-          <li> If a field is sparse (only some documents contain a value), documents missing the field will have a value of 0 </li>
+          <li> If a field is sparse (only some documents contain a value), documents missing the field will have a value
+            of 0 </li>
         </ul>
 
         <p>
@@ -218,9 +214,9 @@
         </p>
         <ul>
           <li> Arithmetic operators: + - * / % </li>
-          <li> Bitwise operators: | & ^ ~ << >> >>> </li>
+          <li> Bitwise operators: | & ^ ~ <<>> >>> </li>
           <li> Boolean operators (including the ternary operator): && || ! ?: </li>
-          <li> Comparison operators: < <= == >= > </li>
+          <li> Comparison operators: < <===>= > </li>
           <li> Common mathematic functions: abs ceil exp floor ln log10 logn max min sqrt pow </li>
           <li> Trigonometric library functions: acosh acos asinh asin atanh atan atan2 cosh cos sinh sin tanh tan </li>
           <li> Distance functions: haversin </li>
@@ -231,46 +227,37 @@
 
   </div>
 
-  <div  ng-if="editor.conflictDescriptionsLength > 0">
+  <div ng-if="editor.conflictDescriptionsLength > 0">
     <p>
       <i class="fa fa-warning text-warning"></i>
       <strong>Field Type Conflict:</strong>
-      The type of this field changes across indices. It is unavailable for many analysis functions. The indices per type are as follows:
+      The type of this field changes across indices. It is unavailable for many analysis functions. The indices per type
+      are as follows:
       <table class="table">
-      <thead>
-        <th> Field Type </th>
-        <th> Index Names </th>
-      </thead>
-      <tbody>
-      <tr ng-repeat="(type, indices) in editor.field.conflictDescriptions">
-        <td>{{type}}</td> <td>{{indices.join(', ')}}</td>
-      </tr>
-      </tbody>
+        <thead>
+          <th> Field Type </th>
+          <th> Index Names </th>
+        </thead>
+        <tbody>
+          <tr ng-repeat="(type, indices) in editor.field.conflictDescriptions">
+            <td>{{type}}</td>
+            <td>{{indices.join(', ')}}</td>
+          </tr>
+        </tbody>
       </table>
     </p>
   </div>
 
   <div class="form-group">
-    <button
-      type="button"
-      ng-click="editor.cancel()"
-      aria-label="Cancel"
-      class="btn btn-primary">
+    <button type="button" ng-click="editor.cancel()" aria-label="Cancel" class="btn btn-primary">
       Cancel
     </button>
-    <button
-      type="button"
-      ng-if="editor.field.scripted && !editor.creating"
-      confirm-click="editor.delete()"
+    <button type="button" ng-if="editor.field.scripted && !editor.creating" confirm-click="editor.delete()"
       confirmation="Are you sure want to delete '{{ editor.field.name }}'? This action is irreversible!"
-      aria-label="Delete"
-      class="btn btn-danger">
+      aria-label="Delete" class="btn btn-danger">
       Delete Field
     </button>
-    <button
-      ng-disabled="form.$invalid"
-      type="submit"
-      aria-label="{{ editor.creating ? 'Create' : 'Update' }} Field"
+    <button ng-disabled="form.$invalid" type="submit" aria-label="{{ editor.creating ? 'Create' : 'Update' }} Field"
       class="btn btn-success">
       {{ editor.creating ? 'Create' : 'Update' }} Field
     </button>

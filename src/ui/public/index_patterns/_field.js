@@ -49,6 +49,33 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
     let aggregatable = !!spec.aggregatable || scripted;
     let visualizable = aggregatable;
 
+    /** 2019-03-28 18:25:29
+     * 处理text类型字段的排序报错
+     * 当前版本逻辑是通过获取索引mapping GET /索引名/_mapping/field/*?ignore_unavailable=false&allow_no_indices=false&include_defaults=true
+     * kibana把es里的text、keyword、string都营收为string类型，string定义就似乎可排序了。 也就是说string类型的字段能不能拍下是通过查询mapping对应字段的index是否为true
+     * 后调用 GET /_field_stats?fields=*&index=索引名 获取 searchable，aggregatable2个值
+     * 在kibana5.6版本中同意是这样的映射关系
+     *
+     * 区别在于5.6调用的是GET /索引名/_field_caps?fields=*&ignore_unavailable=false&allow_no_indices=false
+     * 该方式返回的结果中无index值，值存在
+     * {
+        "fields": {
+          "ExpCode": {
+            "keyword": {
+              "type": "keyword",
+              "searchable": true,
+              "aggregatable": true
+            }
+          }
+        }
+      }
+     * 因返回值无index逻辑就只要根据 aggregatable决定是否可以排序了
+     * 5.6 原始代码 “sortable = spec.name === '_score' || ((indexed || aggregatable) && type.sortable);”
+     * 因当前版本获取索引index为true固去掉对indexed值的判断
+    */
+    sortable = spec.name === '_score' || ((aggregatable) && type.sortable);
+    /** END 2019-03-28 18:25:29 */
+
     obj.fact('name');
     obj.fact('type');
     {
@@ -89,6 +116,17 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
         obj.writ('authObjs', authObjs);
       } else {
         obj.writ('authObjs');
+      }
+
+      //2019-04-15 query查询的字段 query.query_string.fields
+      if (originalField && originalField.isQueryStringField) {
+        var isQueryStringField = originalField.isQueryStringField;
+        if (spec.isQueryStringField !== undefined && isQueryStringField !== spec.isQueryStringField) {
+          isQueryStringField = spec.isQueryStringField;
+        }
+        obj.writ('isQueryStringField', isQueryStringField);
+      } else {
+        obj.writ('isQueryStringField');
       }
     }
     obj.writ('count', spec.count || 0);

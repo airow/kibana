@@ -869,6 +869,14 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       query.query_string.query = dum2.join(' ');
     }
 
+    if (query.query_string) {
+      var queryStringFields = _.filter($scope.indexPattern.fields, 'isQueryStringField');
+      var fieldsArray = _.map(queryStringFields, 'name');
+      if (_.size(fieldsArray) > 0) {
+        query.query_string.fields = fieldsArray;
+      }
+    }
+
     $scope.searchSource
       .size($scope.opts.sampleSize)
       .sort(getSort($state.sort, $scope.indexPattern))
