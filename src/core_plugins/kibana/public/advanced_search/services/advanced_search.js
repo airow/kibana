@@ -186,10 +186,14 @@ module.service('advancedSearch', function (Promise, getAppState) {
                 case "date":
                   if (_.isDate(fieldVaue)) {
                     fieldVaue = parseInt(moment(fieldVaue).format('x'));
+                  } else {
+                    fieldVaue = parseInt(moment(fieldVaue).format('x'));
                   }
                   break;
                 case "date_equal":
                   if (_.isDate(fieldVaue)) {
+                    fieldVaue = parseInt(moment(fieldVaue).format('x'));
+                  } else {
                     fieldVaue = parseInt(moment(fieldVaue).format('x'));
                   }
                   operatorExt.lte = fieldVaue;

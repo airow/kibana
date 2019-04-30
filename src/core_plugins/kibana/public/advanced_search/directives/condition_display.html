@@ -18,7 +18,7 @@
             <span>{{condition.selected.field.alias||condition.selected.field.asFieldName}}</span>
             <span>{{condition.selected.operator.display}}</span>
             <span ng-switch="condition.selected.field.type">
-              <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd'}}</span>
+              <span ng-switch-when='date'>{{condition.selected.value | date:'yyyy-MM-dd HH:mm'}}</span>
               <span ng-switch-when='string'>'{{condition.selected.value}}'</span>
               <span ng-switch-default>{{condition.selected.value}}</span>
             </span>
