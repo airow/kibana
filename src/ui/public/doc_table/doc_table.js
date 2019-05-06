@@ -38,7 +38,7 @@ uiModules.get('kibana')
           $timeout(function () {
             $scope.din = false;
             $scope.changePin();
-          }, 0);
+          }, 1500);
         }
 
         $scope.changePin = function () {
