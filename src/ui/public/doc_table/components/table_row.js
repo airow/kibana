@@ -39,10 +39,10 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       filter: '=',
       indexPattern: '=',
       row: '=kbnTableRow',
-      rowIndex: '=?'
+      rowIndex: '=?',
+      savedObj: '=?'
     },
     controller: function ($scope, advancedSearch, TeldState, globalState, teldSession, timefilter) {
-
       $scope.$TeldState = new TeldState();
       $scope.advancedSearch = advancedSearch;
       $scope.sendPostMessage = function () {
@@ -233,7 +233,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
           returnValue.strategy = column.coloring.strategy;
           returnValue.bgColor = column.coloring.bgColor;
           returnValue.style = column.style;
-          returnValue.config = _.pick(column.coloring, ['ranges', 'expression', 'thresholds', 'enumeration']);
+          returnValue.config = _.pick(column.coloring, ['editorForm', 'ranges', 'expression', 'thresholds', 'enumeration']);
           returnValue.template = _.template(column.coloring.template || '${value}');
           returnValue.enumeration = function (value, row, fieldName) {
             var val = { value: value, color: '' };
@@ -317,6 +317,10 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
                 return false;
               }
             });
+            return val;
+          };
+          returnValue.editorForm = function (value, row, fieldName) {
+            var val = { value: "<div ng-click='editorRow()'>" + value + "</div>", color: '' };
             return val;
           };
         }

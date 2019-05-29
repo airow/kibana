@@ -1,0 +1,30 @@
+<button ng-click='update()' ng-disabled="disabled()">保存</button>
+<table class="table table-condensed">
+  <tbody>
+    <tr ng-repeat="field in fields">
+      <td field-name="field" style="line-height: 35px;" field-type="mapping[field].type" width="1%"
+        class="doc-viewer-field">
+      </td>
+      <td>
+        <!-- <i tooltip-placement="top" tooltip="Field names beginning with _ are not supported"
+          class="fa fa-warning text-color-warning ng-scope doc-viewer-underscore"></i>
+        <i tooltip-placement="top"
+          tooltip="No cached mapping for this field. Refresh field list from the Management > Index Patterns page"
+          class="fa fa-warning text-color-warning ng-scope doc-viewer-no-mapping"></i>
+        <i tooltip-placement="top" tooltip="Objects in arrays are not well supported."
+          class="fa fa-warning text-color-warning ng-scope doc-viewer-object-array"></i> -->
+        <i ng-if="flattened[field]!==originalFlattened[field]" tooltip-placement="top"
+          tooltip="点击还原{{originalFlattened[field]}}" ng-click='flattened[field]=originalFlattened[field]'
+          style="color:red;" class="fa fa-edit"></i>
+        <i ng-if="editorConfByName[field].type==='view' && flattened[field]===originalFlattened[field]"
+          class="fa fa-eye"></i>
+        <i ng-if="editorConfByName[field].type==='edit' && flattened[field]===originalFlattened[field]"
+          tooltip-placement="top" class="fa fa-edit"></i>
+        <i ng-if="editorConfByName[field].type==='external' && flattened[field]===originalFlattened[field]"
+          tooltip-placement="top" class="fa fa-info"></i>
+        <input type="text" style="width:80%;" class="localSearchInput"
+          ng-disabled="editorConfByName[field].type!=='edit'" ng-model="flattened[field]">
+      </td>
+    </tr>
+  </tbody>
+</table>
