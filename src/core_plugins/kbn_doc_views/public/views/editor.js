@@ -84,7 +84,7 @@ docViewsRegistry.register(function () {
             .catch(notify.fatal);
         };
 
-        function sghost(host, SID) {
+        function sghost(host, SID, path) {
           var protocol = window.location.protocol;
           var hostname = window.location.hostname;
           var domain = document.domain || hostname;
@@ -94,7 +94,7 @@ docViewsRegistry.register(function () {
           domain = ares.join('.');
           //if (!/^\.teld\.(cn|net)+$/i.test(domain)) { domain += ':7777'; }//准生产加端口号
           if (!new RegExp("^\.(teld\.(cn|net)+|hfcdgs.com)$", "i").test(domain)) { domain += ':7777'; }//准生产加端口号
-          return protocol + '//' + host + domain + '/api/invoke?SID=' + SID;
+          return protocol + '//' + host + domain + `${(path || "") + "/"}api/invoke?SID=` + SID;
         }
 
         var strategyFun = {
@@ -103,10 +103,10 @@ docViewsRegistry.register(function () {
             var query = {
               "refId": "TSG",
               "format": "table",
-              "url": sghost('sgi', editorConf.sgSID),
+              "url": sghost('sgi', editorConf.sgSID, "/SG"),
               "parameters": [],
               "filterWrap": true,
-              "filterKey": "filter",
+              "filterKey": "modifyParams",
             };
 
             var data = { "queries": [query] };
@@ -123,19 +123,15 @@ docViewsRegistry.register(function () {
               result[field] = $scope.flattened[field];
             }, {});
 
+            // columnsDoc.CustID = 'CustID';
+            // doc.CarModel = 'CarModel';
+
             var modify = { "key": "Modify", "type": "object", "value": doc };
             var columns = { "key": "Columns", "type": "object", "value": columnsDoc };
 
             query.parameters.push(modify);
             query.parameters.push(columns);
 
-            query.parameters = [];
-            query.parameters.push({ "key": "Page", "type": "value", "value": "1" });
-            query.parameters.push({ "key": "Rows", "type": "value", "value": "1" });
-            var filterKey = { "key": "FilterKey", "type": "object", "value": {} };
-            filterKey.value.SortField = "1";
-            filterKey.value.KeyValue = "";
-            query.parameters.push(filterKey);
             return data;
           },
           call: function (strategy, doc) {
@@ -172,9 +168,13 @@ docViewsRegistry.register(function () {
                   headers: { 'Content-Type': 'application/json' }
                 }).success((data, header, config, status) => {
                   debugger;
-                  var dataset = data.results[0].dataset[0];
-                  resolve(dataset);
-                }).error(function () {
+                  var dataset = data.results[0].dataset;
+                  if (dataset.IsSuccess === '1') {
+                    resolve(true);
+                  } else {
+                    reject(dataset.Message);
+                  }
+                }).error(function (err,a1,a2,a3) {
                   reject("SG调用失败");
                 });
             });
