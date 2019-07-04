@@ -689,6 +689,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       .catch(notify.error);
   };
 
+  $scope.$on("editor-complete", function () {
+    $scope.fetch();
+  });
+
   $scope.opts.fetch = $scope.fetch = function () {
     // ignore requests to fetch before the app inits
     if (!init.complete) return;

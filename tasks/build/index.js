@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
   let { flatten } = require('lodash');
 
-  grunt.registerTask('build-error', 'Build packages', function () {
+  grunt.registerTask('build', 'Build packages', function () {
     grunt.task.run(flatten([
       'clean:build',
       'clean:target',
@@ -34,7 +34,7 @@ module.exports = function (grunt) {
     ]));
   });
 
-  grunt.registerTask('build', 'Build packages', function () {
+  grunt.registerTask('build-ok', 'Build packages', function () {
     grunt.task.run(flatten([
       // 'clean:build',
       // 'clean:target',

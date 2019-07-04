@@ -1,41 +1,24 @@
-<div
-  ng-if="hits.length"
-  ng-class="{ loading: searchSource.activeFetchCount > 0 }">
+<div ng-if="hits.length" ng-class="{ loading: searchSource.activeFetchCount > 0 }">
   <paginate ng-if="!infiniteScroll" list="hits" per-page="50" top-controls="true" class="paginate">
     <table class="kbn-table table" ng-if="indexPattern">
-      <thead
-        kbn-table-header
-        columns="columns"
-        index-pattern="indexPattern"
-        sorting="sorting">
+      <thead kbn-table-header columns="columns" index-pattern="indexPattern" sorting="sorting">
       </thead>
       <tbody>
-        <tr ng-repeat="row in page|limitTo:limit track by row._index+row._type+row._id+row._score"
-          kbn-table-row="row"
-          columns="columns"
-          sorting="sorting"
-          index-pattern="indexPattern"
-          filter="filter"
+        <tr ng-repeat="row in page|limitTo:limit track by row._index+row._type+row._id+row._score" kbn-table-row="row"
+          columns="columns" sorting="sorting" index-pattern="indexPattern" saved-obj="savedObj" filter="filter"
           class="discover-table-row"></tr>
       </tbody>
     </table>
   </paginate>
 
   <table ng-if="infiniteScroll" class="kbn-table table" ng-if="indexPattern">
-    <thead
-      kbn-table-header
-      columns="columns"
-      index-pattern="indexPattern"
-      sorting="sorting">
+    <thead kbn-table-header columns="columns" index-pattern="indexPattern" sorting="sorting">
     </thead>
     <tbody>
-      <tr ng-repeat="row in hits|limitTo:limit track by row._index+row._type+row._id+row._score"
-        kbn-table-row="row"
-        columns="columns"
-        sorting="sorting"
-        index-pattern="indexPattern"
-        filter="filter"
-        class="discover-table-row"></tr>
+      <tr ng-repeat="row in hits|limitTo:limit track by row._index+row._type+row._id+row._score" kbn-table-row="row"
+        columns="columns" sorting="sorting" index-pattern="indexPattern" saved-obj="savedObj" filter="filter"
+        class="discover-table-row">
+      </tr>
     </tbody>
   </table>
   <kbn-infinite-scroll ng-if="infiniteScroll" more="addRows"></kbn-infinite-scroll>

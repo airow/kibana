@@ -54,7 +54,8 @@ module.exports = function ({ Plugin }) {
       exposeClient(server);
       createProxy(server, 'GET', '/{paths*}');
       createProxy(server, 'POST', '/_mget');
-      createProxy(server, 'POST', '/{index}/_search');
+      createProxy(server, 'POST', '/{index}/{type}/{id}/_update');
+      createProxy(server, 'POST', '/{index}/_search');      
       createProxy(server, 'POST', '/{index}/_field_stats');
       msearch(server, 'POST', '/_msearch', {
         payload: {

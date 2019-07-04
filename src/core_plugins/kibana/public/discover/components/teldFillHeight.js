@@ -63,7 +63,6 @@ app.directive('teldFixedHeaderTable', function ($compile) {
       let checkTimer;
       let scheduleCheck;
       let listener;
-      debugger;
       listener = $scope.$on('fixedHeaderTableRefresh', function (event, data) {
         //alert($scope.din);
         if ($scope.din) {
