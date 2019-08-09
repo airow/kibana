@@ -355,7 +355,11 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
        */
       function _displayField(row, fieldName, truncate) {
         let indexPattern = $scope.indexPattern;
-        urlFormat(indexPattern, fieldName, row); /** 对rul格式化特殊处理，支持row数据 */
+        /*
+        合并到 src\ui\public\stringify\types\url.js文件
+        Url.prototype._formatTemplate方法处理
+        urlFormat(indexPattern, fieldName, row); // 对rul格式化特殊处理，支持row数据
+        */
         let text = indexPattern.formatField(row, fieldName);
 
         //字段着色、枚举转换、单元格样式

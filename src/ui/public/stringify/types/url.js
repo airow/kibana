@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import 'ui/field_format_editor/pattern/pattern';
 import 'ui/stringify/icons';
 import IndexPatternsFieldFormatProvider from 'ui/index_patterns/_field_format/field_format';
@@ -59,21 +60,44 @@ export default function UrlFormatProvider(Private, highlightFilter) {
     { id: 'img', name: 'Image' }
   ];
 
-  Url.prototype._formatUrl = function (value) {
+  Url.prototype._formatUrl = function (value, hit) {
     let template = this.param('urlTemplate');
     if (!template) return value;
-
+    template = this._formatTemplate(template, hit);
     return this._compileTemplate(template)({
       value: encodeURIComponent(value),
       rawValue: value
     });
   };
 
-  Url.prototype._formatLabel = function (value, url) {
+  var urlFormatHelper = {
+    date: {
+      now: function () { return moment(); },
+      addHours: function (val, set) {
+        return moment(val).add(set, 'h');
+      },
+      addMinutes: function (val, set) {
+        return moment(val).add(set, 'm');
+      },
+      addDays: function (val, set) {
+        return moment(val).add(set, 'd');
+      }
+    }
+  };
+
+  Url.prototype._formatTemplate = function (template, hit) {
+    debugger;
+    if (false === _.isUndefined(hit)) {
+      template = _.template(template, { imports: { moment: moment, helper: urlFormatHelper } })(hit);
+    }
+    return template;
+  };
+
+  Url.prototype._formatLabel = function (value, url, hit) {
     let template = this.param('labelTemplate');
     if (url == null) url = this._formatUrl(value);
     if (!template) return url;
-
+    template = this._formatTemplate(template, hit);
     return this._compileTemplate(template)({
       value: value,
       url: url
@@ -86,8 +110,8 @@ export default function UrlFormatProvider(Private, highlightFilter) {
     },
 
     html: function (rawValue, field, hit) {
-      let url = _.escape(this._formatUrl(rawValue));
-      let label = _.escape(this._formatLabel(rawValue, url));
+      let url = _.escape(this._formatUrl(rawValue, hit));
+      let label = _.escape(this._formatLabel(rawValue, url, hit));
 
       switch (this.param('type')) {
         case 'img':
