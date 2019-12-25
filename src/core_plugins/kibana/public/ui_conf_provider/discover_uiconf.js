@@ -25,11 +25,12 @@ export default function UiConfProvider(Private, Promise, config) {
     fixedHeader: false,
     columnConf: [
       {
+        "rowStyle": false,
         fieldName: '绑定字段',
         disable: true,
         'coloring': {
           'bgColor': false,
-          'strategy': 'ranges|thresholds|expression|enumeration',
+          'strategy': 'ranges|thresholds|expression|enumeration|custom',
           'template': '<span>${value}</span>',
           'ranges': [
             { 'range': '[0 TO 10)', 'color': 'red' },
@@ -46,6 +47,13 @@ export default function UiConfProvider(Private, Promise, config) {
           ],
           'expression': {
             'body': 'return value; //方法签名 fun(value, row, fieldName)'
+          },
+          "custom": {
+            "fun": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}",
+            "fun_demo1": "return {style:{'background-color': 'red'}}; //自定义央视",
+            "fun_demo2": "return {style:{'color': 'white','background-color': 'black'}}; //配合 rowStyle:true可以设置正行背景色",
+            "fun_demo3": "return value=='222' ? {value:value, style:{'color': 'red'}} : {value:value+'ccc'};",
+            "fun_demo4": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}; //添加链接"
           }
         },
         'style': 'width:100px'

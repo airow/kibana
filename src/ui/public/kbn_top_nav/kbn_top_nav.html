@@ -4,7 +4,7 @@
   data-test-subj="top-nav"
 >
   <!-- Top row -->
-  <div class="localNavRow">
+  <div class="localNavRow mobileAssert">
     <!-- Top left corner slot, e.g. breadcrumbs, title. -->
     <div
       class="localNavRow__section"
@@ -12,7 +12,13 @@
     ></div>
 
     <!-- Right-side: menu -->
-    <div class="localNavRow__section">
+    <div class="localNavRow__section" ng-class="{'opend': kbnTopNav.mobileMenu_Show}">
+      <div class="localMenu mobileMenu">
+        <div class="localMenuItem" ng-click="kbnTopNav.mobileMenu_Show=!kbnTopNav.mobileMenu_Show">
+          <i class="fa" ng-class="{true:'fa-remove',false:'fa-bars'}[!!kbnTopNav.mobileMenu_Show] " ></i>
+        </div>
+        <kbn-global-timepicker></kbn-global-timepicker>
+      </div>
       <div class="localMenu">
         <div
           class="localMenuItem"
@@ -21,7 +27,7 @@
           aria-haspopup="{{!menuItem.hasFunction}}"
           aria-expanded="{{kbnTopNav.isCurrent(menuItem.key)}}"
           ng-class="{'localMenuItem-isSelected': kbnTopNav.isCurrent(menuItem.key), 'localMenuItem-isDisabled': menuItem.disableButton()}"
-          ng-click="kbnTopNav.handleClick(menuItem)"
+          ng-click="kbnTopNav.mobileMenu_Show=false;kbnTopNav.handleClick(menuItem)"
           ng-bind="menuItem.label"
           tooltip="{{menuItem.tooltip()}}"
           tooltip-placement="bottom"

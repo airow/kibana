@@ -209,9 +209,42 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
             var val = { value: value, color: '' };
             return val;
           },
-          exec: function (value, row, fieldName) {
-            value = value.replace('<mark>', '').replace('</mark>', '');
-            var color = this[this.strategy || 'defStrategy'](value, row, fieldName);
+          customStrategy: {
+            custom: function (value, row, fieldName, styleString, funStrategy) {
+              var funName = funStrategy || funStrategy.strategy || 'custom';
+              var obj = this[funName](value, row, fieldName);
+              value = new String(_.template('${value}')(obj));
+              var style = [(this.style || '') + styleString];
+              if (obj.color !== '') {
+                if (this.bgColor) {
+                  style.push('background-color:' + obj.color);
+                } else {
+                  style.push('color:' + obj.color);
+                }
+              } else {
+                if (this.bgColor) { style.push('color: inherit !important'); }
+              }
+              if (obj.style) {
+                var styleObj = _.transform(style, (result, value, key) => {
+                  _.each(_.remove(value.split(";")), item => {
+                    var v = item.split(":");
+                    result[_.trim(v[0])] = v[1];
+                  });
+                }, {});
+                styleObj = _.defaults(obj.style, styleObj);
+                value.style = _.map(styleObj, (value, key) => { return `${key}:${value};` });
+                value.style = value.style.join("");
+              }
+              if (obj.value) {
+                debugger;
+                // value = obj.value;
+                value = _.assign(new String(obj.value), value);
+              }
+              return value;
+            }
+          },
+          execOriginalStrategy: function (value, row, fieldName, styleString, funStrategy) {
+            var color = this[funStrategy || 'defStrategy'](value, row, fieldName);
             var style = [this.style || ''];
             value = new String(this.template(color));
             if (color.color !== '') {
@@ -225,6 +258,26 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
             }
             value.style = style.join(';');
             return value;
+          },
+          exec: function (value, row, fieldName, styleString) {
+            value = value.replace('<mark>', '').replace('</mark>', '');
+
+            switch (this.strategy) {
+              case "custom":
+                var customFun = this.customStrategy[this.strategy];
+                if (customFun) {
+                  customFun = customFun.bind(this);
+                  value = customFun(value, row, fieldName, styleString, this.strategy)
+                }
+                break;
+              case "JS":
+                value = this.customStrategy['custom'].bind(this)(value, row, fieldName, styleString, 'expressionObj');
+                break;
+              default:
+                value = this.execOriginalStrategy(value, row, fieldName, styleString, this.strategy);
+                break;
+            }
+            return value;
           }
 
         };
@@ -233,7 +286,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
           returnValue.strategy = column.coloring.strategy;
           returnValue.bgColor = column.coloring.bgColor;
           returnValue.style = column.style;
-          returnValue.config = _.pick(column.coloring, ['editorForm', 'ranges', 'expression', 'thresholds', 'enumeration']);
+          returnValue.config = _.pick(column.coloring, ['editorForm', 'ranges', 'expression', 'expressionObj', 'thresholds', 'enumeration', 'custom']);
           returnValue.template = _.template(column.coloring.template || '${value}');
           returnValue.enumeration = function (value, row, fieldName) {
             var val = { value: value, color: '' };
@@ -252,6 +305,33 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
             var val = { value: value, color: '' };
             var fun = new Function('value', 'row', 'fieldName', this.config.expression.body);
             val.color = fun(value, row, fieldName);
+            return val;
+          };
+          returnValue.expressionObj_bak = function (value, row, fieldName) {
+            var val = { value: value, color: '' };
+            var fun = new Function('value', 'row', 'fieldName', this.config.expressionObj.body);
+            var opts = fun(value, row, fieldName);
+            if (_.isObject(opts)) {
+              val = _.defaults(opts, val);
+            } else {
+              val.color = opts;
+            }
+            return val;
+          };
+          returnValue.expressionObj = function (value, row, fieldName) {
+            var val = this.custom(value, row, fieldName, this.config.expressionObj);
+            return val;
+          };
+          returnValue.custom = function (value, row, fieldName, configOpt) {
+            var val = { value: value, color: '' };
+            configOpt = configOpt || this.config.custom;
+            var fun = new Function('value', 'row', 'fieldName', configOpt.fun || configOpt.body);
+            var opts = fun(value, row, fieldName);
+            if (_.isObject(opts)) {
+              val = _.defaults(opts, val);
+            } else {
+              val.color = opts;
+            }
             return val;
           };
           returnValue.thresholds = function (value, row, fieldName) {
@@ -328,7 +408,7 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
       }
 
 
-      function columnConf(value, row, fieldName) {
+      function columnConf_bak(value, row, fieldName) {
         let columnConf = _.get($scope, '$parent.savedObj.uiConf.columnConf');
         if (!columnConf) {
           return value;
@@ -347,6 +427,27 @@ module.directive('kbnTableRow', function ($compile, advancedSearch, TeldState) {
         }
 
         value = column.exec(value, row, fieldName);
+        return value;
+      }
+
+      function columnConf(value, row, fieldName) {
+
+        let columnConf = _.get($scope, '$parent.savedObj.uiConf.columnConf');
+        if (!columnConf) {
+          return value;
+        }
+        // debugger;
+        let columns = columnConfCache[fieldName];
+        if (!columns) {
+          let colConf = _.filter(columnConf, item => { return item.fieldName == fieldName && item.disable == false || item.rowStyle; });
+          columns = columnConfCache[fieldName] = _.map(colConf, item => { return cac(item) });
+        }
+
+        var styleString = "";
+        _.each(columns, column => {
+          value = column.exec(value, row, fieldName, styleString);
+          styleString = value.style;
+        });
         return value;
       }
 

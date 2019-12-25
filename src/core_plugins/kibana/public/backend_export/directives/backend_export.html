@@ -18,19 +18,36 @@
             <th scope="row">{{finder.pageIndex*5+($index+1)}}</th>
             <td class="hidden-xs hidden-sm">{{task.TargetIndex}}</td>
             <td>{{task.ID}}
-              <a ng-if='task.Status===2' target="_black" ng-href="{{finder.makeUrl(task)}}">
+              <a ng-if='task.CancelFlag!=1 && task.Status===2' target="_black" ng-href="{{finder.makeUrl(task)}}">
                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
               </a>
             </td>
             <td>{{finder.fomartDate(task)}}</td>
             <td>{{task.TotalCount}}</td>
             <td>
-              <div ng-switch="task.Status">
+              <div style="color: coral;" ng-if='task.CancelFlag==1'>
+                任务取消
+              </div>
+              <div ng-if='task.CancelFlag!==1' ng-switch="task.Status">
                 <div ng-switch-when="0">
-                  新建
+                  <div ng-if='task.exeCancel!=1'>
+                    新建<span class="fa fa-close" ng-click='task.exeCancel=1' aria-hidden="true"></span>
+                  </div>
+                  <div ng-if='task.exeCancel==1'>
+                    取消导出?
+                    <button type="button" ng-click="finder.cancelTask(task)" class="btn btn-primary btn-xs">是</button>
+                    <button type="button" ng-click="task.exeCancel=null" class="btn btn-xs">否</button>
+                  </div>
                 </div>
                 <div ng-switch-when="1">
-                  导出中
+                  <div ng-if='task.exeCancel!=1'>
+                    导出中<span class="fa fa-close" ng-click='task.exeCancel=1' aria-hidden="true"></span>
+                  </div>
+                  <div ng-if='task.exeCancel==1'>
+                    取消导出?
+                    <button type="button" ng-click="finder.cancelTask(task)" class="btn btn-primary btn-xs">是</button>
+                    <button type="button" ng-click="task.exeCancel=null" class="btn btn-xs">否</button>
+                  </div>
                 </div>
                 <div ng-switch-when="2">
                   导出完成
@@ -43,7 +60,7 @@
             <td>
               <div class="progress" style="margin-bottom: 0px;">
                 <div class="progress-bar" role="progressbar" aria-valuenow="{{task.DonePercent}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;padding-top:5px; width: {{task.DonePercent}}%;">
-                  {{task.DonePercent}}%
+                  {{task.DonePercent - (task.CancelFlag==1 && task.Status===2 ? 0.5 : 0) }}%
                 </div>
               </div>
             </td>
@@ -74,11 +91,13 @@
   </div>
   <div class="col-md-1">
     <div class="btn-group-vertical hidden-xs hidden-sm" role="group" aria-label="...">
+      <button type="button" class="btn" ng-class="{'btn-default':false==finder.hideCancelTask}" ng-click="finder.hideCancelTask=!finder.hideCancelTask;finder.query()">含取消</button>
       <button type="button" class="btn btn-default" ng-click="finder.export()">快速</button>
       <button type="button" class="btn btn-default" ng-click="finder.backendexport()">全部</button>
       <button type="button" class="btn btn-default" ng-click="finder.query()">刷新</button>
     </div>
     <div class="btn-group visible-xs visible-sm" role="group" aria-label="...">
+      <button type="button" class="btn" ng-class="{'btn-default':false==finder.hideCancelTask}" ng-click="finder.hideCancelTask=!finder.hideCancelTask;finder.query()">含取消</button>
       <button type="button" class="btn btn-default" ng-click="finder.export()">快速</button>
       <button type="button" class="btn btn-default" ng-click="finder.backendexport()">全部</button>
       <button type="button" class="btn btn-default" ng-click="finder.query()">刷新</button>

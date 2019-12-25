@@ -8,8 +8,6 @@ import 'ui/doc_table/components/table_header';
 import 'ui/doc_table/components/table_row';
 import uiModules from 'ui/modules';
 
-
-
 uiModules.get('kibana')
   .directive('docTable', function (config, Notifier, getAppState, $timeout) {
     return {
@@ -38,7 +36,15 @@ uiModules.get('kibana')
           $timeout(function () {
             $scope.din = false;
             $scope.changePin();
-          }, 1500);
+          }, (function () {
+            var userAgent = navigator.userAgent;
+            if (userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") < 1) {
+              return true;
+            }
+            else {
+              return false;
+            }
+          })() ? 2500 : 1500);
         }
 
         $scope.changePin = function () {

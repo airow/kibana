@@ -8,6 +8,11 @@ import 'plugins/kibana/backend_export/services/backend_export_service';
 
 uiModules
   .get('apps/backendexport')
+  .filter('filterCancel', function () {
+    return function (exportList) {
+      return _.filter(exportList, item => { return item.CancelFlag != 1; });
+    }
+  })
   .directive('teldBackendExport', function (Private, $compile, kbnUrl, $interval, backendExportService, Notifier) {
 
     return {
@@ -29,9 +34,33 @@ uiModules
         const notify = new Notifier();
 
         self.pageIndex = 0;
+        self.hideCancelTask = true;
 
         self.export = function ($event) {
           $scope.export();
+        };
+
+        self.cancelTask = function (task) {
+          debugger;
+          if (task.canceling) {
+            notify.warning('任务取消中');
+            return;
+          }
+          task.canceling = true;
+          backendExportService.cancelTask(task.ID).then(/** resolve */
+            res => {
+              if (_.isEmpty(res.data.error)) {
+                notify.info('导出任务取消成功 TaskID:' + res.data.taskId);
+              } else {
+                notify.warning(res.data.error);
+                //alert(res.data.error);
+              }
+              self.query();
+            },
+            /** reject */
+            function () {
+              $scope.exportList = [];
+            });
         };
 
         self.backendexport = function ($event) {
@@ -78,13 +107,14 @@ uiModules
         self.query = function ($event) {
           //debugger;
           var indexPattern = $scope.savedObject.searchSource.get('index');
-          backendExportService.tasklist(indexPattern.id, self.pageIndex, 5).then(
+          backendExportService.tasklist(indexPattern.id, self.pageIndex, 5, self.hideCancelTask).then(
             /** resolve */
             res => {
               if (_.isEmpty(res.data.error)) {
                 $scope.dataTotls = res.data.dataTotls;
                 $scope.totalPageNum = res.data.totalPageNum;
                 $scope.exportList = res.data.data;
+
               } else {
                 alert(res.data.error);
               }

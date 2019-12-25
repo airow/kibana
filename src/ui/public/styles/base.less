@@ -547,6 +547,11 @@ fieldset {
     bottom: 0px;
     overflow-x: auto;
     overflow-y: hidden;
+
+    div::before{
+      /* 在MacOS safari浏览器 div需要有内容才能显示出滚动条  */
+      content: '&nbsp;';
+    }
   }
 }
 

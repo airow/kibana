@@ -90,8 +90,8 @@ uiModules
 
         // fill the scroller with a dummy element that mimics the content
         $scroller
-        .width(containerWidth)
-        .html($('<div>').css({ width: contentWidth, height: SCROLLER_HEIGHT }))
+        .width(containerWidth)/** 在base.less中使用css伪元素::before 在MacOS safari浏览器 div需要有内容才能显示出滚动条  */
+        .html($('<div>')/*.html("&nbsp;")*/.css({ width: contentWidth, height: SCROLLER_HEIGHT }))
         .insertAfter($el);
 
         // listen for scroll events
@@ -202,8 +202,8 @@ uiModules
 
         // fill the scroller with a dummy element that mimics the content
         $scroller
-        .width(containerWidth)
-        .html($('<div>').css({ width: contentWidth, height: SCROLLER_HEIGHT }))
+        .width(containerWidth) /**  在base.less中使用css伪元素::before 在MacOS safari浏览器 div需要有内容才能显示出滚动条  */
+        .html($('<div>')/*.html("&nbsp;")*/.css({ width: contentWidth, height: SCROLLER_HEIGHT }))
         .insertAfter($el);
 
         // listen for scroll events

@@ -61,7 +61,7 @@ export default function UrlFormatProvider(Private, highlightFilter) {
   ];
 
   Url.prototype._formatUrl = function (value, hit) {
-    let template = this.param('urlTemplate');
+    let template = this.param('confUrlTemplate') || this.param('urlTemplate');
     if (!template) return value;
     template = this._formatTemplate(template, hit);
     return this._compileTemplate(template)({

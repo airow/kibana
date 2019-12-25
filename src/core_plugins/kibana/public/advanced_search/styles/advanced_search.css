@@ -69,3 +69,41 @@
   border-top: 0;
   background-color: #f5f5f5;
 }
+.localMenu.mobileMenu { display: none; }
+@media screen and (max-width: 768px) {
+
+    i[title="打开关闭时间图表"],
+    i[title="固定表头"]
+    {
+      top: 20px !important;
+    }
+
+    .mobileAssert {
+        z-index:99999;
+    }
+
+    span[ng-show="opts.savedSearch.id"].localBreadcrumb__emphasis{
+      display: none;
+    }
+
+    .mobileAssert .localMenu.mobileMenu {
+      display: inline-flex;
+    }
+
+    .mobileAssert .localMenu.mobileMenu .localMenuItem:hover {
+      margin-top: 4px;
+      background-color:transparent;
+    }
+
+    .mobileAssert > div.localNavRow__section > div:nth-child(2),
+    .mobileAssert > div.localNavRow__section > div:nth-child(2) div[data-test-subj='globalTimepicker']{
+      display: none;
+    }
+
+    .mobileAssert > div.localNavRow__section.opend > div:nth-child(2){
+      display: inherit;
+      margin-top: 4px;
+    }
+
+    .mobileAssert > div.localNavRow__section.opend > div:nth-child(2) > .localMenuItem  {background-color: #f5f5f5;}
+}

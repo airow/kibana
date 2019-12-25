@@ -52,12 +52,15 @@ module.service('backendExportService', function ($http, kbnIndex) {
       });
   };
 
-  this.tasklist = function (esIndex, pageIndex, pageSize) {
+  this.tasklist = function (esIndex, pageIndex, pageSize, hideCancelTask) {
     return $http.get(this.url + '/tasklist?index=' + esIndex).success(function (data, header, config, status) {
       //响应成功
       debugger;
       //data.data = _.take(data.data, pageSize);
 
+      if (hideCancelTask) {
+        data.data = _.filter(data.data, item => { return item.CancelFlag != 1; });
+      }
       data.dataTotls = _.size(data.data);
       data.totalPageNum = Math.ceil(data.dataTotls / pageSize);
       data.data = _.filter(data.data, (value, index) => {
@@ -69,5 +72,28 @@ module.service('backendExportService', function ($http, kbnIndex) {
       //处理响应失败
       debugger;
     });
+  };
+
+  this.cancelTask = function (taskId) {
+    return $http.post(this.url + '/cancelTask',
+      {
+        taskId: taskId
+      },
+      {
+        transformRequest: function (obj) {
+          var str = [];
+          for (var p in obj) {
+            str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+          }
+          return str.join('&');
+        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }).success(function (data, header, config, status) {
+        debugger;
+        return data;
+      }).error(function (data, header, config, status) {
+        //处理响应失败
+        debugger;
+      });
   };
 });
