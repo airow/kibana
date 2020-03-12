@@ -45,6 +45,9 @@ import 'plugins/kibana/navigation/directives/navigation';
 import 'plugins/kibana/backend_export/directives/backend_export';
 import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
+import 'plugins/kibana/aggs_conf/directives/teld_aggs_conf';
+import 'plugins/kibana/aggs_conf/services/aggs_conf_services';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
@@ -136,35 +139,6 @@ uiRoutes
             'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
           }));
       }
-      // ,teldConf: function (Promise, courier, savedSearches, $route, es) {
-      //   console.log(es);
-      //   console.log("es"+$route.current.params.id);
-
-      //   // let conf = Promise.props({});
-      //   // if ($route.current.params.id) {
-      //   //   conf = es.get({
-      //   //     index: ".teld.conf",
-      //   //     type: 'search',
-      //   //     id: $route.current.params.id
-      //   //   })
-      //   //     .then(function (resp) {
-      //   //       console.log("es get");
-      //   //       console.log(resp);
-      //   //     });
-      //   // }
-
-      //   // return conf;
-
-      //   return es.get({
-      //       index: ".teld.conf",
-      //       type: 'search',
-      //       id: $route.current.params.id
-      //     })
-      //       .then(function (resp) {
-      //         console.log("es get");
-      //         console.log(resp);
-      //       });
-      // }
     }
   });
 
@@ -177,7 +151,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, globalState, teldSession) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, globalState, teldSession, aggsConfSrv) {
 
   $rootScope.showNotify = true;
 
@@ -208,6 +182,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   tellGrafanaMyLoaded();
 
   this.$scope = $scope;
+
   //this.$rootScope=$rootScope;
   //接收PostMessage发送过来的消息，通过Angular-Post-Message组件
   let messageIncomingHandler = $scope.$root.$on('$messageIncoming', messageIncoming.bind(this));
@@ -308,9 +283,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   console.log(savedSearch.uiConf);
   //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
   $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);
-  $scope.uiConf = savedSearch.uiConf;
 
-  function getTopNavMenu(menuKeys) {
+  $scope.uiConf = savedSearch.uiConf;
+  $scope.aggsResult = [];
+  function getTopNavMenu(menuKeysConf) {
+
+    var menuKeys = [];
+    menuKeysConf.forEach(function (item) {
+      menuKeys.push(item);
+    });
+    menuKeys.push("aggs");
+
     let confTopNavMenu = {
       "help": {
         key: '帮助',
@@ -343,6 +326,17 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           kbnTopNav.toggle(menuItem.key);
         },
         testId: 'discoverOpenButton',
+      },
+      'aggs': {
+        key: '统计',
+        description: '统计',
+        template: require('plugins/kibana/discover/partials/aggs_zh_CN.html'),
+        run: function (menuItem, kbnTopNav) {
+          $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
+          //kbnTopNav.setCurrent(menuItem.key);
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'aggsButton',
       },
       'export': {
         key: '导出',
@@ -497,6 +491,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     indexPatternList: $route.current.locals.ip.list,
     timefilter: $scope.timefilter
   };
+
+  if (!$scope.opts.timefield) {
+    _.remove($scope.topNavMenu, { testId: 'aggsButton' });
+  }
 
   $scope.showAdvancedSearchDisplay = function () {
     let returnValue = true;
@@ -772,8 +770,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     }));
 
     segmented.on('mergedSegment', function (merged) {
+      debugger;
       $scope.mergedEsResp = merged;
       $scope.hits = merged.hits.total;
+
+      // $scope.aggsResult.length = 0;
+      _.each(aggsConfSrv.bindAggs(merged, $scope.vis, $scope.aggsResult), item => {
+        //$scope.aggsResult.push(item);
+      });
+
 
       const indexPattern = $scope.searchSource.get('index');
 
@@ -806,6 +811,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     });
 
     segmented.on('complete', function () {
+
       if ($scope.fetchStatus.hitCount === 0) {
         flushResponseData();
       }
@@ -915,34 +921,58 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   };
 
   let loadingVis;
+
   function setupVisualization() {
-    // If we're not setting anything up we need to return an empty promise
+    debugger;
     if (!$scope.opts.timefield) return Promise.resolve();
-    if (loadingVis) return loadingVis;
 
-    const visStateAggs = [
-      {
-        type: 'count',
-        schema: 'metric'
-      },
-      {
-        type: 'date_histogram',
-        schema: 'segment',
-        params: {
-          field: $scope.opts.timefield,
-          interval: $state.interval
-        }
-      }
-    ];
-
-    // we have a vis, just modify the aggs
     if ($scope.vis) {
-      const visState = $scope.vis.getEnabledState();
-      visState.aggs = visStateAggs;
+      // const visState = $scope.vis.getEnabledState();
+      // // visState.aggs = visStateAggs;
 
-      $scope.vis.setState(visState);
+      // $scope.vis.setState(visState);
       return Promise.resolve($scope.vis);
     }
+
+    let visStateAggs = [{
+      type: 'count',
+      schema: 'metric'
+    }, {
+      type: 'date_histogram',
+      schema: 'segment',
+      params: {
+        field: $scope.opts.timefield,
+        interval: $state.interval
+      }
+    }];
+
+    // if ($scope.opts.timefield) {
+    //   visStateAggs.push({
+    //     type: 'date_histogram',
+    //     schema: 'segment',
+    //     params: {
+    //       field: $scope.opts.timefield,
+    //       interval: $state.interval
+    //     }
+    //   });
+    // } else {
+    //   let filtersSegment = {
+    //     type: 'filters',
+    //     schema: 'segment',
+    //     params: {
+    //       filters: [
+    //         { input: { query: { query_string: { query: '*' } } } }
+    //         // { input: { query: { query_string: { query: '*' } } } },
+    //         // { input: { query: { query_string: { query: '*' } } } }
+    //       ]
+    //     }
+    //   };
+    //   visStateAggs.push(filtersSegment);
+    // }
+    // visStateAggs.push({ "type": "sum", "schema": "metric", "params": { "field": "Power" } });
+    // visStateAggs.push({ "type": "min", "schema": "metric", "params": { "field": "Power" } });
+    // we have a vis, just modify the aggs
+
 
     $scope.vis = new Vis($scope.indexPattern, {
       title: savedSearch.title,
@@ -963,23 +993,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       aggs: visStateAggs
     });
 
+    debugger;
     $scope.searchSource.aggs(function () {
+      debugger;
       $scope.vis.requesting();
       return $scope.vis.aggs.toDsl();
     });
-
-    // stash this promise so that other calls to setupVisualization will have to wait
-    loadingVis = new Promise(function (resolve) {
-      $scope.$on('ready:vis', function () {
-        resolve($scope.vis);
-      });
-    })
-      .finally(function () {
-        // clear the loading flag
-        loadingVis = null;
-      });
-
-    return loadingVis;
+    return Promise.resolve($scope.vis);
   }
 
   function resolveIndexPatternLoading() {

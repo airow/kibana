@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-md-12 col-md-offset-0">
+    {{vis.aggs}}
+    <form class="form-inline col-md-3 col-lg-6 col-sm-12 col-xs-12" style="padding: 5px;" ng-repeat='agg in vis.aggs.bySchemaGroup.metrics'>
+      <teld-editor-agg-params agg="agg" group-name="groupName" class="vis-editor-agg-editor">
+      </teld-editor-agg-params>
+      <div class="form-group">
+        <button ng-click="submit(schema)" class="btn-success navbar-btn-link" type="button">
+          <i class="fa fa-play"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row">
+  <button ng-click="submit(schema)" ng-repeat="schema in availableSchema" class="btn-success navbar-btn-link"
+    type="button">
+    <i class="fa fa-play"></i>添加
+  </button>
+  <button class="btn-success navbar-btn-link" type="button" ng-click='stageEditableVis()'>
+    <i class="fa fa-play"></i>确认
+  </button>
+</div>

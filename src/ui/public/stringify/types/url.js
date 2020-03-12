@@ -86,7 +86,7 @@ export default function UrlFormatProvider(Private, highlightFilter) {
   };
 
   Url.prototype._formatTemplate = function (template, hit) {
-    debugger;
+    // debugger;
     if (false === _.isUndefined(hit)) {
       template = _.template(template, { imports: { moment: moment, helper: urlFormatHelper } })(hit);
     }
