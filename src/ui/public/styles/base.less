@@ -550,7 +550,8 @@ fieldset {
 
     div::before{
       /* 在MacOS safari浏览器 div需要有内容才能显示出滚动条  */
-      content: '&nbsp;';
+      // content: '&nbsp;'; /*设置&nbsp; chrome下会显示原文&nbsp;*/
+      content: '　';
     }
   }
 }

@@ -14,6 +14,7 @@ export default function AggTypeMetricSumProvider(Private) {
         name: 'field',
         filterFieldTypes: 'number'
       }
+      //,{ name: "format", type: "string" }
     ]
   });
 };

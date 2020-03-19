@@ -121,7 +121,7 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
         //       type: 'keyword'
         //     },
         //   }
-        // };        
+        // };
 
         // tell mappingSetup to set type
         return mappingSetup.setup(type, mapping);
@@ -181,6 +181,7 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
       return Promise.try(function () {
         parseSearchSource(meta.searchSourceJSON);
         parseAdvancedSearchBool(uiConf.advancedSearchBool);
+        parseAggs(uiConf.aggs);
       })
       .then(hydrateIndexPattern)
       .then(function () {
@@ -223,6 +224,20 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
       }
 
       self.uiConf.advancedSearchBool = state;
+    }
+
+    function parseAggs(aggsJson) {
+      if (!self.uiConf || !self.uiConf.aggs) return;
+
+      // if we have a searchSource, set its state based on the aggsJson field
+      let state;
+      try {
+        state = JSON.parse(aggsJson);
+      } catch (e) {
+        state = {};
+      }
+
+      self.uiConf.aggs = state;
     }
 
     /**
@@ -293,12 +308,18 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
         }
       }
 
+      if (_.has(self, 'uiConf.aggs')) {
+        if (_.isArray(self.uiConf.aggs)) {
+          self.uiConf.aggs = angular.toJson(self.uiConf.aggs);
+        }
+      }
+
       extColumns.forEach(function (value) {
         if (self[value]) {
           body[value] = self[value];
         }
       });
-      
+
       return body;
     };
 

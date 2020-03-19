@@ -41,6 +41,7 @@ import 'plugins/kibana/ui_conf_provider/directives/top';
 import 'plugins/kibana/advanced_search/directives/condition';
 import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
+import 'plugins/kibana/aggs_conf/state/teld_aggs_state';
 import 'plugins/kibana/navigation/directives/navigation';
 import 'plugins/kibana/backend_export/directives/backend_export';
 import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
@@ -151,7 +152,7 @@ app.directive('discoverApp', function () {
 });
 
 function discoverController($http, $scope, $rootScope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, globalState, teldSession, aggsConfSrv) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, es, ngDialog, advancedSearch, TeldState, TeldAggsState, globalState, teldSession, aggsConfSrv) {
 
   $rootScope.showNotify = true;
 
@@ -467,6 +468,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     $scope.fetch();
   });
 
+  const $TeldAggsState = $scope.TeldAggsState = new TeldAggsState();
+  $TeldAggsState.aggs = ($TeldAggsState.aggs || savedSearch.uiConf.aggs) || {};
+  $TeldAggsState.save();
+
   $state.index = $scope.indexPattern.id;
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
@@ -658,6 +663,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         //savedSearch.pageSize = $scope.opts.sampleSize;
         savedSearch.uiConf.pageSize = $scope.opts.sampleSize;
         savedSearch.uiConf.advancedSearchBool = $TeldState.advancedSearchBool;
+        savedSearch.uiConf.aggs = $TeldAggsState.aggs;
         savedSearch.uiConf.fixedHeader = $scope.uiConf.fixedHeader;
         teldSession.setSavedObjOwner(savedSearch);
 
@@ -702,6 +708,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       .then(function () {
         $state.save();
         $TeldState.save();
+        $TeldAggsState.save();
         $scope.kbnTopNav.close();
         return courier.fetch();
       })
@@ -771,7 +778,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     segmented.on('mergedSegment', function (merged) {
       debugger;
-      $scope.mergedEsResp = merged;
+      $scope.mergedEsResp = _.cloneDeep(merged);
+      /* TODO: 直线式Count图*/
+      if ($scope.mergedEsResp.aggregations) {
+        $scope.mergedEsResp.aggregations[2].buckets = _.map(merged.aggregations[2].buckets, item => {
+          return { key_as_string: item.key_as_string, key: item.key, doc_count: item.doc_count };
+        });
+      }
       $scope.hits = merged.hits.total;
 
       // $scope.aggsResult.length = 0;
@@ -847,6 +860,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     //savedSearch.uiConf.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.advancedSearchBool = advancedSearch.syncAdvancedSearch($scope.advancedSearch);
     $TeldState.save();
+    if ($scope.vis) {
+      $TeldAggsState.aggs = aggsConfSrv.syncAggMetric($scope.vis);
+      $TeldAggsState.save();
+    }
+
     let esQueryDSL = advancedSearch.syncAdvancedSearch2EsQueryDSL($scope.advancedSearch);
 
     //debugger;
@@ -972,6 +990,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     // visStateAggs.push({ "type": "sum", "schema": "metric", "params": { "field": "Power" } });
     // visStateAggs.push({ "type": "min", "schema": "metric", "params": { "field": "Power" } });
     // we have a vis, just modify the aggs
+
+    debugger;
+    _.each($TeldAggsState.aggs || [], item => {
+      visStateAggs.push(item);
+    });
+    // visStateAggs = _.concat(visStateAggs, $TeldAggsState.aggs || []);
+    visStateAggs = _.union(visStateAggs);
 
 
     $scope.vis = new Vis($scope.indexPattern, {

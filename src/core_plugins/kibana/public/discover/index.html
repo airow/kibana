@@ -121,22 +121,13 @@
                 <div class="col-md-1 col-lg-3 col-sm-3 col-xs-6" style="text-align: center;" ng-repeat='x in aggsResult'>
                   <span style="background-color: transparent;">
                     <span class="filter-description filter">
-                      <span ng-bind="x.label">平均</span>
+                      <span ng-bind="x.label"></span>
                       <span>：</span>
-                      <span ng-bind="x.value">'234234万'</span>
+                      <span ng-bind="x.value"></span>
                     </span>
                   </span>
                 </div>
-                <div ng-if='false' class="col-lg-1 col-md-1 col-sm-3 col-xs-6" style="text-align: center;" ng-repeat3="x in [1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12]">
-                  <span class="filter-description filter">
-                    <span class="ng-binding">平均</span>
-                    <span>'234234万'</span>
-                  </span>
-                </div>
               </div>
-            </div>
-            <div class="row">
-
             </div>
             <div class="discover-table" fixed-scroll>
               <doc-table hits="rows" index-pattern="indexPattern" saved-obj="savedSearch" sorting="state.sort"

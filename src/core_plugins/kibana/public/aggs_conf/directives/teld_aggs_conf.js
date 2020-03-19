@@ -5,6 +5,7 @@ import conditionTemplate from './teld_aggs_conf.html';
 import uiModules from 'ui/modules';
 import VisAggConfigProvider from 'ui/vis/agg_config';
 import 'plugins/kibana/aggs_conf/directives/teld_agg_params';
+import 'plugins/kibana/aggs_conf/directives/teld_aggs_conf.less';
 
 
 import 'ui-select';
@@ -55,6 +56,20 @@ uiModules
               $scope.fetch();
             }
           };
+        }
+
+        $scope.remove = function (array, item) {
+          _.remove($scope.vis.aggs, item);
+          _.remove($scope.vis.aggs.raw, item);
+          delete $scope.vis.aggs.byId[item.id];
+          _.remove($scope.vis.aggs.byTypeName[item.type.name] || [], item);
+          _.remove($scope.vis.aggs.bySchemaName.metric, item);
+          _.remove($scope.vis.aggs.bySchemaGroup.metrics, item);
+          return array;
+        };
+
+        $scope.move = function (array, index, newIndex) {
+          _.move(array, index, newIndex);
         }
 
         $scope.submit = function (schema) {

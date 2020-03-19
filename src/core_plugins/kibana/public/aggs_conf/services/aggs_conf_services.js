@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import moment from 'moment';
+import numeral from 'numeral';
 import uiModules from 'ui/modules';
 const module = uiModules.get('apps/aggs_conf');
 
 import AggTypesMetricsMetricAggTypeProvider from 'ui/agg_types/metrics/metric_agg_type';
 import AggTypesBucketsBucketAggTypeProvider from 'ui/agg_types/buckets/_bucket_agg_type';
+import AggTypesIndexProvider from 'ui/agg_types/index';
 
 
 // This is the only thing that gets injected into controllers
@@ -12,8 +14,16 @@ module.service('aggsConfSrv', function (Private, Promise, getAppState) {
 
   const MetricAggType = Private(AggTypesMetricsMetricAggTypeProvider);
   const BucketAggType = Private(AggTypesBucketsBucketAggTypeProvider);
+  const AggTypesIndex = Private(AggTypesIndexProvider);
 
   this.fieldTypes = ["string", "number", "date", "boolean"];
+
+  this.labelMapping = {
+    avg: { title: "平均" },
+    sum: { title: "合计" },
+    min: { title: "最小值" },
+    max: { title: "最大值" }
+  };
 
   this.bindAggs = function (mergedEsResp, vis, aggsResult) {
     if (!vis) return aggsResult;
@@ -48,13 +58,6 @@ module.service('aggsConfSrv', function (Private, Promise, getAppState) {
 
     const pureMetric = _.filter(bySchemaName.metric, cc => { return cc.id != countId });
 
-    const labelMapping = {
-      sum: "合计",
-      min: "最小值",
-      max: "最大值",
-      avg: "均值"
-    };
-
     if (hasDateHistogram) {
       const buckets = aggregations[byTypeName.date_histogram[0].id].buckets;
 
@@ -63,11 +66,13 @@ module.service('aggsConfSrv', function (Private, Promise, getAppState) {
 
       _.transform(pureMetric, (result, value, index) => {
 
-        var makeLabel = `${value.params.field.name} ${labelMapping[value.type.name]}`;
+        //var makeLabel = `${value.params.field.name} ${labelMapping[value.type.name]}`;
+
+        var makeLabel = `${value.params.field.alias || value.params.field.name} ${this.labelMapping[value.type.name].title}`;
 
         var tmp = {
           id: value.id,
-          label: value.type.params.customLabel || makeLabel,
+          label: value.params.customLabel || makeLabel,
           value: 0,
           metricAggType: value.type,
           values: _.map(buckets, `${value.id}.value`),
@@ -86,9 +91,11 @@ module.service('aggsConfSrv', function (Private, Promise, getAppState) {
         }, tmp);
         tmp.avg = tmp.sum / tmp.count;
         tmp.value = tmp[tmp.name];
-        // result[value.id] = tmp;
+
+        _.each(['value', 'sum', 'min', 'max', 'avg'], item => {
+          tmp[item] = numeral(tmp[item]).format('0,0.[00]');
+        });
         result.push(tmp);
-        // aggsResult.pureMetric
 
       }, aggsResult);
 
@@ -101,5 +108,25 @@ module.service('aggsConfSrv', function (Private, Promise, getAppState) {
     return aggsResult;
   }
 
+  this.syncAggMetric = function (vis) {
+    // debugger;
+    let metric = vis.aggs.bySchemaName.metric;
+    let countMetric = _.remove(metric, aggConfig => { return aggConfig.type.name === 'count'; });
+
+    let aggs = [];
+
+    _.transform(metric, function (result, val, index) {
+      debugger;
+      let params = _.assign(val.write().params, _.omit(val.params, 'field'));
+      result.push({ type: val.type.name, schema: "metric", params: params });
+    }, aggs);
+
+    console.log(metric);
+    return aggs;
+  }
+
   this.AggType = { MetricAggType, BucketAggType };
+
+  this.MetricAggType = AggTypesIndex.byType.metrics;
+  this.AggTypesIndex = AggTypesIndex;
 });

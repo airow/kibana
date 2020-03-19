@@ -58,7 +58,9 @@ export default function UiConfProvider(Private, Promise, config) {
         },
         'style': 'width:100px'
       }
-    ]
+    ],
+
+    aggs: []
   };
 
 };

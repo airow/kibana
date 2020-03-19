@@ -9,12 +9,15 @@ import AggTypesIndexProvider from 'ui/agg_types/index';
 import uiModules from 'ui/modules';
 import aggParamsTemplate from './teld_agg_params.html';
 import editorHtml_string from './../controls/teld_string.html';
+import editorHtml_format from './../controls/teld_format.html';
 import editorHtml_field from './../controls/teld_field.html';
+import AggTypesParamTypesStringProvider from 'ui/agg_types/param_types/string';
 
 uiModules
 .get('app/aggs_conf')
-.directive('teldEditorAggParams', function ($compile, $parse, Private, Notifier, $filter) {
+  .directive('teldEditorAggParams', function ($compile, $parse, Private, Notifier, $filter, aggsConfSrv) {
   const aggTypes = Private(AggTypesIndexProvider);
+  const stringParamTypes = Private(AggTypesParamTypesStringProvider);
 
   const notify = new Notifier({
     location: 'visAggGroup'
@@ -28,9 +31,17 @@ uiModules
       $scope.$bind('agg', attr.agg);
       $scope.$bind('groupName', attr.groupName);
 
-      debugger;
-      var filterArray = ['avg', 'sum', 'min', 'max', 'cardinality'];
-      var filterTypeOptions = _.filter(aggTypes.byType.metrics, item => { return _.includes(filterArray, item.name) });
+      var mapping = aggsConfSrv.labelMapping;
+      var filterArray = _.keys(mapping);
+      var filterTypeOptions = _.filter(aggTypes.byType.metrics, item => {
+        var returnValue = _.includes(filterArray, item.name);
+        // var returnValue = false === _.isNil(title);
+        if (returnValue) {
+          var title = mapping[item.name].title;
+          item.title = title;
+        }
+        return returnValue;
+      });
       $scope.aggTypeOptions = filterTypeOptions;
       $scope.advancedToggled = false;
 
@@ -103,8 +114,9 @@ uiModules
           if (aggParam = getAggParamHTML(param, i)) {
             aggParamHTML[type].push(aggParam);
           }
-
         });
+
+
 
         // compile the paramEditors html elements
         let paramEditors = aggParamHTML.basic;
@@ -125,7 +137,7 @@ uiModules
           return;
         }
 
-        //去掉json
+        //åŽ»æŽ‰json
         if (param.name === 'json') {
           return;
         }
@@ -133,6 +145,9 @@ uiModules
         switch (param.name) {
           case "customLabel":
             param.editor = editorHtml_string;
+            break;
+          case "format":
+            param.editor = editorHtml_format;
             break;
 
           case "field":
