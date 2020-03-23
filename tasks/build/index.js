@@ -17,7 +17,7 @@ module.exports = function (grunt) {
       '_build:packageJson',
       '_build:readme',
       '_build:babelCache',
-      '_build:installNpmDeps',
+      grunt.option('skip-installNpmDeps') ? ['copy:node_modules'] : ['_build:installNpmDeps'],
       '_build:removePkgJsonDeps',
       'clean:testsFromModules',
       'run:optimizeBuild',

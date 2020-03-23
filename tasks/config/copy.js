@@ -18,5 +18,13 @@ module.exports = function (grunt) {
       dest: 'build/kibana',
       expand: true
     },
+    node_modules: {
+      options: { mode: true },
+      src: [
+        'node_modules/**'
+      ],
+      dest: 'build/kibana',
+      expand: true
+    },
   };
 };
