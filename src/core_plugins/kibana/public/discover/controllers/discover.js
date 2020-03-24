@@ -464,7 +464,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   });
 
   const $TeldAggsState = $scope.TeldAggsState = new TeldAggsState();
-  $TeldAggsState.aggs = ($TeldAggsState.aggs || savedSearch.uiConf.aggs) || {};
+  $TeldAggsState.aggs = ($TeldAggsState.aggs || savedSearch.uiConf.aggs) || [];
   $TeldAggsState.save();
 
   $state.index = $scope.indexPattern.id;
