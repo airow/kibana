@@ -9,6 +9,7 @@ import IndicesEditSectionsProvider from 'plugins/kibana/management/sections/indi
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import editTemplate from 'plugins/kibana/management/sections/indices/_edit.html';
+import editTemplate_Teld from 'plugins/kibana/management/sections/indices/_edit_teld.html';
 import IngestProvider from 'ui/ingest';
 
 uiRoutes
@@ -39,6 +40,34 @@ uiRoutes
   }
 });
 
+uiRoutes
+  .when('/teld_management/kibana/indices/:indexPatternId', {
+    template: editTemplate_Teld,
+    resolve: {
+      indexPattern: function ($route, courier) {
+        return courier.indexPatterns
+          .get($route.current.params.indexPatternId)
+          .catch(courier.redirectWhenMissing('/teld_management/kibana/index'));
+      }
+    }
+  });
+
+uiRoutes
+  .when('/teld_management/kibana/indices', {
+    resolve: {
+      redirect: function ($location, config) {
+        const defaultIndex = config.get('defaultIndex');
+        let path = '/teld_management/kibana/index';
+
+        if (defaultIndex) {
+          path = `/teld_management/kibana/indices/${defaultIndex}`;
+        }
+
+        $location.path(path).replace();
+      }
+    }
+  });
+
 uiModules.get('apps/management')
 .controller('managementIndicesEdit', function ($scope, $location, $route, config, courier, Notifier, Private, AppState, docTitle) {
 
@@ -46,7 +75,6 @@ uiModules.get('apps/management')
   const $state = $scope.state = new AppState();
   const refreshKibanaIndex = Private(RefreshKibanaIndex);
   const ingest = Private(IngestProvider);
-
   $scope.kbnUrl = Private(UrlProvider);
   $scope.indexPattern = $route.current.locals.indexPattern;
   docTitle.change($scope.indexPattern.id);

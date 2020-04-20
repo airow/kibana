@@ -27,7 +27,8 @@ server.host: "0.0.0.0"
 # elasticsearch.url: "http://hdpjntest.es.localhost:9202" #开发环境
 # elasticsearch.url: "http://hdpjntest.es.localhost:12200" #济南测试es
 elasticsearch.url: "http://hdpjntest.chinacloudapp.cn:12200" #济南测试es
-
+# elasticsearch.url: "http://localhost:6789/ES/hdpjntest/12200/Proxy" #济南测试esNginx透明代理
+# elasticsearch.url: "http://localhost:6789/balance" #济南测试esNginx透明代理
 
 # When this setting’s value is true Kibana uses the hostname specified in the server.host
 # setting. When the value of this setting is false, Kibana uses the hostname of the host

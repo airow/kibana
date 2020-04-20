@@ -25,10 +25,13 @@ uiRoutes
 
 // wrapper directive, which sets some global stuff up like the left nav
 uiModules.get('apps/management')
-.directive('kbnManagementIndices', function ($route, config, kbnUrl) {
+  .directive('kbnManagementIndices', function ($route, $location,  config, kbnUrl) {
   return {
     restrict: 'E',
     transclude: true,
+    scope: {
+      sectionName: '@section'
+    },
     template: indexTemplate,
     link: function ($scope) {
       $scope.editingId = $route.current.params.indexPatternId;
@@ -51,10 +54,26 @@ uiModules.get('apps/management')
   };
 });
 
+uiModules.get('apps/management')
+  .controller('managementSection', function ($scope, $location, $route, config, courier, Notifier, Private, AppState, docTitle) {
+
+    debugger;
+    $scope.sectionName = "kibana";
+    $scope.sections = management.items.inOrder;
+    $scope.section = management.getSection($scope.sectionName) || management;
+
+    if ($scope.section) {
+      $scope.section.items.forEach(item => {
+        item.active = `#${$location.path()}`.indexOf(item.url) > -1;
+      });
+    }
+  });
+
+
 /***/
-//2017-02-23@管理页面中隐藏 
+//2017-02-23@管理页面中隐藏
 management.getSection('kibana').register('indices', {
-  display: 'Index Patterns',
+  display: '数据模型',
   order: 0,
   url: '#/management/kibana/indices/'
 });
