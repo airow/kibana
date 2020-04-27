@@ -370,7 +370,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     };
 
     let menus = [];
-    if (menuKeys && menuKeys.length == 0) {
+    if (menuKeys && menuKeys.length == 0 || (menuKeys.length == 1 && menuKeys[0] === "aggs")) {
       for (let key in confTopNavMenu) {
         menuKeys.push(key);
       }

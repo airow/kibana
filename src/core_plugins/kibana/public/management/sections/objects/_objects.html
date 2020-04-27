@@ -59,6 +59,11 @@
                 <i aria-hidden="true" class="fa fa-pencil"></i>
               </button>
 
+              <button ng-click="editJson(service, item)" class="btn btn-default" aria-label="Edit">
+                <span class="sr-only">JOSN</span>
+                <i aria-hidden="true" class="fa fa-file-text-o"></i>
+              </button>
+
               <button ng-click="open(item)" ng-if='item.url' class="btn btn-info" aria-label="Hide">
                 <span class="sr-only">Hide</span>
                 <i aria-hidden="true" class="fa fa-eye"></i>

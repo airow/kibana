@@ -57,7 +57,6 @@ uiModules.get('apps/management')
 uiModules.get('apps/management')
   .controller('managementSection', function ($scope, $location, $route, config, courier, Notifier, Private, AppState, docTitle) {
 
-    debugger;
     $scope.sectionName = "kibana";
     $scope.sections = management.items.inOrder;
     $scope.section = management.getSection($scope.sectionName) || management;

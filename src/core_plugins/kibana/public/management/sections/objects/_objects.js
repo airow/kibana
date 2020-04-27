@@ -140,6 +140,15 @@ uiModules.get('apps/management')
             id: item.id
           };
 
+          kbnUrl.change('/management/kibana/objects/edit_v2/{{ service }}/{{ id }}', params);
+        };
+
+        $scope.editJson = function (service, item) {
+          const params = {
+            service: service.serviceName,
+            id: item.id
+          };
+
           kbnUrl.change('/management/kibana/objects/edit/{{ service }}/{{ id }}', params);
         };
 
