@@ -116,7 +116,18 @@
                 es-resp="mergedEsResp" search-source="searchSource">
               </visualize>
             </div>
-            <div class="row">
+            <div class="filter-bar aggsResultBar" style="background-color: transparent;">
+              <span ng-repeat='x in aggsResult'>
+                <span style="background-color: transparent;">
+                  <span class="filter-description filter aggsResultItem">
+                    <span ng-bind="x.label"></span>
+                    <span>:</span>
+                    <span ng-bind="x.value"></span>
+                  </span>
+                </span>
+            </div>
+            </div>
+            <div class="row" ng-if='false'>
               <div class="filter-bar" style="background-color: transparent;">
                 <div class="col-md-1 col-lg-3 col-sm-3 col-xs-6" style="text-align: center;" ng-repeat='x in aggsResult'>
                   <span style="background-color: transparent;">

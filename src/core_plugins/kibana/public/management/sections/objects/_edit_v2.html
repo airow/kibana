@@ -46,11 +46,9 @@
       <colgroup>
         <col style="width: 70px;" />
         <col />
-        <col />
         <col style="width: 70px;" />
-        <col style="width: 200px;" />
+        <col />
         <col style="width: 70px;" ng-repeat="(key, value) in strategyConf" />
-        <col style="width: 200px;" />
         <col style="width: 150px;" />
       </colgroup>
       <thead>
@@ -62,9 +60,6 @@
             <span>字段</span>
           </th>
           <th>
-            <span>别名</span>
-          </th>
-          <th>
             <span>显示</span>
           </th>
           <th>
@@ -73,9 +68,6 @@
           <td ng-repeat="(key, value) in strategyConf">
             <span>{{value.name}}</span>
           </td>
-          <th ng-if="false">
-            <span>自定义</span>
-          </th>
           <th></th>
         </tr>
       </thead>
@@ -86,9 +78,6 @@
           </td>
           <td>
             <input type="text" ng-model="row.field" class="form-control" />
-          </td>
-          <td>
-            <input type="text" ng-model="row.alias" class="form-control" />
           </td>
           <td>
             <span>
@@ -112,17 +101,6 @@
               <i class="fa fa-edit" ng-bind="strategyConfCount(row.strategyConfGroup,key)"></i>
             </button>
           </td>
-          <td ng-if="false">
-            <span ng-repeat="strategyConf in row.strategyConf track by $index">
-              <span style="display: inline-block; margin: 5px; border-radius: 5px;background-color: blanchedalmond;padding: 5px;">
-                <span ng-bind="strategyConf.strategyName"></span>
-                <i ng-click="colEditor(row.strategyConf,$index)" class="fa fa-edit" aria-hidden="true"></i>
-                <i ng-click="remove(row.strategyConf,$index)" class="fa fa-remove" aria-hidden="true"></i>
-              </span>
-              <span ng-if="!$last">,</span>
-            </span>
-            <i class="fa fa-plus" ng-click="colEditor(row.strategyConf)" aria-hidden="true"></i>
-          </td>
           <td>
             <button ng-disabled="$first" class="btn btn-primary" ng-click="move(fieldRows,$index, $index-1)"><i aria-hidden="true" class="fa fa-arrow-up"></i></button>
             <button ng-disabled="$last" class="btn btn-primary" ng-click="move(fieldRows, $index, $index+1)"><i aria-hidden="true" class="fa fa-arrow-down"></i></button>
@@ -137,26 +115,10 @@
           <td>
             <input type="text" ng-model="newField.field" class="form-control" />
           </td>
-          <td>
-            <input type="text" ng-model="newField.alias" class="form-control" />
-          </td>
           <td ng-repeat="(key, value) in strategyConf">
             <button ng-disabled="$first" class="btn" ng-click="strategyConfEditor(newField,key,newField.strategyConfGroup[key])">
               <i class="fa fa-edit" ng-bind="strategyConfCount(newField.strategyConfGroup,key)"></i>
             </button>
-          </td>
-          <td ng-if="false">
-            <!-- 数据权限 -->
-            <span ng-repeat="authObj in newField.authObj track by $index">
-              <span
-                style="display: inline-block; margin: 5px; border-radius: 5px;background-color: blanchedalmond;padding: 5px;">
-                <span ng-bind="authObj"></span>
-                <i ng-click="colEditor(newField.authObj,$index)" class="fa fa-edit" aria-hidden="true"></i>
-                <i ng-click="remove(newField.authObj,$index)" class="fa fa-remove" aria-hidden="true"></i>
-              </span>
-              <span ng-if="!$last">,</span>
-            </span>
-            <i class="fa fa-plus" ng-click="addAuthObj(newField);colEditor(newField.authObj)" aria-hidden="true"></i>
           </td>
           <td>
             <span ng-bind='row.field'></span>

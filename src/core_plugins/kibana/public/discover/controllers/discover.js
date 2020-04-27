@@ -287,14 +287,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   $scope.uiConf = savedSearch.uiConf;
   $scope.aggsResult = [];
-  function getTopNavMenu(menuKeysConf) {
-
-    var menuKeys = [];
-    menuKeysConf.forEach(function (item) {
-      menuKeys.push(item);
-    });
-    menuKeys.push("aggs");
-
+  function getTopNavMenu(menuKeys) {
     let confTopNavMenu = {
       "help": {
         key: '帮助',
@@ -328,17 +321,6 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverOpenButton',
       },
-      'aggs': {
-        key: '统计',
-        description: '统计',
-        template: require('plugins/kibana/discover/partials/aggs_zh_CN.html'),
-        run: function (menuItem, kbnTopNav) {
-          $scope.showAdvancedSearch = !$scope.showAdvancedSearch;
-          //kbnTopNav.setCurrent(menuItem.key);
-          kbnTopNav.toggle(menuItem.key);
-        },
-        testId: 'aggsButton',
-      },
       'export': {
         key: '导出',
         description: '导出',
@@ -366,6 +348,15 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           kbnTopNav.toggle(menuItem.key);
         },
         testId: 'discoverNavigationButton',
+      },
+      'aggs': {
+        key: '聚合',
+        description: '聚合',
+        template: require('plugins/kibana/discover/partials/aggs_zh_CN.html'),
+        run: function (menuItem, kbnTopNav) {
+          kbnTopNav.toggle(menuItem.key);
+        },
+        testId: 'aggsButton',
       }
     };
 
@@ -373,6 +364,10 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     if (menuKeys && menuKeys.length == 0) {
       for (let key in confTopNavMenu) {
         menuKeys.push(key);
+      }
+    } else {
+      if (false === _.contains(menuKeys, 'aggs')) {
+        menuKeys.push('aggs');
       }
     }
 
@@ -469,7 +464,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
   });
 
   const $TeldAggsState = $scope.TeldAggsState = new TeldAggsState();
-  $TeldAggsState.aggs = ($TeldAggsState.aggs || savedSearch.uiConf.aggs) || {};
+  $TeldAggsState.aggs = ($TeldAggsState.aggs || savedSearch.uiConf.aggs) || [];
   $TeldAggsState.save();
 
   $state.index = $scope.indexPattern.id;

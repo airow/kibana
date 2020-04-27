@@ -235,7 +235,8 @@ uiModules.get('apps/management')
             // $scope.newField = { authObj: [] };
             $scope.clear();
 
-            let columns = obj._source.columns;
+            let esObj_Source = _.cloneDeep(obj._source);
+            let columns = esObj_Source.columns;
 
             let strategyConf = {
               ranges: { name: "范围" },
@@ -248,7 +249,7 @@ uiModules.get('apps/management')
             $scope.strategyConf = strategyConf;
 
             let strategyArray = _.keys(strategyConf);
-            let mappingColumnConf = _.transform(obj._source.uiConf.columnConf, (result, item) => {
+            let mappingColumnConf = _.transform(esObj_Source.uiConf.columnConf, (result, item) => {
               // debugger;
               if (true !== item.disable) {
                 let fieldName = item.fieldName;
@@ -267,7 +268,7 @@ uiModules.get('apps/management')
 
             let columnConf = _.keys(mappingColumnConf);
 
-            let authObjConf = _.transform(obj._source.uiConf.authObj, (result, item) => {
+            let authObjConf = _.transform(esObj_Source.uiConf.authObj, (result, item) => {
               if (true !== item.disable) {
                 let name = _.keys(item);
                 _.remove(name, 'disable');
@@ -284,7 +285,7 @@ uiModules.get('apps/management')
 
             _.transform(columns, (result, name) => {
               let item = _.find(result, { field: name });
-              if (!item) { item = { field: name, display: _.includes(obj._source.columns, name) }; result.push(item); }
+              if (!item) { item = { field: name, display: _.includes(esObj_Source.columns, name) }; result.push(item); }
               if (mappingColumnConf[name]) {
                 // item.strategyConf = mappingColumnConf[name].strategyConf;
                 item.strategyConfGroup = _.groupBy(mappingColumnConf[name].strategyConf, 'strategyKey');
@@ -310,6 +311,8 @@ uiModules.get('apps/management')
               }
               if (authObjConf[name]) {
                 item.authObj = authObjConf[name].value;
+              } else {
+                item.authObj = [];
               }
             }, $scope.fieldRows);
 
@@ -371,7 +374,18 @@ uiModules.get('apps/management')
 
         $scope.strategyConfCount = function (strategyConfGroup, key) {
           if (strategyConfGroup) {
-            return "(" + _.size(strategyConfGroup[key]) + ")";
+            var size = _.size(strategyConfGroup[key]);
+            switch (key) {
+              case "expression":
+              case "custom":
+                break;
+              default:
+                if (size > 0) {
+                  size = _.size(strategyConfGroup[key][0][key]);
+                }
+                break;
+            }
+            return "(" + size + ")";
           }
           return "";
         }
@@ -435,7 +449,13 @@ uiModules.get('apps/management')
           debugger;
 
           $scope.obj._source.columns = _.map(_.filter($scope.fieldRows, 'display'), 'field');
-          $scope.obj._source.uiConf.authObj = _.map(_.filter($scope.fieldRows, 'authObj'), i => { return _.zipObject([i.field], [i.authObj]) });
+          $scope.obj._source.uiConf.authObj = _.map(
+            _.filter($scope.fieldRows, fieldRow => {
+              return _.size(fieldRow.authObj) > 0;
+            }),
+            i => {
+              return _.zipObject([i.field], [i.authObj])
+            });
 
           debugger;
           var strategyConfGroup = _.filter($scope.fieldRows, 'strategyConfGroup');
@@ -631,100 +651,3 @@ uiModules.get('apps/management')
       $modalInstance.dismiss('cancel');
     };
   });
-  // .controller('ModalInstanceStrategyEditorCtrl', function ($scope, $modalInstance, strategy, strategyConf) {
-  //   debugger;
-  //   $scope.strategy = strategy;
-  //   $scope.strategyConf = strategyConf;
-  //   if (_.size($scope.strategyConf) === 0) {
-  //     $scope.add($scope.strategyConf);
-  //   } else {
-
-  //   }
-
-
-  //   // $scope.current = $scope.strategyConf[0];
-
-  //   $scope.aceLoaded = function (editor) {
-  //     // if (_.contains(loadedEditors, editor)) return;
-  //     // loadedEditors.push(editor);
-
-  //     editor.$blockScrolling = Infinity;
-
-  //     const session = editor.getSession();
-  //     const fieldName = editor.container.id;
-
-  //     session.setTabSize(2);
-  //     session.setUseSoftTabs(true);
-  //     session.on('changeAnnotation', function () {
-  //       const annotations = session.getAnnotations();
-  //       if (_.some(annotations, { type: 'error' })) {
-  //         if (!_.contains($scope.aceInvalidEditors, fieldName)) {
-  //           $scope.aceInvalidEditors.push(fieldName);
-  //         }
-  //       } else {
-  //         $scope.aceInvalidEditors = _.without($scope.aceInvalidEditors, fieldName);
-  //       }
-
-  //       if ($rootScope.$$phase) $scope.$apply();
-  //     });
-  //   };
-
-  //   $scope.setCurrent = function (conf) {
-  //     $scope.current = conf;
-  //   };
-
-  //   $scope.add = function (itemArray) {
-  //     debugger;
-  //     switch ($scope.strategy.key) {
-  //       case "ranges":
-  //       case "thresholds":
-  //       case "enumeration":
-
-  //         if ($scope.current['strategy'] === undefined) {
-  //           $scope.current = {
-  //             "bgColor": false,
-  //             "strategy": $scope.strategy.key,
-  //             "strategyKey": $scope.strategy.key,
-  //             "strategyName": $scope.strategy.name,
-  //           };
-  //           $scope.current[$scope.strategy.key] = [{}];
-  //         }
-  //         $scope.current[$scope.strategy.key].push({});
-  //         break;
-  //       default:
-  //         $scope.current = {
-  //           "bgColor": false,
-  //           "strategy": $scope.strategy.key,
-  //           "strategyKey": $scope.strategy.key,
-  //           "strategyName": $scope.strategy.name,
-  //           ranges: []
-  //         };
-  //         break;
-  //     }
-  //     itemArray.push($scope.current);
-  //   }
-  //   $scope.remove = function (itemArray, index) {
-  //     $scope.setCurrent(itemArray[index - 1]);
-  //     itemArray.splice(index, 1);
-  //   }
-
-  //   $scope.ok = function () {
-  //     $modalInstance.close($scope.strategyConf);
-  //   };
-
-  //   $scope.cancel = function () {
-  //     $modalInstance.dismiss('cancel');
-  //   };
-  // })
-  // .controller('ModalInstanceCtrl', function ($scope, $modalInstance, options) {
-  //   debugger;
-  //   $scope.options = options;
-
-  //   $scope.ok = function () {
-  //     $modalInstance.close();
-  //   };
-
-  //   $scope.cancel = function () {
-  //     $modalInstance.dismiss('cancel');
-  //   };
-  // });
