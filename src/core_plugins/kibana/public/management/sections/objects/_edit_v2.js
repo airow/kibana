@@ -146,185 +146,187 @@ uiModules.get('apps/management')
           return returnValue;
         };
 
-        es.get({
-          index: kbnIndex,
-          type: service.type,
-          id: $routeParams.id
-        })
-          .then(function (obj) {
-
-            // /** 处理功能菜单 */
-            // obj._source.menus = obj._source.menus || [];
-
-            // let uiConfProvider = {
-            //   'search': Private(DiscoverUiConfProvider),
-            //   'dashboard': Private(DashboardUiConfProvider),
-            //   'visualization': Private(VisualizationUiConfProvider)
-            // }
-            // let uiConf_default = uiConfProvider[service.type].defaultConf;
-
-            if (service.Class && service.Class.hasUiConf) {
-              let timefilterSchema = { disabled: true, timeFrom: '', timeTo: '' };
-              //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
-              let navigationSchema = {
-                'conf_id': 'navigationConf的id，配置了conf_id将忽略url，但disabled依然有效',
-                'display': '显示的名称',
-                'url': '#/visualize/edit/{visualize name} 或 #/discover/{discover name}',
-                'disabled': true
-              };
-              let authObjSchema = { disable: true, '绑定字段': ['授权对象名称'] };
-              let columnConfSchema = {
-                "rowStyle": false,
-                fieldName: '绑定字段',
-                disable: true,
-                'coloring': {
-                  'bgColor': false,
-                  'strategy': 'ranges|thresholds|expression|enumeration|custom',
-                  'template': '<span>${value}</span>',
-                  'ranges': [
-                    { 'range': '[0 TO 10)', 'color': 'red' },
-                    { 'range': '[10 TO 15]', 'color': 'green' },
-                    { 'range': '(15 TO *]', 'color': 'yellow' }
-                  ],
-                  'thresholds': [
-                    { 'value': 0, 'color': 'red' },
-                    { 'value': 50, 'color': 'red' }
-                  ],
-                  'enumeration': [
-                    { 'value': '1', 'text': '公交站', 'color': 'red' },
-                    { 'value': '2', 'text': '非公交' }
-                  ],
-                  'expression': {
-                    'body': 'return value; //方法签名 fun(value, row, fieldName)'
-                  },
-                  "custom": {
-                    "fun": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}",
-                    "fun_demo1": "return {style:{'background-color': 'red'}}; //自定义央视",
-                    "fun_demo2": "return {style:{'color': 'white','background-color': 'black'}}; //自定义央视",
-                    "fun_demo3": "return value=='222' ? {value:value, style:{'color': 'red'}} : {value:value+'ccc'};",
-                    "fun_demo4": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}; //添加链接"
-                  }
-                },
-                'style': 'width:100px'
-              };
-              /** 默认显示配置项 */
-              let uiConfDefault = {
-                showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], authObj: [authObjSchema], navigation: [navigationSchema],
-                columnConf: [columnConfSchema],
-                timefilter: angular.toJson(timefilterSchema)
-              };
-
-              obj._source.uiConf = obj._source.uiConf || {};
-
-              for (let key in uiConfDefault) {
-                if (false === (key in obj._source.uiConf)) {
-                  obj._source.uiConf[key] = uiConfDefault[key];
-                }
-              }
-            }
-
-
-
-            // $scope.editObj = _.pick(obj._source, ['columns', 'uiConf']);
-
-
-            $scope.obj = obj;
-            $scope.link = service.urlFor(obj._id);
-
-            $scope.fieldRows = [];
-            // $scope.newField = { authObj: [] };
-            $scope.clear();
-
-            let esObj_Source = _.cloneDeep(obj._source);
-            let columns = esObj_Source.columns;
-
-            let strategyConf = {
-              ranges: { name: "范围" },
-              thresholds: { name: "阈值" },
-              enumeration: { name: "枚举" },
-              expression: { name: "表达式" },
-              custom: { name: "自定义" }
-            };
-
-            $scope.strategyConf = strategyConf;
-
-            let strategyArray = _.keys(strategyConf);
-            let mappingColumnConf = _.transform(esObj_Source.uiConf.columnConf, (result, item) => {
-              // debugger;
-              if (true !== item.disable) {
-                let fieldName = item.fieldName;
-                // result[name] = item;
-                if (result[fieldName] == undefined) {
-                  result[fieldName] = { columnConf: _.omit(item, "coloring"), strategyConf: [] };
-                }
-                if (item.coloring && _.includes(strategyArray, item.coloring.strategy)) {
-                  let colorConf = _.pick(item.coloring, ['bgColor', 'strategy', item.coloring.strategy]);
-                  colorConf.strategyKey = item.coloring.strategy;
-                  colorConf.strategyName = strategyConf[item.coloring.strategy].name;
-                  result[fieldName].strategyConf.push(colorConf);
-                }
-              }
-            }, {});
-
-            let columnConf = _.keys(mappingColumnConf);
-
-            let authObjConf = _.transform(esObj_Source.uiConf.authObj, (result, item) => {
-              if (true !== item.disable) {
-                let name = _.keys(item);
-                _.remove(name, 'disable');
-                name = _.first(name);
-                result[name] = { disable: item.disable, value: item[name] };
-              }
-            }, {});
-
-            let authObjFields = _.keys(authObjConf);
-
-            debugger;
-
-            columns = columns.concat(columnConf, authObjFields);
-
-            _.transform(columns, (result, name) => {
-              let item = _.find(result, { field: name });
-              if (!item) { item = { field: name, display: _.includes(esObj_Source.columns, name) }; result.push(item); }
-              if (mappingColumnConf[name]) {
-                // item.strategyConf = mappingColumnConf[name].strategyConf;
-                item.strategyConfGroup = _.groupBy(mappingColumnConf[name].strategyConf, 'strategyKey');
-
-                // debugger;
-                if (item.strategyConfGroup.ranges) {
-                  _.each(item.strategyConfGroup.ranges, rangesGroup => {
-                    _.each(rangesGroup.ranges, rangeItem => {
-                      let rangeFirstChar = rangeItem.range[0];
-                      let rangeLastChar = rangeItem.range[rangeItem.range.length - 1];
-                      let values = rangeItem.range.substring(1, rangeItem.range.length - 1).split(" TO ");
-                      let rangeLeftVal = values[0];
-                      let rangeRightVal = values[1];
-
-
-                      rangeItem.rangeFirstChar = rangeFirstChar;
-                      rangeItem.rangeLastChar = rangeLastChar;
-                      rangeItem.rangeLeftVal = rangeLeftVal;
-                      rangeItem.rangeRightVal = rangeRightVal;
-                    });
-                  });
-                }
-              }
-              if (authObjConf[name]) {
-                item.authObj = authObjConf[name].value;
-              } else {
-                item.authObj = [];
-              }
-            }, $scope.fieldRows);
-
-
-            // _.concat(["ClientIP", "BatchID", "DataVersion", "Action", "AppCode", "ModuleCode", "AppVersion"], ['asdf'])
-
-            const fields = _.reduce(obj._source, createField, []);
-            if (service.Class) readObjectClass(fields, service.Class);
-            $scope.fields = _.sortBy(fields, 'name');
+        function get() {
+          es.get({
+            index: kbnIndex,
+            type: service.type,
+            id: $routeParams.id
           })
-          .catch(notify.fatal);
+            .then(function (obj) {
 
+              // /** 处理功能菜单 */
+              // obj._source.menus = obj._source.menus || [];
+
+              // let uiConfProvider = {
+              //   'search': Private(DiscoverUiConfProvider),
+              //   'dashboard': Private(DashboardUiConfProvider),
+              //   'visualization': Private(VisualizationUiConfProvider)
+              // }
+              // let uiConf_default = uiConfProvider[service.type].defaultConf;
+
+              if (service.Class && service.Class.hasUiConf) {
+                let timefilterSchema = { disabled: true, timeFrom: '', timeTo: '' };
+                //timefilter_Schema.refreshInterval = { display: '暂停', pause: false, value: '' };
+                let navigationSchema = {
+                  'conf_id': 'navigationConf的id，配置了conf_id将忽略url，但disabled依然有效',
+                  'display': '显示的名称',
+                  'url': '#/visualize/edit/{visualize name} 或 #/discover/{discover name}',
+                  'disabled': true
+                };
+                let authObjSchema = { disable: true, '绑定字段': ['授权对象名称'] };
+                let columnConfSchema = {
+                  "rowStyle": false,
+                  fieldName: '绑定字段',
+                  disable: true,
+                  'coloring': {
+                    'bgColor': false,
+                    'strategy': 'ranges|thresholds|expression|enumeration|custom',
+                    'template': '<span>${value}</span>',
+                    'ranges': [
+                      { 'range': '[0 TO 10)', 'color': 'red' },
+                      { 'range': '[10 TO 15]', 'color': 'green' },
+                      { 'range': '(15 TO *]', 'color': 'yellow' }
+                    ],
+                    'thresholds': [
+                      { 'value': 0, 'color': 'red' },
+                      { 'value': 50, 'color': 'red' }
+                    ],
+                    'enumeration': [
+                      { 'value': '1', 'text': '公交站', 'color': 'red' },
+                      { 'value': '2', 'text': '非公交' }
+                    ],
+                    'expression': {
+                      'body': 'return value; //方法签名 fun(value, row, fieldName)'
+                    },
+                    "custom": {
+                      "fun": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}",
+                      "fun_demo1": "return {style:{'background-color': 'red'}}; //自定义央视",
+                      "fun_demo2": "return {style:{'color': 'white','background-color': 'black'}}; //自定义央视",
+                      "fun_demo3": "return value=='222' ? {value:value, style:{'color': 'red'}} : {value:value+'ccc'};",
+                      "fun_demo4": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}; //添加链接"
+                    }
+                  },
+                  'style': 'width:100px'
+                };
+                /** 默认显示配置项 */
+                let uiConfDefault = {
+                  showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], authObj: [authObjSchema], navigation: [navigationSchema],
+                  columnConf: [columnConfSchema],
+                  timefilter: angular.toJson(timefilterSchema)
+                };
+
+                obj._source.uiConf = obj._source.uiConf || {};
+
+                for (let key in uiConfDefault) {
+                  if (false === (key in obj._source.uiConf)) {
+                    obj._source.uiConf[key] = uiConfDefault[key];
+                  }
+                }
+              }
+
+
+
+              // $scope.editObj = _.pick(obj._source, ['columns', 'uiConf']);
+
+
+              $scope.obj = obj;
+              $scope.link = service.urlFor(obj._id);
+
+              $scope.fieldRows = [];
+              // $scope.newField = { authObj: [] };
+              $scope.clear();
+
+              let esObj_Source = _.cloneDeep(obj._source);
+              let columns = esObj_Source.columns;
+
+              let strategyConf = {
+                ranges: { name: "范围" },
+                thresholds: { name: "阈值" },
+                enumeration: { name: "枚举" },
+                // expression: { name: "表达式" },
+                custom: { name: "自定义" }
+              };
+
+              $scope.strategyConf = strategyConf;
+
+              let strategyArray = _.keys(strategyConf);
+              let mappingColumnConf = _.transform(esObj_Source.uiConf.columnConf, (result, item) => {
+                // debugger;
+                if (true !== item.disable) {
+                  let fieldName = item.fieldName;
+                  // result[name] = item;
+                  if (result[fieldName] == undefined) {
+                    result[fieldName] = { columnConf: _.omit(item, "coloring"), strategyConf: [] };
+                  }
+                  if (item.coloring && _.includes(strategyArray, item.coloring.strategy)) {
+                    let colorConf = _.pick(item.coloring, ['bgColor', 'strategy', item.coloring.strategy]);
+                    colorConf.strategyKey = item.coloring.strategy;
+                    colorConf.strategyName = strategyConf[item.coloring.strategy].name;
+                    result[fieldName].strategyConf.push(colorConf);
+                  }
+                }
+              }, {});
+
+              let columnConf = _.keys(mappingColumnConf);
+
+              let authObjConf = _.transform(esObj_Source.uiConf.authObj, (result, item) => {
+                if (true !== item.disable) {
+                  let name = _.keys(item);
+                  _.remove(name, 'disable');
+                  name = _.first(name);
+                  result[name] = { disable: item.disable, value: item[name] };
+                }
+              }, {});
+
+              let authObjFields = _.keys(authObjConf);
+
+              debugger;
+
+              columns = columns.concat(columnConf, authObjFields);
+
+              _.transform(columns, (result, name) => {
+                let item = _.find(result, { field: name });
+                if (!item) { item = { field: name, display: _.includes(esObj_Source.columns, name) }; result.push(item); }
+                if (mappingColumnConf[name]) {
+                  // item.strategyConf = mappingColumnConf[name].strategyConf;
+                  item.strategyConfGroup = _.groupBy(mappingColumnConf[name].strategyConf, 'strategyKey');
+
+                  // debugger;
+                  if (item.strategyConfGroup.ranges) {
+                    _.each(item.strategyConfGroup.ranges, rangesGroup => {
+                      _.each(rangesGroup.ranges, rangeItem => {
+                        let rangeFirstChar = rangeItem.range[0];
+                        let rangeLastChar = rangeItem.range[rangeItem.range.length - 1];
+                        let values = rangeItem.range.substring(1, rangeItem.range.length - 1).split(" TO ");
+                        let rangeLeftVal = values[0];
+                        let rangeRightVal = values[1];
+
+
+                        rangeItem.rangeFirstChar = rangeFirstChar;
+                        rangeItem.rangeLastChar = rangeLastChar;
+                        rangeItem.rangeLeftVal = rangeLeftVal;
+                        rangeItem.rangeRightVal = rangeRightVal;
+                      });
+                    });
+                  }
+                }
+                if (authObjConf[name]) {
+                  item.authObj = authObjConf[name].value;
+                } else {
+                  item.authObj = [];
+                }
+              }, $scope.fieldRows);
+
+
+              // _.concat(["ClientIP", "BatchID", "DataVersion", "Action", "AppCode", "ModuleCode", "AppVersion"], ['asdf'])
+
+              const fields = _.reduce(obj._source, createField, []);
+              if (service.Class) readObjectClass(fields, service.Class);
+              $scope.fields = _.sortBy(fields, 'name');
+            })
+            .catch(notify.fatal);
+        }
+        get();
         // This handles the validation of the Ace Editor. Since we don't have any
         // other hooks into the editors to tell us if the content is valid or not
         // we need to use the annotations to see if they have any errors. If they
@@ -385,9 +387,9 @@ uiModules.get('apps/management')
                 }
                 break;
             }
-            return "(" + size + ")";
+            return size;
           }
-          return "";
+          return 0;
         }
         $scope.strategyConfEditor = function (row, key) {
           let strategyConfGroup = row.strategyConfGroup;
@@ -428,22 +430,6 @@ uiModules.get('apps/management')
             // $log.info('Modal dismissed at: ' + new Date());
           });
         }
-        /**
-         * Deletes an object and sets the notification
-         * @param {type} name description
-         * @returns {type} description
-         */
-        $scope.delete = function () {
-          es.delete({
-            index: kbnIndex,
-            type: service.type,
-            id: $routeParams.id
-          })
-            .then(function (resp) {
-              return redirectHandler('deleted');
-            })
-            .catch(notify.fatal);
-        };
 
         $scope.restore = function () {
           debugger;
@@ -515,53 +501,6 @@ uiModules.get('apps/management')
             });
         }
 
-        $scope.submit = function () {
-          const source = _.cloneDeep($scope.obj._source);
-
-          _.each($scope.fields, function (field) {
-            let value = field.value;
-
-            if (field.type === 'number') {
-              value = Number(field.value);
-            }
-
-            if (field.type === 'array') {
-              value = JSON.parse(field.value);
-            }
-
-            _.set(source, field.name, value);
-          });
-
-          es.index({
-            index: kbnIndex,
-            type: service.type,
-            id: $routeParams.id,
-            body: source
-          })
-            .then(function (resp) {
-              return redirectHandler('updated');
-            })
-            .catch(notify.fatal);
-        };
-
-        function redirectHandler(action) {
-          return es.indices.refresh({
-            index: kbnIndex
-          })
-            .then(function (resp) {
-              const msg = 'You successfully ' + action + ' the "' + $scope.obj._source.title + '" ' + $scope.title.toLowerCase() + ' object';
-
-              $location.path('/management/kibana/objects').search({
-                _a: rison.encode({
-                  tab: serviceObj.title
-                })
-              });
-              notify.info(msg);
-            });
-        }
-
-
-
         $scope.open = function () {
           debugger;
           // kbnUrl.change("/discover/" + $routeParams.id);
@@ -585,6 +524,7 @@ uiModules.get('apps/management')
           });
           modalInstance.result.then(function (result) {
             console.log(result);
+            get();
           }, function (reason) {
             console.log(reason);// 点击空白区域，总会输出backdrop
             // click，点击取消，则会暑促cancel
@@ -627,16 +567,6 @@ uiModules.get('apps/management')
             // $log.info('Modal dismissed at: ' + new Date());
           });
         };
-
-        $scope.addAuthObj = function (row) {
-          (row.authObj || (row.authObj = [], row.authObj)).push("");
-          return _.last(row.authObj);
-        }
-
-        $scope.addStrategyConf = function (row) {
-          (row.authObj || (row.authObj = [], row.authObj)).push("");
-          return _.last(row.authObj);
-        }
       }
     };
   })

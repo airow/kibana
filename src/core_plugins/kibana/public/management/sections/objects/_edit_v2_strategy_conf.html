@@ -2,16 +2,16 @@
   <h3 class="modal-title">{{strategy.name}}</h3>
 </div>
 <div class="modal-body" style="padding:0px;">
-    <div class="col-lg-12 col-sm-12 col-xs-12">
+    <div class="col-lg-12 col-sm-12 col-xs-12" ng-if="strategy.key=='expression' || strategy.key=='custom'" >
       <div class="btn-group" style="margin-right: 3px;" ng-if="strategy.key=='expression' || strategy.key=='custom'" ng-repeat="conf in strategyConf track by $index">
-        <button class="btn btn-primary" ng-class="{'btn-primary':current==conf}" ng-click="setCurrent(conf)">{{$index+1}}
+        <button style="width: 100px;" class="btn btn-xs" ng-class="{true:'btn-info',false:'btn-primary'}[current==conf]" ng-click="setCurrent(conf)">{{$index+1}}
           {{conf.display}}</button>
-        <button class="btn btn-danger"  ng-if="current==conf" ng-click="remove(strategyConf, $index)">
+        <button class="btn btn-xs btn-danger" ng-if="current==conf" ng-disabled="current!=conf" ng-click="remove(strategyConf, $index)">
           <span class="fa fa-remove" aria-hidden="true"></span>
         </button>
       </div>
       <div class="btn-group">
-        <button class="btn btn-success" ng-click="add(strategyConf)">
+        <button class="btn btn-xs btn-success" ng-click="add(strategyConf)">
           <span class="fa fa-plus" aria-hidden="true"></span>
       </button>
       </div>
@@ -19,7 +19,7 @@
     <div ng-if="strategy.key=='expression'">
       <div class="col-lg-6 col-sm-6 col-xs-6">
         <form role="form-inline" name="objectForm">
-          <div class="form-group">
+          <div class="form-group" ng-if="false">
             <label>名称</label>
             <input type="text" ng-model="current.display" class="form-control span12" />
           </div>
@@ -41,7 +41,7 @@
     <div ng-if="strategy.key=='custom'">
       <div class="col-lg-6 col-sm-6 col-xs-6">
         <form role="form-inline" name="objectForm">
-          <div class="form-group">
+          <div class="form-group" ng-if="false">
             <label>名称</label>
             <input type="text" ng-model="current.display" class="form-control span12" />
           </div>
@@ -60,38 +60,146 @@
         </div>
       </div>
     </div>
-    <div ng-if="strategy.key=='ranges' || strategy.key=='thresholds' || strategy.key=='enumeration'">
+
+    <div ng-if="strategy.key=='ranges'">
       <!-- ranges -->
-      <div ng-if="strategy.key=='ranges'" class="col-lg-12 col-sm-12 col-xs-12" ng-repeat="eachItem in current[strategy.key] track by $index">
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <select ng-model="eachItem.rangeFirstChar"
-            ng-options="item.value as item.text for item in [{text:'大于',value:'['},{text:'大于等于',value:'('}]"></select>
-        </div>
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <input type="text" ng-model="eachItem.rangeLeftVal" class="form-control span12" />
-        </div>
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <select ng-model="eachItem.rangeLastChar" ng-options="item.value as item.text for item in [{text:'小于',value:']'},{text:'小于等于',value:')'}]"></select>
-        </div>
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <input type="text" ng-model="eachItem.rangeRightVal" class="form-control span12" />
-        </div>
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <input type="text" ng-model="eachItem.color" class="form-control span12" />
-        </div>
-      </div>
+      <table class="table table-striped table-hover">
+        <colgroup>
+
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="width: 100px;">
+              <span>开始</span>
+            </th>
+            <th>
+              <span>开始值</span>
+            </th>
+            <th style="width: 100px;">
+              <span>结束</span>
+            </th>
+            <th>
+              <span>结束值</span>
+            </th>
+            <th>颜色</th>
+            <th>
+              <button class="btn btn btn-xs btn-success" ng-click="add(strategyConf)">
+                <span class="fa fa-plus" aria-hidden="true"></span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="eachItem in current[strategy.key] track by $index">
+            <td>
+              <select style="width: 100%;" ng-model="eachItem.rangeFirstChar"
+                ng-options="item.value as item.text for item in [{text:'>',value:'('},{text:'>=',value:'['}]"></select>
+            </td>
+            <td>
+              <input type="text" ng-model="eachItem.rangeLeftVal" class="form-control span12" />
+            </td>
+            <td>
+              <select style="width: 100%;" ng-model="eachItem.rangeLastChar"
+                ng-options="item.value as item.text for item in [{text:'<',value:')'},{text:'<=',value:']'}]"></select>
+            </td>
+            <td>
+              <input type="text" ng-model="eachItem.rangeRightVal" class="form-control span12" />
+            </td>
+            <td>
+              <input type="text" ng-model="eachItem.color" class="form-control span12" />
+            </td>
+            <td>
+              <button ng-disabled="$first" class="btn btn-xs btn-primary" ng-click="move(fieldRows,$index, $index-1)"><i
+                  aria-hidden="true" class="fa fa-arrow-up"></i></button>
+              <button ng-disabled="$last" class="btn btn-xs btn-primary" ng-click="move(fieldRows, $index, $index+1)"><i
+                  aria-hidden="true" class="fa fa-arrow-down"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-if="strategy.key=='thresholds'">
       <!-- thresholds -->
-      <div ng-if="strategy.key=='thresholds'" class="col-lg-12 col-sm-12 col-xs-12" ng-repeat="eachItem in current[strategy.key] track by $index">
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <input type="number" ng-model="eachItem.value" class="form-control span12" />
-        </div>
-        <div class="col-lg-2 col-sm-2 col-xs-2">
-          <input type="text" ng-model="eachItem.color" class="form-control span12" />
-        </div>
-      </div>
+      <table class="table table-striped table-hover">
+        <colgroup>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>
+              值
+            </th>
+            <th>颜色</th>
+            <th>
+              <button class="btn btn btn-xs btn-success" ng-click="add(strategyConf)">
+                <span class="fa fa-plus" aria-hidden="true"></span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="eachItem in current[strategy.key] track by $index">
+            <td>
+              <input type="number" ng-model="eachItem.value" class="form-control span12" />
+            </td>
+            <td>
+              <input type="text" ng-model="eachItem.color" class="form-control span12" />
+            </td>
+            <td>
+              <button ng-disabled="$first" class="btn btn-xs btn-primary" ng-click="move(fieldRows,$index, $index-1)"><i
+                  aria-hidden="true" class="fa fa-arrow-up"></i></button>
+              <button ng-disabled="$last" class="btn btn-xs btn-primary" ng-click="move(fieldRows, $index, $index+1)"><i
+                  aria-hidden="true" class="fa fa-arrow-down"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-if="strategy.key=='enumeration'">
+      <!-- enumeration -->
+      <table class="table table-striped table-hover">
+        <colgroup>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>
+              名称
+            </th>
+            <th>
+              值
+            </th>
+            <th>颜色</th>
+            <th>
+              <button class="btn btn btn-xs btn-success" ng-click="add(strategyConf)">
+                <span class="fa fa-plus" aria-hidden="true"></span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="eachItem in current[strategy.key] track by $index">
+            <td>
+              <input type="text" ng-model="eachItem.text" class="form-control span12" />
+            </td>
+            <td>
+              <input type="value" ng-model="eachItem.value" class="form-control span12" />
+            </td>
+            <td>
+              <input type="text" ng-model="eachItem.color" class="form-control span12" />
+            </td>
+            <td>
+              <button ng-disabled="$first" class="btn btn-xs btn-primary" ng-click="move(fieldRows,$index, $index-1)"><i
+                  aria-hidden="true" class="fa fa-arrow-up"></i></button>
+              <button ng-disabled="$last" class="btn btn-xs btn-primary" ng-click="move(fieldRows, $index, $index+1)"><i
+                  aria-hidden="true" class="fa fa-arrow-down"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 </div>
 <div class="modal-footer" style="padding-bottom:5px; padding-top:5px;">
-  <button class="btn btn-primary" ng-click="ok()">关闭</button>
+  <button class="btn btn-primary" ng-click="ok()">确定</button>
   <button class="btn btn-warning" ng-click="cancel()">取消</button>
 </div>
