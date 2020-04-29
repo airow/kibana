@@ -8,7 +8,7 @@ import indexTemplate from 'plugins/kibana/management/sections/indices/index.html
 
 const indexPatternsResolutions = {
   indexPatternIds: function (courier) {
-    return courier.indexPatterns.getIds();
+    return courier.indexPatterns.getIdsTeld();
   }
 };
 
@@ -39,6 +39,7 @@ uiModules.get('apps/management')
 
       $scope.$watch('defaultIndex', function () {
         const ids = $route.current.locals.indexPatternIds;
+        debugger;
         $scope.indexPatternList = ids.map(function (id) {
           return {
             id: id,

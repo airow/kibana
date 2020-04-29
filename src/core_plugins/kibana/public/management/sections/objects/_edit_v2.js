@@ -15,7 +15,7 @@ import './_edit_v2_modal_instance_ctrl';
 import indexTemplate from 'plugins/kibana/management/sections/indices/index.html';
 const indexPatternsResolutions = {
   indexPatternIds: function (courier) {
-    return courier.indexPatterns.getIds();
+    return courier.indexPatterns.getIdsTeld();
   }
 };
 uiRoutes
@@ -134,6 +134,7 @@ uiModules.get('apps/management')
         $scope.notFound = $routeParams.notFound;
 
         $scope.title = service.type;
+        $scope.urlID = $routeParams.id;
 
         $scope.checkFieldAllowEdit = function (fieldName) {
           let returnValue = service.Class && service.Class.allowEdit;
@@ -247,8 +248,39 @@ uiModules.get('apps/management')
                 custom: { name: "自定义" }
               };
 
-              $scope.strategyConf = strategyConf;
+              let menusConf = [
+                {
+                  key: 'help',
+                  description: '帮助'
+                },
+                {
+                  key: 'save',
+                  description: '保存查询'
+                },
+                {
+                  key: 'open',
+                  description: '打开查询'
+                }, {
+                  key: 'adv',
+                  description: '高级过滤'
+                },
+                {
+                  key: 'backendexport',
+                  description: '导出'
+                },
+                {
+                  disable: true,
+                  key: 'navigation',
+                  description: '统计分析'
+                },
+                {
+                  disable: true,
+                  key: 'aggs',
+                  description: '聚合'
+                }
+              ];
 
+              $scope.strategyConf = strategyConf;
               let strategyArray = _.keys(strategyConf);
               let mappingColumnConf = _.transform(esObj_Source.uiConf.columnConf, (result, item) => {
                 // debugger;
@@ -268,6 +300,12 @@ uiModules.get('apps/management')
               }, {});
 
               let columnConf = _.keys(mappingColumnConf);
+
+              let uiConfMenus = _.size(esObj_Source.uiConf.menus) == 0 ? _.map(menusConf, 'key') : esObj_Source.uiConf.menus;
+              debugger;
+              $scope.menusConf = _.each(_.cloneDeep(menusConf), menu => {
+                menu.selected = _.indexOf(uiConfMenus, menu.key) > -1;
+              });
 
               let authObjConf = _.transform(esObj_Source.uiConf.authObj, (result, item) => {
                 if (true !== item.disable) {
@@ -318,6 +356,7 @@ uiModules.get('apps/management')
               }, $scope.fieldRows);
 
 
+
               // _.concat(["ClientIP", "BatchID", "DataVersion", "Action", "AppCode", "ModuleCode", "AppVersion"], ['asdf'])
 
               const fields = _.reduce(obj._source, createField, []);
@@ -326,6 +365,7 @@ uiModules.get('apps/management')
             })
             .catch(notify.fatal);
         }
+        $scope.refresh = get;
         get();
         // This handles the validation of the Ace Editor. Since we don't have any
         // other hooks into the editors to tell us if the content is valid or not
@@ -434,7 +474,10 @@ uiModules.get('apps/management')
         $scope.restore = function () {
           debugger;
 
+
+
           $scope.obj._source.columns = _.map(_.filter($scope.fieldRows, 'display'), 'field');
+          $scope.obj._source.uiConf.menus = _.map(_.filter($scope.menusConf, 'selected'), 'key');
           $scope.obj._source.uiConf.authObj = _.map(
             _.filter($scope.fieldRows, fieldRow => {
               return _.size(fieldRow.authObj) > 0;
@@ -531,6 +574,35 @@ uiModules.get('apps/management')
             // $log.info('Modal dismissed at: ' + new Date());
           });
         };
+
+        $scope.openJSON = function () {
+
+          var modalInstance = $modal.open({
+            // templateUrl: "myModalContent.html",
+            template: objectEditOnlineHTML,
+            controller: 'ModalInstanceCtrl',
+            windowClass: 'modal-class',
+            size: 'lg',
+            resolve: {
+              options: function () {
+                return {
+                  iframeUrl: "/app/kibana#/management/kibana/objects/edit/savedSearches/" + $routeParams.id
+                };
+              }
+            }
+          });
+          modalInstance.opened.then(function () {// 模态窗口打开之后执行的函数
+            console.log('modal is opened');
+          });
+          modalInstance.result.then(function (result) {
+            console.log(result);
+            get();
+          }, function (reason) {
+            console.log(reason);// 点击空白区域，总会输出backdrop
+            // click，点击取消，则会暑促cancel
+            // $log.info('Modal dismissed at: ' + new Date());
+          });
+        }
 
         $scope.move = function (itemArray, index, newIndex) {
           itemArray[index] = itemArray.splice(newIndex, 1, itemArray[index])[0];

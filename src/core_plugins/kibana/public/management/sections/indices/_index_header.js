@@ -42,7 +42,10 @@ uiModules
         modalInstance.result.then(function (result) {
           debugger;
           console.log(result);
-          $location.path(`discover/" + ${result.title}`);
+          if (result.title && result.title != "New Saved Search") {
+            // $location.path(`/discover/" + ${result.title}`);
+            $location.path(`/management/kibana/objects/edit_v2/savedSearches/${result.title}`);
+          }
         }, function (reason) {
           console.log(reason);// 点击空白区域，总会输出backdrop
           // click，点击取消，则会暑促cancel

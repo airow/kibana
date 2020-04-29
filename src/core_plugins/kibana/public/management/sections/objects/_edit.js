@@ -14,7 +14,7 @@ import VisualizationUiConfProvider from 'plugins/kibana/ui_conf_provider/visuali
 import indexTemplate from 'plugins/kibana/management/sections/indices/index.html';
 const indexPatternsResolutions = {
   indexPatternIds: function (courier) {
-    return courier.indexPatterns.getIds();
+    return courier.indexPatterns.getIdsTeld();
   }
 };
 uiRoutes

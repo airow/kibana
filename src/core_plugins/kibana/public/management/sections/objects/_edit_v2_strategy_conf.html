@@ -57,6 +57,14 @@
           <textarea style="height: 500px;" readonly disabled class="form-control span12">function(value, row, fieldName){
             {{current.custom.fun}}
             }</textarea>
+
+<code>"fun": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}",
+"fun_demo1": "return {style:{'background-color': 'red'}}; //自定义央视",
+"fun_demo2": "return {style:{'color': 'white','background-color': 'black'}}; //自定义央视",
+"fun_demo3": "return value=='222' ? {value:value, style:{'color': 'red'}} : {value:value+'ccc'};",
+"fun_demo4": "return {value:`<a href='http://www.baidu.com'>${value}</a>`}; //添加链接",
+"fun_demo5": "return {value:`${fieldName}`}; //获取字段名",
+</code>
         </div>
       </div>
     </div>
@@ -164,10 +172,10 @@
         <thead>
           <tr>
             <th>
-              名称
+              值
             </th>
             <th>
-              值
+              名称
             </th>
             <th>颜色</th>
             <th>
@@ -180,10 +188,10 @@
         <tbody>
           <tr ng-repeat="eachItem in current[strategy.key] track by $index">
             <td>
-              <input type="text" ng-model="eachItem.text" class="form-control span12" />
+              <input type="value" ng-model="eachItem.value" class="form-control span12" />
             </td>
             <td>
-              <input type="value" ng-model="eachItem.value" class="form-control span12" />
+              <input type="text" ng-model="eachItem.text" class="form-control span12" />
             </td>
             <td>
               <input type="text" ng-model="eachItem.color" class="form-control span12" />

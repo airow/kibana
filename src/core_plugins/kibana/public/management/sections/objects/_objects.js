@@ -11,7 +11,7 @@ import indexTemplate from 'plugins/kibana/management/sections/indices/index.html
 const MAX_SIZE = Math.pow(2, 31) - 1;
 const indexPatternsResolutions = {
   indexPatternIds: function (courier) {
-    return courier.indexPatterns.getIds();
+    return courier.indexPatterns.getIdsTeld();
   }
 };
 uiRoutes
@@ -140,7 +140,11 @@ uiModules.get('apps/management')
             id: item.id
           };
 
-          kbnUrl.change('/management/kibana/objects/edit_v2/{{ service }}/{{ id }}', params);
+          if (params.service === 'savedSearches') {
+            kbnUrl.change('/management/kibana/objects/edit_v2/{{ service }}/{{ id }}', params);
+          } else {
+            kbnUrl.change('/management/kibana/objects/edit/{{ service }}/{{ id }}', params);
+          }
         };
 
         $scope.editJson = function (service, item) {

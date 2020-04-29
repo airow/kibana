@@ -15,7 +15,8 @@
           continue.
         </div>
       </li>
-      <li ng-repeat="pattern in indexPatternList | orderBy:['-default','id'] track by pattern.id " class="sidebar-item">
+      <input type="text" class="form-control" ng-model="idsSearch" placeholder="过滤">
+      <li ng-repeat="pattern in indexPatternList | filter: idsSearch | orderBy:['-default','id'] track by pattern.id " class="sidebar-item">
         <a href="{{::pattern.url}}">
           <div class="{{::pattern.class}}">
             <i aria-hidden="true" ng-if="pattern.default" class="fa fa-star"></i>

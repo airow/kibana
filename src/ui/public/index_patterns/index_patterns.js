@@ -4,6 +4,7 @@ import errors from 'ui/errors';
 import IndexPatternsIndexPatternProvider from 'ui/index_patterns/_index_pattern';
 import IndexPatternsPatternCacheProvider from 'ui/index_patterns/_pattern_cache';
 import IndexPatternsGetIdsProvider from 'ui/index_patterns/_get_ids';
+import IndexPatternsGetIdsTeldProvider from 'ui/index_patterns/_get_ids_teld';
 import IndexPatternsIntervalsProvider from 'ui/index_patterns/_intervals';
 import IndexPatternsMapperProvider from 'ui/index_patterns/_mapper';
 import IndexPatternsPatternToWildcardProvider from 'ui/index_patterns/_pattern_to_wildcard';
@@ -47,6 +48,7 @@ function IndexPatternsProvider(es, Notifier, Private, Promise, kbnIndex) {
 
   self.cache = patternCache;
   self.getIds = Private(IndexPatternsGetIdsProvider);
+  self.getIdsTeld = Private(IndexPatternsGetIdsTeldProvider);
   self.intervals = Private(IndexPatternsIntervalsProvider);
   self.mapper = Private(IndexPatternsMapperProvider);
   self.patternToWildcard = Private(IndexPatternsPatternToWildcardProvider);

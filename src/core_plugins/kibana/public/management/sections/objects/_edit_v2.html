@@ -1,13 +1,15 @@
 <kbn-management-app section="kibana">
-  <kbn-management-objects-edit-v2 class="container-fluid">
-    <h1>编辑查询方案</h1>
+  <kbn-management-objects-edit-v2>
+    <h4>编辑 {{ urlID }} 方案</h4>
     <div class="form-group">
       <button class="btn btn-primary" ng-click="open()"><i aria-hidden="true" class="fa fa-eye"></i>在线设计</button>
-      <button aria-label="Cancel" class="btn btn-primary" ng-click="cancel()">Cancel</button>
-      <button aria-label="Save {{ title }} Object" class="btn btn-success" ng-click="restore()"
-        ng-disabled="objectForm.$invalid || aceInvalidEditors.length !==0">Save {{ title }} Object</button>
+      <button class="btn btn-primary" ng-click="refresh()"><i aria-hidden="true" class="fa fa-refresh"></i>刷新</button>
+      <!-- <button aria-label="Cancel" class="btn btn-primary" ng-click="cancel()">Cancel</button> -->
+      <!-- <button aria-label="Save {{ title }} Object" class="btn btn-success" ng-click="restore()"
+        ng-disabled="objectForm.$invalid || aceInvalidEditors.length !==0">Save {{ title }} Object</button> -->
       <button aria-label="Save {{ title }} Object" class="btn btn-success" ng-click="submit_source()"
-        ng-disabled="objectForm.$invalid || aceInvalidEditors.length !==0">Save {{ title }} Object</button>
+        ng-disabled="objectForm.$invalid || aceInvalidEditors.length !==0">保存</button>
+      <button class="btn" ng-click="openJSON()">专家模式</button>
     </div>
     <div class="bs-callout bs-callout-danger" ng-if="notFound">
       <h4>There is a problem with that saved object</h4>
@@ -51,6 +53,21 @@
             </div>
           </div>
         </div>
+        <div class="row col-lg-12 col-sm-12 col-xs-12">
+          <div class="col-lg-6 col-sm-6 col-xs-12">
+            <div class="input-group">
+              <span style="width: 100px;" class="input-group-addon">菜单</span>
+              <div class="btn-group" style="margin: 3px;">
+                <button ng-if='menu.disable!=true' ng-repeat="menu in menusConf" type="button"
+                  ng-class="{true:'btn-info',false:'btn-primary'}[menu.selected]" ng-click='menu.selected=!menu.selected'
+                  class="btn btn-sm">
+                  <i ng-if='menu.selected' class="fa fa-check"></i>
+                  <span  ng-bind="menu.description"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="bs-callout bs-callout-info" style="padding:auto;background-color:initial">
@@ -62,7 +79,7 @@
             <col style="width: 70px;" />
             <col />
             <col style="width: 70px;" />
-            <col />
+            <col style="width: 170px;" />
             <col style="width: 70px;" ng-repeat="(key, value) in strategyConf" />
             <col style="width: 150px;" />
           </colgroup>
