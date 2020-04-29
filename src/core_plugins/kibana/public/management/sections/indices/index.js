@@ -37,6 +37,8 @@ uiModules.get('apps/management')
       $scope.editingId = $route.current.params.indexPatternId;
       config.bindToScope($scope, 'defaultIndex');
 
+      $scope.allowNewIndex = window.top == window;
+
       $scope.$watch('defaultIndex', function () {
         const ids = $route.current.locals.indexPatternIds;
         debugger;
