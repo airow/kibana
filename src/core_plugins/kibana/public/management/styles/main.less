@@ -8,6 +8,7 @@ kbn-management-indices-edit,
 kbn-management-indices-create,
 kbn-management-advanced,
 kbn-management-objects,
+kbn-management-objects-edit,
 kbn-management-objects-view {
   display: block;
 }
@@ -91,10 +92,13 @@ kbn-management-objects {
     margin-bottom: @line-height-computed;
   }
   .list-unstyled {
+    .sidebar-item{
+      border-bottom: 0px solid !important;
+    }
     li {
       border-bottom: 1px solid;
       border-bottom-color: @management-objects-list-border;
-      padding: 8px;
+      // padding: 8px;
     }
   }
   .empty {
@@ -149,12 +153,51 @@ kbn-management-advanced {
   }
 }
 
+kbn-management-objects-edit,
+kbn-management-objects-edit-v2,
 kbn-management-objects-view {
   label {
     font-family: @font-family-monospace;
   }
   .ace_editor { height: 300px; }
 }
+
+.ccccc{
+  .ace_editor { height: 300px; }
+}
+
+div[window-class="modal-class"]{
+  .modal-lg{
+        width: 98%;
+        // max-width: 1024px;
+  }
+}
+
+div[window-class="modal-class-expression"],
+div[window-class="modal-class-custom"]{
+  .modal-lg{
+        width: 70%;
+        // max-width: 1024px;
+  }
+  .row{
+    margin-left: 0;
+    margin-right:0;
+  }
+}
+
+div[window-class="modal-class-ranges"],
+div[window-class="modal-class-thresholds"],
+div[window-class="modal-class-enumeration"]{
+  .modal-lg{
+        width: 50%;
+        // max-width: 1024px;
+  }
+  .row{
+    margin-left: 0;
+    margin-right:0;
+  }
+}
+
 
 .advanced-settings {
   overflow-x: scroll;

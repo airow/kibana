@@ -83,6 +83,16 @@ module.exports = async function (kbnServer, server, config) {
   });
 
   server.route({
+    path: "/frameset",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.view('frameset', {
+        kibanaPayload: { basePath: config.get('server.basePath') }
+      });
+    }
+  });
+
+  server.route({
     path: "/config",
     method: 'GET',
     handler: function (req, reply) {
@@ -95,6 +105,14 @@ module.exports = async function (kbnServer, server, config) {
     method: 'GET',
     handler: function (req, reply) {
       return reply.redirect(`/app/kibana#/management/kibana/objects?_a=(tab:${req.params.tab})`);
+    }
+  });
+
+  server.route({
+    path: "/management",
+    method: 'GET',
+    handler: function (req, reply) {
+      return reply.redirect("app/kibana#/teld_management/kibana/indices");
     }
   });
 

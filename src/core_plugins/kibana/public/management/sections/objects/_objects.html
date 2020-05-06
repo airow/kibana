@@ -1,5 +1,5 @@
 <kbn-management-app section="kibana">
-  <kbn-management-objects class="container-fluid">
+  <kbn-management-objects class="container-fluid1">
     <div class="header">
       <h2 class="title">Edit Saved Objects</h2>
       <button class="btn btn-default controls" ng-click="exportAll()"><i aria-hidden="true" class="fa fa-download"></i> Export Everything</button>
@@ -13,10 +13,13 @@
       From here you can delete saved objects, such as saved searches. You can also edit the raw data of saved objects. Typically objects are only modified via their associated application, which is probably what you should use instead of this screen. Each tab is limited to 100 results. You can use the filter to find objects not in the default list.
     </p>
     <form role="form">
-      <input aria-label="Filter" ng-model="advancedFilter" class="form-control span12" type="text" placeholder="Filter"/>
+      <input aria-label="Filter" ng-keydown="filterkeydown($event,advancedFilter)" ng-model="advancedFilter" class="form-control span11" type="text" placeholder="Filter"/>
+      <button ng-click="refreshDataByFilter(advancedFilter)" class="btn btn-default" style="float: right; position: relative; top: -33px;" aria-label="Edit">
+        <i aria-hidden="true" class="fa fa-search"></i>
+      </button>
     </form>
 
-    <ul class="nav nav-tabs">
+    <ul ng-hide="services.length===1" class="nav nav-tabs">
       <li class="kbn-management-tab" ng-class="{ active: state.tab === service.title }" ng-repeat="service in services">
         <a title="{{ service.title }}" ng-click="changeTab(service)">{{ service.title }}
           <small>
@@ -25,50 +28,53 @@
         </a>
       </li>
     </ul>
+    <ul class="nav nav-tabs">
+      <li class="kbn-management-tab" ng-hide="state.tab!=='searches' && state.tab!=='visualizations'" ng-class="{ active: state.service === service }"
+        ng-repeat="service in folder">
+        <a title="{{ service }}" ng-click="state.service=service">{{ service }}
+        </a>
+      </li>
+    </ul>
     <div class="tab-content">
       <div class="action-bar">
         <label>
-          <input type="checkbox" ng-checked="currentTab.data.length > 0 && selectedItems.length == currentTab.data.length" ng-click="toggleAll()" />
+          <input type="checkbox" ng-checked="currentTab.data.length > 0 && selectedItems.length == currentTab.data.length"
+            ng-click="toggleAll()" />
           Select All
         </label>
-        <!-- 
-        <a ng-disabled="selectedItems.length == 0"
-          confirm-click="bulkDelete()"
-          confirmation="Are you sure you want to delete the selected {{currentTab.title}}? This action is irreversible!"
-          class="btn btn-xs btn-danger" aria-label="Delete"><i aria-hidden="true" class="fa fa-trash"></i> Delete</a>-->
-        <a ng-disabled="selectedItems.length == 0"
-          ng-click="bulkExport()"
-          class="btn btn-xs btn-default" aria-label="Export"><i aria-hidden="true" class="fa fa-download"></i> Export</a>
+        <!--
+                          <a ng-disabled="selectedItems.length == 0"
+                            confirm-click="bulkDelete()"
+                            confirmation="Are you sure you want to delete the selected {{currentTab.title}}? This action is irreversible!"
+                            class="btn btn-xs btn-danger" aria-label="Delete"><i aria-hidden="true" class="fa fa-trash"></i> Delete</a>-->
+        <a ng-disabled="selectedItems.length == 0" ng-click="bulkExport()" class="btn btn-xs btn-default"
+          aria-label="Export"><i aria-hidden="true" class="fa fa-download"></i> Export</a>
       </div>
       <div ng-repeat="service in services" ng-class="{ active: state.tab === service.title }" class="tab-pane">
         <ul class="list-unstyled">
-          <li class="item" ng-repeat="item in service.data | orderBy:'title'">
+          <li class="item" ng-repeat="item in service.data | orderBy:'title' | filterPlan:state.service==='公有方案':editingId">
             <div class="actions pull-right">
-              <button
-                ng-click="edit(service, item)"
-                class="btn btn-default"
-                aria-label="Edit">
+              <button ng-click="edit(service, item)" class="btn btn-default" aria-label="Edit">
                 <span class="sr-only">Edit</span>
                 <i aria-hidden="true" class="fa fa-pencil"></i>
               </button>
 
-              <button
-                ng-click="open(item)" ng-if='item.url'
-                class="btn btn-info"
-                aria-label="Hide">
+              <button ng-click="editJson(service, item)" class="btn btn-default" aria-label="Edit">
+                <span class="sr-only">JOSN</span>
+                <i aria-hidden="true" class="fa fa-file-text-o"></i>
+              </button>
+
+              <button ng-click="open(item)" ng-if='item.url' class="btn btn-info" aria-label="Hide">
                 <span class="sr-only">Hide</span>
                 <i aria-hidden="true" class="fa fa-eye"></i>
               </button>
             </div>
 
             <div class="pull-left">
-              <input
-                ng-click="toggleItem(item)"
-                ng-checked="selectedItems.indexOf(item) >= 0"
-                type="checkbox" >
+              <input ng-click="toggleItem(item)" ng-checked="selectedItems.indexOf(item) >= 0" type="checkbox">
             </div>
 
-            <div class="item-title">              
+            <div class="item-title">
               <a ng-click="edit(service, item)">{{ item.title }}</a>
               <i ng-show="item.uiConf.owner && item.uiConf.owner.UserId">&nbsp;&nbsp;By:{{item.uiConf.owner.UserName}}</i>
             </div>

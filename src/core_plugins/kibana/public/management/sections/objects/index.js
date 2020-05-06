@@ -1,6 +1,8 @@
 import management from 'ui/management';
 import 'plugins/kibana/management/sections/objects/_view';
 import 'plugins/kibana/management/sections/objects/_objects';
+import 'plugins/kibana/management/sections/objects/_edit';
+import 'plugins/kibana/management/sections/objects/_edit_v2';
 import 'ace';
 import 'ui/directives/confirm_click';
 import uiModules from 'ui/modules';
@@ -9,7 +11,7 @@ import uiModules from 'ui/modules';
 uiModules.get('apps/management');
 
 management.getSection('kibana').register('objects', {
-  display: 'Saved Objects',
+  display: '查询方案',
   order: 10,
   url: '#/management/kibana/objects'
 });
