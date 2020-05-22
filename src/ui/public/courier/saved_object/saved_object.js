@@ -19,11 +19,14 @@ import MappingSetupProvider from 'ui/utils/mapping_setup';
 import DocSourceProvider from '../data_source/doc_source';
 import SearchSourceProvider from '../data_source/search_source';
 
+import ClusterGroupProvider from './cluster_group';
+
 export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notifier, safeConfirm, indexPatterns) {
 
   let DocSource = Private(DocSourceProvider);
   let SearchSource = Private(SearchSourceProvider);
   let mappingSetup = Private(MappingSetupProvider);
+  let ClusterGroup = Private(ClusterGroupProvider);
 
   function SavedObject(config) {
     if (!_.isObject(config)) config = {};
@@ -344,6 +347,21 @@ export default function SavedObjectFactory(es, kbnIndex, Promise, Private, Notif
     };
 
     self.saveSource = function (source) {
+      debugger;
+      return new ClusterGroup().isMaster().then(function (isMaster) {
+        if (isMaster) {
+          return self.saveSource_original(source);
+        } else {
+          alert('当前为备用集群，不支持保存操作，稍后再试。');
+        }
+      }, function () {
+        alert('当前为备用集群，不支持保存操作，稍后再试。');
+      }).catch(() => {
+        alert('保存失败，请稍后再试！');
+      });
+    };
+
+    self.saveSource_original = function (source) {
       let finish = function (id) {
         self.id = id;
         return es.indices.refresh({
