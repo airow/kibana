@@ -14,8 +14,8 @@ export default (grunt) => {
 
   async function archives({ name, buildName, zipPath, tarPath }) {
     if (/windows/.test(name)) {
-      //await exec('zip', ['-rq', '-ll', zipPath, buildName]);
-      await exec('C:\\Program Files\\7-Zip\\7z', ['a', zipPath, "kibana"]);
+      await exec('zip', ['-rq', '-ll', zipPath, buildName]);
+      // await exec('C:\\Program Files\\7-Zip\\7z', ['a', zipPath, "kibana"]);
     } else {
       await exec('tar', ['-zchf', tarPath, buildName]);
     }

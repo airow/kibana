@@ -25,6 +25,6 @@ module.exports = function (grunt) {
       ],
       dest: 'build/kibana',
       expand: true
-    },
+    }
   };
 };

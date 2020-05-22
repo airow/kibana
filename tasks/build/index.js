@@ -10,6 +10,7 @@ module.exports = function (grunt) {
         '_build:extractNodeBuilds',
       ],
       'copy:devSource',
+      '_conf:ClusterGroup',
       'babel:build',
       '_build:babelOptions',
       '_build:plugins',
@@ -21,7 +22,7 @@ module.exports = function (grunt) {
       '_build:removePkgJsonDeps',
       'clean:testsFromModules',
       'run:optimizeBuild',
-      //'stop:optimizeBuild',
+      'stop:optimizeBuild',
       // '_build:versionedLinks',
       // '_build:osShellScripts',
       grunt.option('remove-config') ? ['_build:removeConfig'] : [],
@@ -55,8 +56,10 @@ module.exports = function (grunt) {
       'clean:testsFromModules',
       'run:optimizeBuild',
       //'stop:optimizeBuild',
-      // '_build:versionedLinks',
-      // '_build:osShellScripts',
+      grunt.option('skip-archives') ? [] : [
+        '_build:versionedLinks',
+        '_build:osShellScripts'
+      ],
       grunt.option('remove-config') ? ['_build:removeConfig'] : [],
       grunt.option('skip-archives') ? [] : ['_build:archives'],
       grunt.option('skip-os-packages') ? [] : [
