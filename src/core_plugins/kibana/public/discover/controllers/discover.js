@@ -940,10 +940,13 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     if (!$scope.opts.timefield) return Promise.resolve();
 
     if ($scope.vis) {
-      // const visState = $scope.vis.getEnabledState();
-      // // visState.aggs = visStateAggs;
-
-      // $scope.vis.setState(visState);
+      const visState = $scope.vis.getEnabledState();
+      let date_histogram = _.find(visState.aggs, { type: "date_histogram" })
+      if (date_histogram && date_histogram.params.interval != $state.interval) {
+        date_histogram.params.interval = $state.interval;
+        // // visState.aggs = visStateAggs;
+        $scope.vis.setState(visState);
+      }
       return Promise.resolve($scope.vis);
     }
 
