@@ -1,6 +1,6 @@
 <div class="form-group">
   <label>
-    Interval
+    {{ "Interval" | translate }}
     <kbn-info
       ng-show="agg.buckets.getInterval().scaled"
       placement="right"
@@ -16,7 +16,7 @@
     ng-options="opt as opt.display for opt in aggParam.options.raw | filter: optionEnabled"
     class="form-control"
     name="interval">
-    <option value="">-- select a valid interval --</option>
+    <option value="">-- {{ "select a valid interval" | translate }} --</option>
   </select>
   <input
     type="text"

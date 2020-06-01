@@ -21,7 +21,7 @@
               ng-class="{'is-vis-editor-sub-nav-link-selected': sidebar.section == 'data'}"
               ng-click="sidebar.section='data'"
             >
-              Data
+              {{ 'Data' | translate }}
             </a>
           </li>
           <li ng-class="{active: sidebar.section == 'options'}">
@@ -30,7 +30,7 @@
               ng-class="{'is-vis-editor-sub-nav-link-selected': sidebar.section == 'options'}"
               ng-click="sidebar.section='options'"
             >
-              Options
+              {{ 'Options' | translate }}
             </a>
           </li>
         </ul>

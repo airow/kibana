@@ -8,11 +8,11 @@
   <div class="vis-option-item">
     <label>
       <input type="checkbox" ng-model="vis.params.setYExtents">
-      Set Y-Axis Extents
+      {{ "Set Y-Axis Extents" | translate }}
     </label>
     <div ng-if="vis.params.setYExtents">
       <label>
-        y-max
+        {{ "y-max" | translate }}
         <input name="yMax"
                class="form-control"
                type="number"
@@ -22,10 +22,10 @@
                ng-required="vis.params.setYExtents">
       </label>
       <div ng-show="vis.params.yAxis.min >= vis.params.yAxis.max">
-        <span class="text-danger">Max must be greater than min</span>
+        <span class="text-danger">{{ "Max must be greater than min" | translate }}</span>
       </div>
       <label>
-        y-min
+        {{ "y-min" | translate }}
         <input name="yMin"
                class="form-control"
                type="number"
@@ -37,18 +37,18 @@
       </label>
     </div>
     <div ng-show="vis.params.setYExtents && vis.params.scale === 'log' && vis.params.yAxis.min <= 0">
-      <span class="text-danger">Min must exceed 0 when a log scale is selected</span>
+      <span class="text-danger">{{ "Min must exceed 0 when a log scale is selected" | translate }}</span>
     </div>
     <div class="vis-option-item">
       <label>
         <input type="checkbox" ng-model="vis.params.defaultYExtents" ng-disabled="vis.params.setYExtents">
-        Scale Y-Axis to Data Bounds
+        {{ "Scale Y-Axis to Data Bounds" | translate }}
       </label>
     </div>
     <div class="vis-option-item">
       <label>
         <input type="checkbox" ng-model="vis.params.orderBucketsBySum">
-        Order buckets by descending sum
+        {{ "Order buckets by descending sum" | translate }}
       </label>
     </div>
   </div>

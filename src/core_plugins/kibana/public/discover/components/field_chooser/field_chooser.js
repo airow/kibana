@@ -204,6 +204,7 @@ app.directive('discFieldChooser', function ($location, globalState, config, $rou
           };
         }
 
+        // debugger;
         return '#/visualize/create?' + $.param(_.assign(_.clone($location.search()), {
           indexPattern: $scope.state.index,
           type: type,
@@ -214,10 +215,11 @@ app.directive('discFieldChooser', function ($location, globalState, config, $rou
               type: type,
               aggs: [
                 agg,
-                {schema: 'metric', type: 'count', 'id': '2'}
+                { schema: 'metric', type: 'count', 'id': '2' }
               ]
             }
-          })
+          }),
+          backward: $location.path()
         }));
       };
 

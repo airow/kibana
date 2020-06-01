@@ -184,3 +184,23 @@ app.directive('goToConfig', function () {
     }
   };
 });
+
+app.directive('goToBackward', function ($location) {
+  return {
+    restrict: 'E',
+    scope: {
+      target: '@'
+    },
+    template: '<a ng-if="show" ng-click="backward()" style="margin-left:6px;"><i style="padding-right: 5px;" class="fa fa-backward" aria-hidden="true"></i>{{title}}</a>',
+    link: function ($scope, $element) {
+      $scope.backward = function () {        
+        $location.path($location.search().backward);
+      };
+
+      $scope.show = false === _.isEmpty($location.search().backward);
+      if ($scope.show) { 
+        $scope.title = _.last(($location.search().backward || "").split("/"));
+      }      
+    }
+  };
+});

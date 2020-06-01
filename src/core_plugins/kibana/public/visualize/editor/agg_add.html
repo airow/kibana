@@ -1,5 +1,5 @@
 <div ng-show="add.form" class="vis-editor-agg-add-schemas">
-  <label>Select {{ groupName }} type</label>
+  <label>{{ "Select $groupName type" | translate:{ groupName: groupName } }}</label>
   <ul class="form-group list-group list-group-menu">
     <li
       ng-hide="schema.deprecate"
@@ -20,13 +20,13 @@
 
   <div ng-if="!add.form">
     <div class="btn btn-sm btn-primary" ng-if="groupName !== 'buckets' || !stats.count && !stats.deprecate">
-      Add {{ groupName }}
+      {{ 'Add $groupName' | translate:{ groupName: groupName } }}
     </div>
     <div class="btn btn-sm btn-primary" ng-if="groupName === 'buckets' && stats.count > 0 && !stats.deprecate">
-      Add sub-{{ groupName }}
+      {{ 'Add sub $groupName' | translate:{ groupName: groupName } }}
     </div>
   </div>
   <div class="btn btn-sm btn-primary" ng-if="add.form">
-    Cancel
+    {{ "Cancel" | translate }}
   </div>
 </div>

@@ -1,11 +1,11 @@
 <div class="form-group">
   <label for="field">
-    Field
+    {{ "Field" | translate }}
   </label>
 
   <span class="pull-right text-warning hintbox-label" ng-show="agg.params.field.analyzed"
       ng-click="showAnalyzedFieldWarning = !showAnalyzedFieldWarning">
-    <i class="fa fa-warning"></i> Analyzed Field
+    <i class="fa fa-warning"></i> {{ "Analyzed Field" | translate }}
   </span>
   <div class="hintbox" ng-show="showAnalyzedFieldWarning && agg.params.field.analyzed">
     <p>
@@ -13,11 +13,11 @@
     </p>
 
     <p ng-show="indexedFields.byName[agg.params.field.name + '.keyword'].analyzed == false">
-      <strong>Tip:</strong> <i>{{agg.params.field.name + '.keyword'}}</i> may be a non analyzed version of this field.
+      <strong>Tip:</strong> <i>{{agg.params.field.name + '.keyword'}}</i> {{ "may be a non analyzed version of this field" | translate }}.
     </p>
 
     <p ng-show="indexedFields.byName[agg.params.field.name + '.raw'].analyzed == false">
-      <strong>Tip:</strong> <i>{{agg.params.field.name + '.raw'}}</i> may be a non analyzed version of this field.
+      <strong>Tip:</strong> <i>{{agg.params.field.name + '.raw'}}</i> {{ "may be a non analyzed version of this field" | translate }}.
     </p>
   </div>
 
@@ -35,7 +35,7 @@
   <div class="hintbox" ng-if="!indexedFields.length">
     <p>
       <i class="fa fa-danger text-danger"></i>
-      <strong>No Compatible Fields:</strong> The "{{ vis.indexPattern.id }}" index pattern does not contain any of the following field types: {{ agg.type.params.byName.field.filterFieldTypes | commaList:false }}
+      <strong>{{ "No Compatible Fields" | translate }} :</strong> The "{{ vis.indexPattern.id }}" index pattern does not contain any of the following field types: {{ agg.type.params.byName.field.filterFieldTypes | commaList:false }}
     </p>
   </div>
 

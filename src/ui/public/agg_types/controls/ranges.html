@@ -1,10 +1,10 @@
 <table class="vis-editor-agg-editor-ranges form-group" ng-show="agg.params.ranges.length">
   <tr>
     <th>
-      <label>From</label>
+      <label>{{ "From" | translate }}</label>
     </th>
     <th colspan="2">
-      <label>To</label>
+      <label>{{ "To" | translate }}</label>
     </th>
   </tr>
 
@@ -41,12 +41,12 @@
 <div class="hintbox" ng-show="aggForm.rangeLength.$invalid">
   <p>
     <i class="fa fa-danger text-danger"></i>
-    <strong>Required:</strong> You must specify at least one range.
+    <strong>Required:</strong> {{ "You must specify at least one range" | translate }}.
   </p>
 </div>
 
 <div
   ng-click="agg.params.ranges.push({})"
   class="sidebar-item-button primary">
-  Add Range
+  {{ "Add Range" | translate }}
 </div>
