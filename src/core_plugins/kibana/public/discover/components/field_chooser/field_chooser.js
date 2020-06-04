@@ -209,6 +209,7 @@ app.directive('discFieldChooser', function ($location, globalState, config, $rou
           indexPattern: $scope.state.index,
           type: type,
           _a: rison.encode({
+            columns: $scope.state.columns || [],
             filters: $scope.state.filters || [],
             query: $scope.state.query || undefined,
             vis: {
