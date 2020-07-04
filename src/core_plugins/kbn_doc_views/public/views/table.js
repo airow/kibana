@@ -15,11 +15,19 @@ docViewsRegistry.register(function () {
         filter: '=',
         columns: '='
       },
-      controller: function ($scope) {
+      controller: function ($scope) {        
+
         $scope.mapping = $scope.indexPattern.fields.byName;
         $scope.flattened = $scope.indexPattern.flattenHit($scope.hit);
         $scope.formatted = $scope.indexPattern.formatHit($scope.hit);
         $scope.fields = _.keys($scope.flattened).sort();
+
+        let columnConf = _.get($scope, '$parent.$parent.savedObj.uiConf.columnConf', {});
+        let colms = _.map(_.filter(columnConf, item => { return item.disable !== true }), 'fieldName');
+        _.each(colms, function (fieldName) {
+          debugger;
+          $scope.formatted[fieldName] = "" + $scope.flattened[fieldName];
+        });
 
         $scope.toggleColumn = function (fieldName) {
           _.toggleInOut($scope.columns, fieldName);
