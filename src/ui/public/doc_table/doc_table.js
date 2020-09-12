@@ -95,6 +95,15 @@ uiModules.get('kibana')
           return style;
         }
 
+        $scope.selectedID;
+        $scope.selectRow = function (row) {
+          if ($scope.selectedID === row._id) {
+            delete $scope.selectedID;
+          } else {
+            $scope.selectedID = row._id;
+          }
+        }
+
         // This exists to fix the problem of an empty initial column list not playing nice with watchCollection.
         $scope.$watch('columns', function (columns) {
           if (columns.length !== 0) return;
