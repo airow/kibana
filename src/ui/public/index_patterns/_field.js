@@ -128,6 +128,29 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
       } else {
         obj.writ('isQueryStringField');
       }
+
+      //2020-09-16 字段是否可用
+
+      function genExtVal(fieldVal, specVal) {
+        var val = fieldVal;
+        if (specVal !== undefined && fieldVal !== specVal) {
+          val = specVal;
+        }
+        return val;
+      }
+
+      if (originalField) {
+        // var disable = originalField.disable;
+        // if (spec.disable !== undefined && disable !== spec.disable) {
+        //   disable = spec.disable;
+        // }
+        // obj.fact('disable', disable);
+
+        // setExtVal(obj, 'disable', originalField.disable, spec.disable);
+        obj.fact('disable', genExtVal(originalField.disable, spec.disable));
+        // obj.fact('disable', genExtVal(indexPattern.fields.byName[spec.name].disable, spec.disable));
+      }
+
     }
     obj.writ('count', spec.count || 0);
 

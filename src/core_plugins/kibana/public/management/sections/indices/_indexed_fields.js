@@ -25,6 +25,7 @@ uiModules.get('apps/management')
           { title: 'name' },
           { title: 'alias' },
           { title: 'authObjs' },
+          { title: 'disable' },
           { title: 'qsField', info: '???query_string.fields??' },
           { title: 'type' },
           { title: 'format' },
@@ -65,6 +66,10 @@ uiModules.get('apps/management')
               {
                 markup: `<span>${field.authObjs || ''}</span>`,
                 value: field.authObjs
+              },
+              {
+                markup: field.disable ? yesTemplate : noTemplate,
+                value: field.disable
               },
               {
                 markup: field.isQueryStringField ? yesTemplate : noTemplate,

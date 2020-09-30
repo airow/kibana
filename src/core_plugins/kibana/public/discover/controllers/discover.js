@@ -910,6 +910,11 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       .set('dpfilter', getDataPermFilter())
       .set('advancedSearch', esQueryDSL);
 
+    //存在禁用的字段时，只返回有效字段
+    if (_.size($scope.excludes) > 0) {
+      let includes = _.map(_.filter($scope.indexPattern.fields, item => { return item.disable != true; }), 'name')
+      $scope.searchSource.source({ excludes: [], includes: includes });
+    }
     //$scope.advancedSearch = advancedSearch2UiBind(temp, advancedSearch.getFieldSource($scope.indexPattern));
 
     if (config.get('doc_table:highlight')) {
@@ -1024,10 +1029,12 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
     });
     return Promise.resolve($scope.vis);
   }
-
+  // $scope.excludes
   function resolveIndexPatternLoading() {
     const props = $route.current.locals.ip;
     const loaded = props.loaded;
+    let fields = savedSearch.searchSource.get('index').fields;
+    $scope.excludes = fields.remove('disable'); //不可用字段
     const stateVal = props.stateVal;
     const stateValFound = props.stateValFound;
 

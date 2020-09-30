@@ -142,9 +142,10 @@ uiModules.get('apps/management')
         $scope.title = service.type;
 
         $scope.checkFieldAllowEdit = function (fieldName) {
-          let returnValue = service.Class && service.Class.allowEdit;
-          returnValue = returnValue || $filter('startsWith')(fieldName, 'uiConf.');
-          return returnValue;
+          // let returnValue = service.Class && service.Class.allowEdit;
+          // returnValue = returnValue || $filter('startsWith')(fieldName, 'uiConf.');
+          // return returnValue;
+          return true;
         }
 
         $scope.allowEdit = function () {
