@@ -31,10 +31,12 @@ uiModules.get('apps/management')
     return function (input, isPublic, indexPatternId) {
       if (indexPatternId) {
         input = _.filter(input, item => {
-          let searchSourceJSON = item.kibanaSavedObjectMeta.searchSourceJSON;
-          if (searchSourceJSON) {
-            let searchSource = JSON.parse(searchSourceJSON);
-            return searchSource.index === indexPatternId;
+          if (item.kibanaSavedObjectMeta) {
+            let searchSourceJSON = item.kibanaSavedObjectMeta.searchSourceJSON;
+            if (searchSourceJSON) {
+              let searchSource = JSON.parse(searchSourceJSON);
+              return searchSource.index === indexPatternId;
+            }
           }
           return true;
         });

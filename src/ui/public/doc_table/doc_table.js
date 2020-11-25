@@ -98,7 +98,7 @@ uiModules.get('kibana')
         $scope.selectedID;
         $scope.selectRow = function (row) {
           if ($scope.selectedID === row._id) {
-            delete $scope.selectedID;
+            // delete $scope.selectedID;
           } else {
             $scope.selectedID = row._id;
           }

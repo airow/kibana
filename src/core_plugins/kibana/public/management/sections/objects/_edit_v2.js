@@ -174,6 +174,17 @@ uiModules.get('apps/management')
                   'url': '#/visualize/edit/{visualize name} 或 #/discover/{discover name}',
                   'disabled': true
                 };
+                let linksSchema = {
+                  'display': '显示的名称',
+                  'url': '#/visualize/edit/{visualize name} 或 #/discover/{discover name}',
+                  'disabled': true,
+                  'params': { "pick": [], "omit": [] }
+                };
+                let linksItemsSchema = {
+                  'display': '显示的名称',
+                  'items': [linksSchema],
+                  'disabled': true,
+                };
                 let authObjSchema = { disable: true, '绑定字段': ['授权对象名称'] };
                 let columnConfSchema = {
                   "rowStyle": false,
@@ -211,7 +222,8 @@ uiModules.get('apps/management')
                 };
                 /** 默认显示配置项 */
                 let uiConfDefault = {
-                  showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], authObj: [authObjSchema], navigation: [navigationSchema],
+                  showTimeDiagram: true, menus: [], pageSize: 100, sizeRange: [], authObj: [authObjSchema],
+                  navigation: [navigationSchema], links: [linksSchema, linksItemsSchema],
                   columnConf: [columnConfSchema],
                   timefilter: angular.toJson(timefilterSchema)
                 };

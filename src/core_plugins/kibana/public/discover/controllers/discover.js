@@ -43,6 +43,7 @@ import 'plugins/kibana/advanced_search/services/advanced_search';
 import 'plugins/kibana/advanced_search/state/teld_state';
 import 'plugins/kibana/aggs_conf/state/teld_aggs_state';
 import 'plugins/kibana/navigation/directives/navigation';
+import 'plugins/kibana/links_navigation/directives/navigation';
 import 'plugins/kibana/backend_export/directives/backend_export';
 import getAuthObjValue from 'plugins/kibana/extension/teld_auth_obj';
 
@@ -283,11 +284,38 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
   console.log(savedSearch.uiConf);
   //$scope.topNavMenu = getTopNavMenu(savedSearch.menus);
-  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus);
+  // savedSearch.uiConf.links = [
+  //   {
+  //     "display": "系统运行日志-ALL",
+  //     "url": "#/discover/SYS-运行日志-ALL",
+  //     "disabled": false
+  //   },
+  //   {
+  //     display: "asdf", items: [{
+  //       "display": "系统运行日志-ALL",
+  //       "url": "#/discover/SYS-运行日志-ALL",
+  //       "disabled": false
+  //     }, {
+  //       "display": "系统运行日志-ALL",
+  //       "url": "#/discover/SYS-运行日志-ALL",
+  //       "disabled": false
+  //     }]
+  //   },
+  //   {
+  //     display: "asdfwww", items: [{
+  //       "display": "系统运行日志-ALL",
+  //       "url": "#/discover/SYS-运行日志-ALL",
+  //       "disabled": false
+  //     }]
+  //   }];
+  let extendConf = {};
+  if (savedSearch.uiConf.links) { extendConf.links = _.filter(savedSearch.uiConf.links, link => link.disabled !== true) }
+  $scope.topNavMenu = getTopNavMenu(savedSearch.uiConf.menus, extendConf);
 
   $scope.uiConf = savedSearch.uiConf;
   $scope.aggsResult = [];
-  function getTopNavMenu(menuKeys) {
+  function getTopNavMenu(menuKeys, extendConf) {
+    let links = {};
     let confTopNavMenu = {
       "help": {
         key: '帮助',
@@ -349,6 +377,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         },
         testId: 'discoverNavigationButton',
       },
+      'links': links,
       'aggs': {
         key: '聚合',
         description: '聚合',
@@ -378,6 +407,42 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
       }
     });
 
+    _.keys(extendConf).forEach(function (value) {
+      let confMenu = confTopNavMenu[value];
+      if (confMenu) {
+        menus.push(confMenu);
+      }
+    });
+    menus = _.union(menus);
+
+    debugger;
+    //配置了links，替换掉占位符
+    let index = _.indexOf(menus, links);
+    if (extendConf && extendConf.links) {
+      [].splice.apply(menus, [index + 1, 0].concat(extendConf.links.map(item => {
+        if (item.items) {
+          return {
+            key: item.display,
+            description: item.display,
+            template: `<teld-links-navigation saved-object="opts.savedSearch" find-key={{'${item.display}'}} on-choose="linkOnChoose"></teld-links-navigation>`,
+            run: function (menuItem, kbnTopNav) {
+              kbnTopNav.toggle(menuItem.key);
+            },
+            testId: 'discoverNavigationButton',
+          };
+        } else {
+          return {
+            key: item.display,
+            description: item.display,
+            run: function (menuItem, kbnTopNav) {
+              $scope.linkOnChoose(item);
+            }
+          }
+        }        
+      })));
+    }
+    menus.splice(index, 1);
+
     if (_.includes(menuKeys, 'backendexport') && _.includes(menuKeys, 'export')) {
       _.remove(menus, { testId: 'discoverExportButton' });
     }
@@ -393,6 +458,32 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
 
     return menus;
   }
+
+  $scope.linkOnChoose = function (item) {
+    if (_.startsWith("#", item.url)) {
+      kbnUrl.changeAttchState(item.url.substr(1), [new TeldState()]);
+    } else {
+      debugger;
+      var openUrl = item.url;
+      if (item.params) {
+        var params = _.omit($route.current.params, ['id']);
+        if (_.size(item.params.pick) > 0) params = _.pick(params, item.params.pick);
+        if (_.size(item.params.omit) > 0) params = _.omit(params, item.params.omit);
+        if (params._ts) {
+          var _ts = rison.decode(params._ts);
+          if (_ts.s) {
+            delete _ts.s;
+            params._ts = rison.encode(_ts);
+          }
+        }
+        var urlParams = _.transform(params, (r, v, k) => { r.push(`${k}=${v}`) }, []);
+        if (_.size(urlParams) > 0) {
+          openUrl = _.template(openUrl)({ urlParams: urlParams, urlParamsString: urlParams.join("&") });
+        }
+      }
+      window.open(openUrl, item.display);
+    }
+  };
 
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
