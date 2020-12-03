@@ -441,7 +441,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
         }        
       })));
     }
-    menus.splice(index, 1);
+    if (index !== -1) { menus.splice(index, 1); }
 
     if (_.includes(menuKeys, 'backendexport') && _.includes(menuKeys, 'export')) {
       _.remove(menus, { testId: 'discoverExportButton' });
@@ -481,7 +481,7 @@ function discoverController($http, $scope, $rootScope, config, courier, $route, 
           openUrl = _.template(openUrl)({ urlParams: urlParams, urlParamsString: urlParams.join("&") });
         }
       }
-      window.open(openUrl, item.display);
+      window.open(openUrl, item.display + moment().valueOf());
     }
   };
 
