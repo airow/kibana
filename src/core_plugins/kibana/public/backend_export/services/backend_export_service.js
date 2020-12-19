@@ -25,15 +25,28 @@ module.service('backendExportService', function ($http, kbnIndex) {
     if (false === _.isUndefined(timeFieldName)) {
       docvalue.push(timeFieldName);
     }
+    
     flatSource.body._source = [].concat(docvalue, savedObject.columns);
-    flatSource.body._source = _.uniq(flatSource.body._source);
+    flatSource.body._source = _.uniq(flatSource.body._source);   
+    
+    let obj = {
+      userId: 'userId',
+      index: flatSource.index.id,
+      queryJson: JSON.stringify(flatSource.body)
+    };
+
+    const aliasFields = _.filter(ip.fields, 'alias');
+    if (_.size(aliasFields) > 0) {
+      const aliasMapping = _.transform(aliasFields, (result, value) => {
+        return result[value.displayName] = value.alias
+      }, {});
+      if (_.isEmpty(aliasMapping) === false) {
+        obj.alias = JSON.stringify(aliasMapping);
+      }
+    }
 
     return $http.post(this.url + '/export',
-      {
-        userId: 'userId',
-        index: flatSource.index.id,
-        queryJson: JSON.stringify(flatSource.body)
-      },
+      obj,
       {
         transformRequest: function (obj) {
           var str = [];
