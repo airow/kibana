@@ -6,6 +6,11 @@ export default function discoverExportExcelService(Private, Promise) {
 
   function exportExcel(indexPattern, columns, savedSearch, rows) {
 
+    const aliasFields = _.filter(indexPattern.fields, 'alias');
+    const aliasMapping = _.transform(aliasFields, (result, value) => {
+      return result[value.displayName] = value.alias
+    }, {});
+
     function createSummaryRow(row) {
 
       // We just create a string here because its faster.
@@ -18,7 +23,8 @@ export default function discoverExportExcelService(Private, Promise) {
 
       columns.forEach(function (column) {
         //exportRow.push({ text: _displayField(row, column, true) });
-        exportRow[column] = getFiled(row, column, true);
+        var columnName = aliasMapping[column] || column;
+        exportRow[columnName] = getFiled(row, column, true);
       });
 
       return exportRow;
